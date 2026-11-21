@@ -45,36 +45,21 @@ requirements unless the user explicitly requests a complete document normalizati
 
 ---
 
-## Mandatory Skill: Grilling
+## Mandatory Skill: Interview
 
-Interview the user relentlessly until shared understanding is achieved. Map the product as a
-design tree: every decision branches into the decisions that depend on it.
+Follow [`interview-prompt.md`](interview-prompt.md): it defines the decision tree, the
+rounds, the question format, how answers are handled and the stop condition. This prompt
+supplies what the protocol asks from its caller:
 
-Work the tree in rounds:
-
-- The frontier is every decision whose prerequisites are already settled.
-- Ask the whole frontier in one round, numbering each question and giving a recommendation.
-- Format every round as:
-
-  ```yaml
-  ❓ **Q1** - **<question title>**: <question body, including choices when useful>
-
-  ➡️ <recommended answer>
-
-  ---
-
-  ❓ **Q2** - **<question title>**: <question body>
-
-  ➡️ <recommended answer>
-  ```
-
-- Wait for the user's answers before recomputing the next frontier.
-- Research facts in files, code, designs, tools or the internet before asking about them. Perform
-  repository research directly; do not delegate it to subagents.
-- Keep decisions with the user; record decisions, dependencies and unresolved assumptions.
-- Challenge contradictions, risks and scope creep.
-- When the frontier is empty, present the shared understanding and ask for explicit confirmation.
-- Do not create or update the PRD until the user confirms the shared understanding.
+- **Subject:** the product or feature the PRD describes.
+- **Minimum coverage:** the topics of `## Decision Tree` below, unless the materials already
+  resolve them.
+- **Impact dimensions:** scope, actors, capabilities and their dependencies, user journeys,
+  permissions and delivery risk.
+- **Record:** the PRD sections that hold decisions, assumptions and discarded alternatives,
+  including `Discarded during definition`.
+- **Gate:** do not create or update the PRD until the user confirms the shared understanding
+  (see `## Mandatory Confirmation`).
 
 ---
 
@@ -190,8 +175,9 @@ Do not ask questions about items already resolved in the materials or by the use
 
 ## Question Format
 
-Use the YAML-style grilling format defined in `Mandatory Skill: Grilling`. Ask every currently
-unblocked frontier question in the same round; do not ask one question per message.
+Use the question format and the rounds defined in [`interview-prompt.md`](interview-prompt.md):
+at most three questions per round, taken from the frontier, each with lettered options and one
+marked recommendation.
 
 ---
 
