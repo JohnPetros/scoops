@@ -79,3 +79,6 @@ apps/web/.playwright-cli
 .env.testing
 .env.staging
 .env.production
+
+# Doop snapshot read by check:design
+.design-snapshot/
