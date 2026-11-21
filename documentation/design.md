@@ -4,7 +4,7 @@
 
 Scoops Product Design Guide. Aligns tokens, components and screen patterns for consistency between modules (Auth, Inventory, Sales, BI, Billing).
 
-Sources: Global CSS of the app, reference **Purple Stream** and screens drawn with Pencil.
+Sources: Global CSS of the app, reference **Purple Stream** and screens drawn on the Doop canvas.
 
 ---
 
@@ -550,7 +550,7 @@ Operational app surfaces retain the neutral treatment above. The landing uses Ma
 −0.03em), with intrinsic height and 24px desktop / 12px narrow outer margins. Its
 order preview contains labeled illustrative data and is a static image. Controls
 remain keyboard accessible; white focus outlines contrast against the deep-purple
-surface. See the saved public-landing-hero design handoff for measured layout values.
+surface. See the `Identity / Landing / Desktop` and `Identity / Landing / Mobile` frames for measured layout values.
 
 The hero uses an animated mesh gradient inspired by the supplied NestJS reference:
 near-black `--landing-ink: #08050D`, organic purple regions derived from existing

@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Publish or update a Scoops delivery pull request with GitHub Issue and SDD traceability, current validation evidence, and saved design-reference coverage.
+description: Publish or update a Scoops delivery pull request with GitHub Issue and SDD traceability, current validation evidence, and Doop frame coverage.
 ---
 
 # Create or Update a Pull Request
@@ -135,29 +135,25 @@ When HTTP routes are affected, include the matching `.rest` files in that scope 
 confirm their route/example parity is recorded in Evaluation. Do not omit a REST-client file
 from the delivery diff merely because it is manually executed or not compiled by the workspace.
 
-Use `design/handoff.md` for new design bundles. If an existing feature bundle lacks
-it, read its legacy `design/manifest.md` instead; preserve that legacy artifact and
-do not create both files.
+For design-backed UI, use the Doop frames named in the Spec's Design Contract and reuse the
+recorded independent comparison for every frame and every required supplemental frame:
 
-For design-backed UI, use the saved Spec design bundle—not live Pencil—and reuse the recorded independent
-comparison for every supplied screenshot and every required supplemental screenshot:
-
-- route/state and exact saved reference path or source node ID from `design/handoff.md`;
+- route/state and the exact Doop frame name (page and name) from the Design Contract;
 - target viewport;
 - Playwright CLI manual result;
 - implementation screenshot/comparison path;
-- one direct comparison for each supplied and required supplemental reference, recording
+- one direct comparison for each frame, recording
   structure, content, hierarchy, spacing, dimensions, tokens, interaction/state and responsive
   differences;
 - accessibility/DOM observations and resolved visual findings.
 
-The visual evidence must enumerate every supplied screenshot and every required supplemental
-screenshot suggested by the Spec creator or added to close a documented state/viewport gap. Each
-entry must name the original reference, exact viewport/state, transient implementation capture
+The visual evidence must enumerate every Doop frame in the Design Contract, including those
+added to close a documented state/viewport gap. Each
+entry must name the frame, exact viewport/state, transient implementation capture
 or CI artifact identifier and direct comparison result, including missing, extra, altered or
 mismatched elements. Do not publish a
-design-backed PR when a required reference lacks an independent comparison or when a required
-supplemental screenshot decision remains unresolved.
+design-backed PR when a required frame lacks an independent comparison or when a required
+supplemental frame decision remains unresolved.
 
 Review migrations, generated artifacts and lockfile changes when affected. Do not claim a
 check, manual flow, review or deployment that was not observed. For server-backed or database

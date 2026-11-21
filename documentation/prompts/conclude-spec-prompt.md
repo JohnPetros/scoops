@@ -48,7 +48,7 @@ according to the change. Delivery PRs must be ready for review; verify `isDraft:
    such classified inventory exists, record the structural checker as not applicable. Do not
    invent an internal file inventory to satisfy the tool. This check never replaces semantic
    acceptance evidence.
-4. Verify migrations, generated artifacts, saved design references and affected documentation.
+4. Verify migrations, generated artifacts, the Design Contract's Doop frames and affected documentation.
    For every affected HTTP route group, verify its matching
    `apps/server/rest-client/<module>/<route-group>.rest` file is scoped and route-complete with
    current parameters, headers, representative bodies and reusable non-secret variables.

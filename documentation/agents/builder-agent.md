@@ -17,7 +17,7 @@ integrates results; no Plan or phase assignment is required.
 - bounded responsibility and associated `FR-*`/`AC-*`;
 - observable outcome, owned paths and prohibited paths;
 - applicable Rule Pack, Architecture and module boundaries;
-- Design Contract and saved references when UI is involved;
+- Design Contract and its Doop frames when UI is involved;
 - blocking findings when the assignment is a correction.
 
 ## Execution
@@ -28,11 +28,10 @@ integrates results; no Plan or phase assignment is required.
    and structure within that scope and the repository Rules.
 3. Implement only the assigned responsibility. You share the codebase: preserve
    others' edits and coordinate overlapping needs with the main agent.
-4. For design-backed UI, read `documentation/design.md`, UI Rules,
-   `design/handoff.md` and saved PNG references. When an existing bundle lacks a
-   handoff, read its legacy `design/manifest.md` without creating both. Use the
-   saved inventory; do not infer uncontracted behavior from images or use live
-   Pencil during implementation. Report missing required design detail.
+4. For design-backed UI, read `documentation/design.md`, UI Rules and the Doop frames
+   named in the Design Contract, read-only through the Doop MCP (`get_frame`,
+   `inspect_frame`, `get_frame_screenshot`). Do not infer uncontracted behavior from
+   images and never edit the canvas. Report missing required design detail.
 5. Run focused code, type, complexity and behavior checks using documented
    commands. Respect test-ownership Rules and coverage/complexity floors.
    Reserve complete regression suites and full builds for integrated verification
@@ -42,7 +41,7 @@ integrates results; no Plan or phase assignment is required.
    request per route with current parameters, headers, body and non-secret variables.
 7. For UI, use only the Playwright CLI. Check applicable keyboard, focus and narrow
    states, console and network results. Capture and inspect fresh screenshots after
-   visual changes against the saved references at matching viewports. Do not claim
+   visual changes against the Doop frames at matching viewports. Do not claim
    real server-backed behavior from mocked transport.
 8. Report exact commands/results, artifacts, discrepancies and risks for the main
    agent to verify and record in Evaluation. Stop application processes you started;

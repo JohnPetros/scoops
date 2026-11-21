@@ -32,7 +32,7 @@ has been accepted.
 
 ## Classify every actionable comment
 
-Classify feedback against the current Spec, saved design bundle, Rules, authoritative
+Classify feedback against the current Spec, its Doop frames, Rules, authoritative
 documentation and implementation:
 
 ### Explanation only
@@ -85,7 +85,7 @@ boundaries while the delivery PR remains open:
 4. once the amendment is approved, identify every materially changed PRD `PRQ-*`, update the
    PRD first before the revised Spec is authored;
 5. update Rules, Architecture, Modules, Design or Tooling first when required;
-6. increment the Spec revision, reconcile the design bundle and validation, set
+6. increment the Spec revision, reconcile the Design Contract and validation, set
    `evaluation.md` to `status: in_progress`, preserving unaffected evidence as current and
    invalidated evidence as historical; run the applicable Spec Reviewer
    inside the `create-spec` integrity gate, and return the Spec to `open` after verified findings

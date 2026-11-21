@@ -2,7 +2,7 @@ Guidance for AI coding agents working in this repository (Scoops).
 
 ## Tool availability and usage
 
-The development environment uses Pencil and Context7 MCP servers. Use an MCP when
+The development environment uses Doop and Context7 MCP servers. Use an MCP when
 the task matches its purpose; do not invoke one when local source, repository
 documentation, and normal validation commands are sufficient. Use the Playwright
 CLI for all browser interaction, inspection and validation; do not use
@@ -12,7 +12,8 @@ CLI for all browser interaction, inspection and validation; do not use
 
 When the grilling protocol is being applied, do not use the question tool
 (`request_user_input`) to ask the user questions. Ask any needed questions through
-the conversation in accordance with the grilling protocol.
+the conversation in accordance with the grilling protocol defined in
+[`documentation/prompts/interview-prompt.md`](documentation/prompts/interview-prompt.md).
 
 ## Parallel work and subagents
 
@@ -28,58 +29,66 @@ such as `checkout-flow-tester`, `catalog-schema-explorer`, or
 `auth-api-builder`; do not use generic names such as `worker`, `agent`, or
 `subagent`.
 
-### Pencil MCP
+### Doop MCP
 
-Use Pencil for `.pen` files, Pencil node inspection or editing, design-system
-work, design-to-code implementation, and visual validation tied to a Pencil
-design.
+Use the Doop MCP for the `Scoops` canvas: frame inspection or editing,
+design-system work, component and token reading, design-to-code implementation, and
+visual validation tied to those designs. Drawing or changing frames follows the
+`design` workflow and critiquing them the `review-design` workflow.
 
-Before another Pencil operation, call `mcp__pencil__get_editor_state` with
-`include_schema: true` when the current editor state and schema are not already
-known. Treat `.pen` files as encrypted design documents: never read, search, or
-modify them with shell commands or generic filesystem tools. Use only Pencil MCP
-operations for their contents.
+- Work only through the Doop MCP. The Doop canvas `Scoops`
+  (https://doop.design/c/ams11lLQ8a) is the visual source; follow
+  [`documentation/rules/doop-rules.md`](documentation/rules/doop-rules.md) for pages,
+  frame names and components.
+- Pass an `agent_name` on every Doop call. Read `get_guide` with the topic
+  `doop-instructions` once per session, and with the topic `components` before the
+  first component change of a task. Confirm with `get_canvas` that the connected
+  canvas is `Scoops`; the account may have other canvases.
+- Locate pages and frames by name instead of hardcoding IDs.
+- Use the canvas's components (`list_components`) and tokens (`get_tokens`), do
+  not change existing components without a request, and verify every change by
+  capturing the affected frames with `get_frame_screenshot`.
+- Draw a dialog as a standalone frame, never as a full page with a backdrop.
+- Check frames with `pnpm run check:design` (see
+  [`documentation/tooling.md`](documentation/tooling.md)); it reads a saved snapshot,
+  not the live canvas.
 
-Before modifying a Pencil design, classify the request as either a visual-only
-change or a product-behavior change. A change to actors, permissions, workflow,
-states, validation, scope or business outcomes is a product-behavior change.
+Before modifying a Doop frame, classify the request as either a visual-only change or a
+product-behavior change. A change to actors, permissions, workflow, states, validation,
+scope or business outcomes is a product-behavior change.
 
 For a product-behavior change requested outside an active Spec:
 
-1. Pause the Pencil edit and read the affected module PRD.
+1. Pause the frame edit and read the affected module PRD.
 2. Identify the current PRD statement, the proposed change and its product
    impact; ask concise product questions for any unresolved behavior.
 3. Present the proposed PRD amendment and obtain explicit user approval.
-4. Update the PRD first, then reread it before editing Pencil.
-5. Apply and visually validate the approved Pencil change.
+4. Update the PRD first, then reread it before editing the frames.
+5. Apply and visually validate the approved frame change.
 
 Do not create or reopen a Spec solely for an out-of-Spec design request. If the
-change is later selected for implementation, create the normal issue and Spec
-from the updated PRD and Pencil design; `create-spec` then captures the required
-frame screenshots and manifest. When a Spec is already active, use its contract
-amendment workflow instead. Visual-only changes do not require a PRD amendment,
-but must remain consistent with the current PRD and Design documentation.
+change is later selected for implementation, create the normal issue and Spec from the
+updated PRD and the Doop frames; the Spec's Design Contract names the frames. When a
+Spec is already active, use its contract amendment workflow instead. Visual-only changes
+do not require a PRD amendment, but must remain consistent with the current PRD and
+Design documentation.
 
-When implementing a Pencil design:
+When implementing a design from the Doop canvas:
 
 1. Read `documentation/design.md` and the applicable UI rules first.
-2. Inspect the relevant Pencil nodes and reusable design-system components.
-3. Map Pencil values to existing Scoops tokens instead of introducing parallel
+2. Inspect the named frames and the canvas components and tokens through the Doop MCP.
+3. Map the frame's values to existing Scoops tokens instead of introducing parallel
    hardcoded colors, spacing, typography, radii, or shadows.
 4. Implement the smallest coherent screen or component boundary.
 5. Validate the result with the Playwright CLI when the application can be run
    locally.
-6. After an approved Pencil update, treat the affected design as an
-   implementation change when production code is in scope: trace the changed
-   nodes to their owning source paths, update the corresponding UI, routes,
-   behavior and tests in the same task, and validate the runtime result against
-   the updated Pencil reference. Do not finish with only a `.pen` change when
-   the request includes implementation changes. If the Pencil update changes
-   product behavior, use the active Spec amendment and PRD workflow before
-   editing production code.
-
-Use the Pencil design skill whenever a task involves a Pencil workflow and that
-skill is available in the current agent environment.
+6. After an approved frame update, treat the affected design as an implementation
+   change when production code is in scope: trace the changed frames to their owning
+   source paths, update the corresponding UI, routes, behavior and tests in the same
+   task, and validate the runtime result against the updated frame. Do not finish with
+   only a frame change when the request includes implementation changes. If the frame
+   update changes product behavior, use the active Spec amendment and PRD workflow
+   before editing production code.
 
 ### Context7 MCP
 
@@ -194,6 +203,63 @@ Route or transport mocks are acceptable for isolated tests, but they must not be
 presented as evidence that a real authenticated or server-backed integration
 works. Use `pnpm --filter web test:integration` for the repository's committed
 Playwright test suite.
+
+## Skills
+
+### Third-party skills
+
+The third-party skills pinned in `skills-lock.json` live in `.agents/skills/` (ignored by
+Git, with links under `.claude/skills/`) and are restored with `pnpm skills`; change the
+set with `pnpm dlx skills add` or `remove`, which update the lock file. Invoke the skill
+whose purpose matches the task instead of working from memory; the project workflows under
+`documentation/prompts/` and the rules in this file take precedence over a skill's generic
+advice.
+
+| Skill               | Use when                                                                                      | Project notes                                                                                           |
+| ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `impeccable`        | Designing, critiquing, auditing or refining UI: hierarchy, type, color, layout, copy, motion. | In Doop work, use it through `/design` and `/review-design`; its `critique` runs only through them.     |
+| `frontend-design`   | Choosing an aesthetic direction for new UI or a reshaped one.                                 | `documentation/design.md` and the Doop canvas decide; use it only where they leave the direction open.  |
+| `accessibility`     | WCAG 2.2 audits and fixes: contrast, keyboard, focus, screen readers.                         | For Doop frames, `pnpm run check:design --rule contrast` covers contrast (it reads a saved snapshot).   |
+| `performance`       | Load speed, bundle size, caching and rendering cost.                                          |                                                                                                         |
+| `core-web-vitals`   | LCP, INP and CLS problems.                                                                    |                                                                                                         |
+| `best-practices`    | Security, compatibility and code-quality review of web code.                                  | Follow the repository Rules first; the skill's generic advice never overrides them.                     |
+| `seo`               | Meta tags, structured data, sitemaps and search visibility.                                   |                                                                                                         |
+| `web-quality-audit` | A combined audit of performance, accessibility, SEO and best practices.                       |                                                                                                         |
+| `playwright-cli`    | Driving a real browser: exploration, inspection, diagnosis and one-off tasks.                 | Follow the Playwright CLI section above for environments, accounts and credentials.                     |
+| `gh-cli`            | GitHub operations through `gh`: issues, Pull Requests, CI checks and releases.                | Pull Requests follow the `create-pr` workflow.                                                          |
+
+### Project workflow skills
+
+The project's own workflows are the prompts in `documentation/prompts/`. They are the only
+source: `node ./scripts/sync-commands.mjs` (`pnpm sync:commands`) turns each prompt into a
+skill (`.agents/skills/<name>/SKILL.md`) and a slash command (`.claude/commands`,
+`.cursor/commands`, `.opencode/commands`), where `<name>` is the file name without a
+trailing `-prompt`. The agent definitions in `documentation/agents/*-agent.md` become
+subagents through `scripts/sync-agents.mjs` (`pnpm sync:agents`); `pnpm sync` runs both.
+
+- Edit the prompt or agent definition and re-run the sync; never edit the generated files,
+  which are ignored by Git and overwritten on the next sync.
+- Every prompt needs a one-line `description` in its frontmatter; the script fails without
+  it, and it is what makes the skill discoverable. The skill name comes from the file name,
+  not from a `name` field. An agent definition needs a `name` equal to its file name.
+- When a task matches a workflow below, invoke that skill instead of working from memory.
+  These workflows take precedence over the third-party skills above;
+  [SDD Workflow](documentation/sdd.md) defines how the SDD ones chain together.
+- A workflow that is missing for a recurring task is a gap: ask before adding a prompt.
+
+| Group         | Skills                                                                                 | Use when                                                                       |
+| ------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Issues        | `create-feat-issue`, `create-bug-issue`, `create-refactor-issue`                       | Creating a scoped GitHub issue from a requirement, failure or technical debt.  |
+| PRD           | `create-prd`                                                                           | Researching, creating or refining a module PRD.                                |
+| Design        | `design`, `review-design`                                                              | Drawing the Doop frames a PRD needs, or critiquing existing frames.            |
+| SDD delivery  | `interview`, `create-spec`, `implement-spec`, `conclude-spec`                          | Specifying, implementing and closing a feature delivery.                       |
+| Bugs          | `create-bug-report`                                                                    | Diagnosing a GitHub bug issue into an evidence-based report.                   |
+| Git and PRs   | `commit-code`, `create-pr`, `resolve-pr-feedback`, `create-release-pr`                 | Committing, publishing a PR, resolving review feedback and releasing.          |
+| Tests         | `increase-test-coverage`                                                               | Raising coverage with behavior-focused tests without weakening baselines.      |
+
+The table groups the prompts for orientation; `documentation/prompts/` is the complete and
+current list. Skill names follow the file names, so `create-feat-issue` has no `-prompt`
+suffix to strip.
 
 ## Required reading
 

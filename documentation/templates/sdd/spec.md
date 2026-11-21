@@ -46,12 +46,13 @@ execution order. Use create-spec for clarification and independent review before
 
 ### Design Contract
 
-<!-- Include for design-backed UI. Use existing design/manifest.md only when handoff.md
-does not exist. Saved reference images are durable; implementation captures are transient. -->
+<!-- Include for design-backed UI. The design source is the Doop canvas `Scoops`; do not save
+design screenshots or a handoff file. Implementation captures are transient. -->
 
-**Saved references:** [Design handoff](./design/handoff.md).
+**Doop frames:** <page / frame name, `updatedAt` when authored, and the state and viewport each
+covers; frame inventory per the create-spec Design Contract>.
 
-**Required states and viewports:** <reference-backed states, responsive behavior,
+**Required states and viewports:** <frame-backed states, responsive behavior,
 accessibility and permitted deviations, mapped to AC IDs>.
 
 ## 3. Technical Contract
@@ -160,7 +161,7 @@ browser work; mocked transport does not prove real server-backed integration. --
 
 - **Acceptance:** <AC IDs>.
 - **Prerequisites:** <services/health checks, accounts, data and starting route/state>.
-- **Viewport and reference:** <dimensions and applicable saved reference>.
+- **Viewport and frame:** <dimensions and applicable Doop frame>.
 
 1. <Action with accessible locator or control name>.
 2. <Keyboard path and relevant state-changing action>.
@@ -169,7 +170,7 @@ browser work; mocked transport does not prove real server-backed integration. --
 focus/accessibility, console and failed-request checks>.
 
 **Capture and comparison:** <fresh screenshot in ignored test-results/ or CI artifacts,
-mapped saved reference and comparison obligation; record actual path/result in Evaluation>.
+mapped Doop frame and comparison obligation; record actual path/result in Evaluation>.
 
 **Cleanup:** <task-owned processes and temporary state>.
 

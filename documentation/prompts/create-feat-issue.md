@@ -143,7 +143,7 @@ Use the following structure:
 
 <Prose paragraphs, not bullets: the applications and modules to change, the included
 product behavior, important business, technical, design or integration constraints, the
-design references with the exact Pencil file and node IDs when supplied, and the PRD wording
+design references with the exact Doop page and frame names when supplied, and the PRD wording
 the delivery must update. Close by stating that detailed architecture decisions and
 contracts are defined in the Spec.>
 
@@ -169,7 +169,7 @@ current screenshots with the referenced design.>
 - Journeys: <Journey letters and names, when applicable>
 - Milestone: <GitHub link to the applicable milestone>
 - Dependency: <module, issue or contract the delivery relies on, when applicable>
-- Design: <Pencil file path and node IDs, or link, when applicable>
+- Design: <Doop page and frame names, or link, when applicable>
 
 ## 🚫 Out of Scope
 
@@ -182,8 +182,8 @@ the solution; the Spec owns layer-by-layer contracts, file choices, runtime
 flows, and detailed validation commands. Omit optional traceability lines and
 criteria that do not apply. Keep acceptance criteria observable and testable,
 end each with the PRD requirement and journey it traces to, and separate
-required behavior from implementation ideas. When the request supplies Pencil
-design references, place the exact file path and node IDs in the Delivery Scope
+required behavior from implementation ideas. When the request supplies Doop
+design references, place the exact page and frame names in the Delivery Scope
 paragraphs; the Traceability section repeats them as supporting context.
 
 ## Scope rules
@@ -198,7 +198,7 @@ paragraphs; the Traceability section repeats them as supporting context.
   and other business decisions.
 - Do not add unrelated cleanup, speculative future work, or unrequested
   dependencies.
-- When Pencil file or node references are supplied, preserve them exactly and
+- When Doop page or frame references are supplied, preserve them exactly and
   include them in the Delivery Scope rather than only listing them under
   Traceability.
 - Do not claim that a requirement is implemented; this prompt only creates the issue.

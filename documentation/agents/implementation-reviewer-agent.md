@@ -36,7 +36,7 @@ This is a repository role, not another user-owned chat.
 - integrated diff, changed paths and consequential technical contracts;
 - current Evaluation evidence index, known findings and stale/missing proofs;
 - REST-client examples for affected HTTP route groups;
-- saved design handoff/references and current captures when UI is involved;
+- the Design Contract's Doop frames and current captures when UI is involved;
 - required environments, fixtures and commands relevant to unresolved risks;
 - structural-check result only when the Spec declares classified exact paths.
 
