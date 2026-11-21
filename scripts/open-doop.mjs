@@ -1,7 +1,6 @@
-// Opens Penpot in a dedicated Chrome instance whose tabs never sleep, so the
-// Penpot MCP plugin keeps its connection.
-// Usage: node scripts/open-penpot.mjs [url]
-// It always uses the Scoops profile, which keeps its own Penpot login.
+// Opens Doop in a dedicated Chrome instance whose tabs never sleep.
+// Usage: node scripts/open-doop.mjs [url]
+// It always uses the Scoops profile, which keeps its own Doop login.
 import { execFileSync, spawn } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
@@ -9,7 +8,7 @@ import path from 'node:path'
 import { setTimeout as sleep } from 'node:timers/promises'
 import { fileURLToPath } from 'node:url'
 
-const defaultUrl = 'https://design.penpot.app'
+const defaultUrl = 'https://doop.design/c/ams11lLQ8a'
 const profileName = 'Scoops'
 const keepAwakeFlags = [
   '--disable-background-timer-throttling',

@@ -659,9 +659,8 @@ fallback.
 stale managed definitions, and generates matching Codex, Claude Code, and OpenCode agent
 configuration.
 
-`open-penpot.mjs` (`pnpm penpot [url]`) opens Penpot in a dedicated Chrome profile with
-background throttling disabled so the Penpot MCP plugin keeps its connection. See
-[`penpot-rules.md`](rules/penpot-rules.md).
+`open-doop.mjs` (`pnpm doop [url]`) opens the Scoops Doop canvas in a dedicated Chrome
+profile with background throttling disabled. See [`doop-rules.md`](rules/doop-rules.md).
 
 `test:scripts` runs the tests under `scripts/tests` with Node's built-in test runner.
 

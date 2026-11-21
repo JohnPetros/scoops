@@ -4,7 +4,7 @@ import {
   filterInstances,
   isTransientInteropError,
   readUserDataDirectory,
-} from '../open-penpot.mjs'
+} from '../open-doop.mjs'
 
 test('readUserDataDirectory reads quoted and unquoted flags', () => {
   assert.equal(
