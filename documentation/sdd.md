@@ -306,10 +306,10 @@ With authorization to commit, push and publish:
 1. resolve every selected `PRQ-*` through FR/AC to evidence and classify it as fully
    delivered, partially delivered or deferred after local closure preflight and before the
    delivery commit;
-2. use `commit-code` for scoped commits, including delivery-owned Spec/Evaluation
+2. use `commit` for scoped commits, including delivery-owned Spec/Evaluation
    and required PRD changes; exclude inherited unrelated governance or user work
    unless explicitly authorized, recording its disposition;
-3. invoke `create-pr` when the delivery PR is missing or its publication details
+3. invoke `open-pr` when the delivery PR is missing or its publication details
    are stale; update the same PR and record its URL;
 4. publish the integrated implementation candidate and require every applicable
    checked-in GitHub Actions workflow to pass on that candidate PR head;
@@ -330,13 +330,13 @@ never reported as passed proof. Do not merge or deploy without an explicit reque
 | Workflow | Canonical source |
 | --- | --- |
 | Define product intent | [create-prd](./prompts/create-prd-prompt.md) |
-| Create feature Issue | [create-feat-issue](./prompts/create-feat-issue.md) |
-| Create refactor Issue | [create-refactor-issue](./prompts/create-refactor-issue-prompt.md) |
+| Open feature Issue | [open-feat-issue](./prompts/open-feat-issue-prompt.md) |
+| Open refactor Issue | [open-refactor-issue](./prompts/open-refactor-issue-prompt.md) |
 | Create or amend Spec | [create-spec](./prompts/create-spec-prompt.md) |
 | Implement and verify | [implement-spec](./prompts/implement-spec-prompt.md) |
 | Increase existing-behavior coverage | [increase-test-coverage](./prompts/increase-test-coverage-prompt.md) |
 | Publish and conclude | [conclude-spec](./prompts/conclude-spec-prompt.md) |
-| Create or update delivery PR | [create-pr](./prompts/create-pr-prompt.md) |
+| Create or update delivery PR | [open-pr](./prompts/open-pr-prompt.md) |
 | Resolve PR feedback | [resolve-pr-feedback](./prompts/resolve-pr-feedback-prompt.md) |
 
 Prompts and agent contracts inherit this workflow. `pnpm sync:commands` and

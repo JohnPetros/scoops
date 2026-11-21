@@ -1,9 +1,9 @@
 ---
-name: create-feat-issue
-description: Create a scoped GitHub feature issue from a product requirement or feature request.
+name: open-feat-issue
+description: Open a scoped GitHub feature issue from a product requirement or feature request.
 ---
 
-# Prompt: Create Feature Issue
+# Prompt: Open Feature Issue
 
 ## Objective
 

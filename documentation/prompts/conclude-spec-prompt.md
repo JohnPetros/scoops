@@ -102,8 +102,8 @@ from `implement-spec`. Diagnose repeated failures and change the approach before
 
 ## Publish the candidate
 
-Use `commit-code` for intentional scoped commits, including authorized PRD changes and
-all delivery-owned documentation. Then invoke `create-pr` to publish or update the same PR;
+Use `commit` for intentional scoped commits, including authorized PRD changes and
+all delivery-owned documentation. Then invoke `open-pr` to publish or update the same PR;
 never create a duplicate or bypass its metadata/traceability workflow. Inspect publication's
 resulting diff, base, head SHA and evidence freshness, especially after integration-base merges.
 An integration change invalidates only the checks whose claims it affects. Route required
@@ -143,7 +143,7 @@ the task while required checks are pending.
 
 On failure, record the observed cause and keep the Spec `in_progress`. Invoke `implement-spec`
 for an in-contract implementation or checked-in CI correction, or the amendment route for a
-Contract change. After Evaluation returns `ready`, use `commit-code` and `create-pr` to publish
+Contract change. After Evaluation returns `ready`, use `commit` and `open-pr` to publish
 the corrected candidate; do not publish a separate commit solely for the `ready` transition.
 Verify its new head and repeat the candidate gate. A same-SHA rerun is allowed only for a
 concretely documented transient infrastructure failure; wait for its terminal result. Repeat
@@ -174,8 +174,8 @@ canonical prompts or agent definitions with the documented repository commands w
 After implementation-candidate PR CI passes and no blocking finding remains, record those
 candidate gate results in Evaluation, set Evaluation and Spec `completed`, preserve the full Spec
 contract and detailed evidence, and add a concise outcome and Evaluation link. Publish these
-closure changes together in one scoped documentation commit with `commit-code`, then use
-`create-pr` to update the same PR. Require every applicable live check to pass on this final
+closure changes together in one scoped documentation commit with `commit`, then use
+`open-pr` to update the same PR. Require every applicable live check to pass on this final
 head. This batches the readiness evidence and completion record; it does not waive the final-head
 CI gate.
 

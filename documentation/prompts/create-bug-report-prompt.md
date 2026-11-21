@@ -40,7 +40,7 @@ from hypotheses and omit claims that cannot be supported by repository evidence.
 ## Workflow
 
 1. Require an existing GitHub bug issue. If none exists, stop and route intake through
-   `create-bug-issue`; do not create or update the issue from this workflow.
+   `open-bug-issue`; do not create or update the issue from this workflow.
 2. Separate the observed failure from expected product behavior.
 3. Link the report to the relevant PRD `PRQ-*` when the defect violates an existing product
    requirement. Do not amend the PRD unless intended product behavior changes.

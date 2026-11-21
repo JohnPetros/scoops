@@ -226,7 +226,7 @@ advice.
 | `seo`               | Meta tags, structured data, sitemaps and search visibility.                                   |                                                                                                         |
 | `web-quality-audit` | A combined audit of performance, accessibility, SEO and best practices.                       |                                                                                                         |
 | `playwright-cli`    | Driving a real browser: exploration, inspection, diagnosis and one-off tasks.                 | Follow the Playwright CLI section above for environments, accounts and credentials.                     |
-| `gh-cli`            | GitHub operations through `gh`: issues, Pull Requests, CI checks and releases.                | Pull Requests follow the `create-pr` workflow.                                                          |
+| `gh-cli`            | GitHub operations through `gh`: issues, Pull Requests, CI checks and releases.                | Pull Requests follow the `open-pr` workflow.                                                          |
 
 ### Project workflow skills
 
@@ -249,17 +249,16 @@ subagents through `scripts/sync-agents.mjs` (`pnpm sync:agents`); `pnpm sync` ru
 
 | Group         | Skills                                                                                 | Use when                                                                       |
 | ------------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Issues        | `create-feat-issue`, `create-bug-issue`, `create-refactor-issue`                       | Creating a scoped GitHub issue from a requirement, failure or technical debt.  |
+| Issues        | `open-feat-issue`, `open-bug-issue`, `open-refactor-issue`                             | Opening a scoped GitHub issue from a requirement, failure or technical debt.   |
 | PRD           | `create-prd`                                                                           | Researching, creating or refining a module PRD.                                |
 | Design        | `design`, `review-design`                                                              | Drawing the Doop frames a PRD needs, or critiquing existing frames.            |
 | SDD delivery  | `interview`, `create-spec`, `implement-spec`, `conclude-spec`                          | Specifying, implementing and closing a feature delivery.                       |
 | Bugs          | `create-bug-report`                                                                    | Diagnosing a GitHub bug issue into an evidence-based report.                   |
-| Git and PRs   | `commit-code`, `create-pr`, `resolve-pr-feedback`, `create-release-pr`                 | Committing, publishing a PR, resolving review feedback and releasing.          |
+| Git and PRs   | `commit`, `open-pr`, `resolve-pr-feedback`, `open-release-pr`                          | Committing, publishing a PR, resolving review feedback and releasing.          |
 | Tests         | `increase-test-coverage`                                                               | Raising coverage with behavior-focused tests without weakening baselines.      |
 
 The table groups the prompts for orientation; `documentation/prompts/` is the complete and
-current list. Skill names follow the file names, so `create-feat-issue` has no `-prompt`
-suffix to strip.
+current list. Skill names are the file names without the `-prompt` suffix.
 
 ## Required reading
 

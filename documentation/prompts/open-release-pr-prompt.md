@@ -1,8 +1,8 @@
 ---
-description: Prompt for creating release pull requests from develop to main via gh, using SemVer and release-ready notes.
+description: Prompt for opening release pull requests from develop to main via gh, using SemVer and release-ready notes.
 ---
 
-# Prompt: Create a Release PR
+# Prompt: Open a Release PR
 
 **Goal:** Standardize release Pull Requests from `develop` to `main`. The
 version and release notes must work with production deployment and GitHub

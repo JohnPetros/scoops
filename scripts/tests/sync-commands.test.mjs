@@ -20,11 +20,11 @@ test('sync-commands generates command and skill representations', async () => {
   })
 
   assert.match(stdout, /(?:linked|copied):/)
-  await assertFileExists(path.join(ROOT_DIR, '.cursor', 'commands', 'create-pr.md'))
+  await assertFileExists(path.join(ROOT_DIR, '.cursor', 'commands', 'open-pr.md'))
 
   const skill = await readFile(
-    path.join(ROOT_DIR, '.agents', 'skills', 'create-pr', 'SKILL.md'),
+    path.join(ROOT_DIR, '.agents', 'skills', 'open-pr', 'SKILL.md'),
     'utf8',
   )
-  assert.match(skill, /Auto-generated from documentation\/prompts\/create-pr-prompt\.md/)
+  assert.match(skill, /Auto-generated from documentation\/prompts\/open-pr-prompt\.md/)
 })

@@ -1,8 +1,8 @@
 ---
-description: Create a concise GitHub bug issue from an observed product or technical failure.
+description: Open a concise GitHub bug issue from an observed product or technical failure.
 ---
 
-# Prompt: Create Bug Issue
+# Prompt: Open Bug Issue
 
 ## Goal
 
