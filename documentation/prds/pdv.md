@@ -8,15 +8,17 @@ navigation entries: `New sale`, `Orders`, `Sales channels` and `Discounts`. The 
 them under non-interactive section labels, which are not parent groups.
 
 Operators find eligible products, configure size, brand, accompaniments and quantity, review
-the cart and register a definitive sale. Managers configure optional sales-channel percentage
-adjustments and fixed-price Combos. The system calculates prices and discounts, atomically
+the cart, record the order's payment method and register a definitive sale. The payment
+method is a recorded fact only; PDV does not process, confirm or reconcile payments. Managers
+configure optional sales-channel percentage adjustments and fixed-price Combos. The system calculates prices and discounts, atomically
 records the order and stock consumption, and preserves commercial snapshots for later history.
 
 Managers can also cancel any registered order through an explicit, one-way action. Cancellation
-preserves the original commercial history, atomically restores sale consumption whose current
-product and, when applicable, brand stock target still exists, records skipped restoration facts
-for deleted targets, records the cancellation facts and keeps the order available in history with
-a `Canceled` status.
+preserves the original commercial history and, for each sold line, either returns its consumption
+to stock or records it as a loss, as the Manager chooses. In one atomic transaction it restores
+returned consumption whose current product and, when applicable, brand stock target still exists,
+records skipped restoration facts for deleted targets, records loss and cancellation facts and
+keeps the order available in history with a `Canceled` status.
 
 ## 2. Problem and Opportunity
 
@@ -70,7 +72,7 @@ who need to assemble and record orders during service.
 
 - Chains and franchises that depend on advanced multi-store management.
 - Restaurants that need tables, controls, kitchen or bill division.
-- Operations that require cash, payment, tax issuance or operation
+- Operations that require cash management, payment processing, tax issuance or operation
   offline on first launch.
 
 ### Context of use
@@ -88,7 +90,7 @@ who need to assemble and record orders during service.
 - Automatically apply the best combination of eligible Combos.
 - Apply different prices per commercial context without duplicating products.
 - Avoid negative stock and partial write-offs.
-- Consult who registered a sale, when and for what amount.
+- Consult who registered a sale, when, for what amount and how it was paid.
 
 ### Jobs to Be Done
 
@@ -101,6 +103,8 @@ who need to assemble and record orders during service.
   inconsistent.
 - When I need to check a previous sale, I want to open its details,
   to view the data applied at the time of the order.
+- When the customer tells me how they will pay, I want to record the payment method on the
+  order, so that the team can later find the orders paid by each method.
 - When a channel ceases to exist, I want to be able to delete it without losing context
   of previous orders.
 - When I configure an offer with different products, I want to define a
@@ -252,17 +256,16 @@ PRQ-05.
 - **Unavailable products:** when revealed by a search, the card is disabled and identified with
   `Out of stock`, or with `No price` and the price line `Price not set`.
 - **Product added:** the card of a product present in the cart must display
-  the `Added` badge, remains visually distinct and cannot open a new
-  configuration.
+  the `Added` badge, remains visually distinct and can still open a new
+  configuration that creates an independent line while stock permits.
 - **Partial unavailability:** unavailable options must inform the reason.
 - **Initial empty state:** should guide product registration when not
   there are no eligible products.
 - **Empty search status:** should display `No products found` and allow
   Clear search and filters.
 - **Loading:** the grid must use skeletons or equivalent indicator.
-- **Action blocked:** unavailable or already added cards cannot open the
-  item configuration; for an added product, the interface must guide the
-  adjustment of configuration or quantity directly in the cart.
+- **Action blocked:** unavailable cards cannot open the item configuration;
+  an existing line's configuration or quantity is adjusted directly in the cart.
 - **Responsiveness:** the number of columns must adapt to the width
   available.
 - **Accessibility:** cards must be keyboard operable and communicate
@@ -376,8 +379,8 @@ and PRQ-13.
 **Consumes:** active channel configuration from PRQ-01, eligible product catalog from PRQ-02,
 configured Portion items from PRQ-03 and configured Resale items from PRQ-04.
 
-**Provides:** the current unpersisted cart, selected channel and configured line items consumed
-by PRQ-06, PRQ-07, PRQ-08 and PRQ-14.
+**Provides:** the current unpersisted cart, selected channel, selected payment method and
+configured line items consumed by PRQ-06, PRQ-07, PRQ-08 and PRQ-14.
 
 #### Capabilities
 
@@ -396,6 +399,18 @@ by PRQ-06, PRQ-07, PRQ-08 and PRQ-14.
   another.
 - **Removal:** removing an item recalculates the total immediately.
 - **Empty cart:** cannot be registered.
+- **Payment methods:** the order's payment method is one of a fixed list shared by every ice
+  cream shop: `Pix`, `Credit card`, `Debit card` and `Cash`. Methods cannot be created, edited
+  or disabled.
+- **Required payment method:** an order cannot be registered without exactly one payment method,
+  which covers the full order total. Split payment is not supported.
+- **No default method:** no payment method is selected automatically; a new or cleared cart
+  starts without one.
+- **Label only:** the payment method records how the customer paid. It does not change prices,
+  channel adjustments or Combo savings, and it does not start any payment processing,
+  confirmation, amount received or change calculation.
+- **Method preserved:** the selected method remains through item edits, channel changes,
+  recalculation, revalidation conflicts and failed registration attempts.
 - **Unreserved stock:** items in the cart do not block balance.
 - **Movement:** no write-off occurs before definitive registration.
 
@@ -420,17 +435,21 @@ by PRQ-06, PRQ-07, PRQ-08 and PRQ-14.
   unit prices and base line subtotals. Show the channel adjustment only in the
   order total composition; preserve server calculations and saved financial facts.
 - **Channel:** optional selection must remain visible during assembly.
+- **Payment method:** a required selector next to the channel selector must remain visible
+  during assembly, offering `Pix`, `Credit card`, `Debit card` and `Cash` with none selected.
 - **Empty state:** should display `Add products to start sale`.
 - **Output:** must warn that unregistered items will be lost.
 - **Feedback:** edits, removals and recalculations should update the interface
   immediately.
 - **Action blocked:** `Register order` is disabled when the cart
-  is empty or has an invalid configuration.
+  is empty, has an invalid configuration or has no payment method selected; the missing payment
+  method must be stated as a reason, not communicated by the disabled state alone.
 - **Narrow screens:** the cart can take on a dedicated panel, preserving
   access to total and main action.
 - **Accessibility:** quantity, editing and removal controls must have
   accessible names; the card's change to `Added` must be announced by
-  assistive technology.
+  assistive technology; the payment-method selector must have a label, expose its selected
+  option and be keyboard operable.
 
 ---
 
@@ -470,7 +489,8 @@ PRQ-09 and PRQ-14.
 
 - **Selector:** must offer active channels and the `No channel` option.
 - **Optionality:** the absence of a channel does not block the registration.
-- **Immediate feedback:** selection or exchange recalculates prices, subtotals and total.
+- **Immediate feedback:** selection or exchange recalculates the channel adjustment, Combo
+  savings and total; cart lines keep displaying base prices and base subtotals, following PRQ-05.
 - **Transparency:** must display the name and percentage of the selected channel.
 - **No channel:** must identify that base prices are being used.
 - **Loading:** the recalculation must have a visual state when it is not instantaneous.
@@ -563,10 +583,14 @@ registration-time cost facts consumed by PRQ-09.
 
 - **Mandatory confirmation:** the order cannot be registered by an action
   implicit.
-- **Summary:** must contain channel or `No channel`, number of items, Combos
+- **Summary:** must contain channel or `No channel`, payment method, number of items, Combos
   applied, economy and total.
 - **Final registration:** confirmation creates a completed order.
-- **No payment:** there is no payment step, cashier or change.
+- **Payment method recorded:** the order stores the selected payment method in the same atomic
+  transaction as the order and its stock consumption. A request without a valid payment method
+  is rejected by the server.
+- **No payment processing:** there is no payment processing, confirmation, cashier, amount
+  received or change; registration does not depend on any payment outcome.
 - **Atomic transaction:** order creation and stock issues occur at the same time
   transaction.
 - **Cost capture:** the final registration captures the current known MRP operating cost of every
@@ -582,7 +606,8 @@ registration-time cost facts consumed by PRQ-09.
   as the main reference.
 - **Immutability:** the order cannot be edited, reversed or deleted in MVP;
   cancellation follows PRQ-15 and does not alter preserved snapshots.
-- **Success:** clears the cart only after confirmation from the server.
+- **Success:** clears the cart, including the selected channel and payment method, only after
+  confirmation from the server.
 - **Failure:** does not create order or maintain any write-off.
 
 #### Experience
@@ -621,7 +646,11 @@ commercial, cancellation, cost, and cost-completeness facts.
 #### Capabilities
 
 - **General data:** identifier, sequence number, ice cream shop, date, time,
-  operator, quantity of items and total.
+  operator, payment method, quantity of items and total.
+- **Payment method snapshot:** the recorded payment method never changes after registration,
+  including after cancellation.
+- **Orders without payment method:** orders registered before payment methods were recorded
+  are explicitly identified as not informed; no method is inferred or backfilled for them.
 - **Channel snapshot:** original identifier, name and percentage, when
   selected.
 - **No channel:** must be explicitly persisted as no channel.
@@ -668,6 +697,7 @@ commercial, cancellation, cost, and cost-completeness facts.
 - **Readability:** history should show copied names, not identifiers
   technical identifiers.
 - **Missing channel:** should display `No channel`.
+- **Missing payment method:** should display `Not informed`.
 - **Values:** must display the actual values.
 - **Registration deleted:** should not generate missing item messages in the history.
 - **Error state:** failed to load details should allow retry without
@@ -693,9 +723,12 @@ PRQ-09 and establishment access from the Identity module.
 - **Sort:** most recent orders appear first.
 - **Period filter:** accepts start and end date.
 - **Channel filter:** accepts a specific channel or `No channel`.
+- **Payment-method filter:** accepts `Pix`, `Credit card`, `Debit card`, `Cash` or
+  `Not informed`.
 - **Search:** accepts an order sequence number or snapshotted product name and remains scoped to
   the current ice cream shop.
-- **Combined filters:** period and channel can be used simultaneously.
+- **Combined filters:** search, period, channel, payment method and status can be used
+  simultaneously.
 - **Scope of the Operator:** the Operator consults orders from the entire ice cream shop, not
   just their own.
 - **Loading:** must use pagination or incremental loading.
@@ -711,10 +744,10 @@ PRQ-09 and establishment access from the Identity module.
 
 #### Experience
 
-- **Filters:** search, period and channel must appear above the listing.
-- **Line:** must display number, date, time, operator, channel, number of items
+- **Filters:** search, period, channel, payment method and status must appear above the listing.
+- **Line:** must display number, date, time, operator, channel, payment method, number of items
   and total.
-- **Detail:** must present items, configurations, quantities, prices,
+- **Detail:** must present payment method, items, configurations, quantities, prices,
   subtotals, consumption and total.
 - **No channel:** must be filterable and displayed as `No channel`.
 - **Loading:** must use skeletons or equivalent indicator.
@@ -740,6 +773,9 @@ profiles, with all data isolated to the current establishment.
 
 **Consumes:** establishment, authentication and profile authorization facts from the Identity
 module.
+
+**Provides:** profile-gated navigation, management actions and cancellation authorization
+consumed by PRQ-01, PRQ-10, PRQ-13 and PRQ-15.
 
 #### Capabilities
 
@@ -938,6 +974,10 @@ PRQ-08 and PRQ-09.
 - **Tiebreaker:** combinations with the same total savings must prioritize,
   deterministically, the Combos created first.
 - **Positive savings:** a Combo is only applied when it reduces the order total.
+- **Channel-reduced savings:** activation checks savings against base prices (PRQ-13), while
+  application uses channel-adjusted prices. An active Combo is therefore not applied when a
+  negative channel percentage removes its savings; the cart continues without that discount and
+  without an error message.
 - **Mandatory application:** the Operator cannot manually remove a Combo
   eligible.
 - **Lines preserved:** the products remain in their original lines and
@@ -1020,8 +1060,8 @@ consumed by PRQ-10 and future operational history.
 - **Reason:** cancellation reason is optional; when supplied, it is preserved.
 - **Stock disposition:** before confirming cancellation, the Manager chooses for each sold order
   line whether its stock consumption is returned to stock or recorded as a loss. Each line
-  defaults to `Devolver ao estoque`, preserving the current behavior unless the Manager changes
-  it to `Registrar como perda`.
+  defaults to `Return to stock`, preserving the current behavior unless the Manager changes
+  it to `Record as loss`.
 - **Line scope:** a line's disposition applies to all stock consumption attributed to that sale
   line, including its product, brand and accompaniments when applicable.
 - **Atomic outcomes:** cancellation changes order status and metadata, restores the eligible
@@ -1040,7 +1080,8 @@ consumed by PRQ-10 and future operational history.
 - **One-way transition:** `Registered` -> `Canceled` only. Canceled orders cannot be edited,
   reactivated, canceled again or deleted.
 - **History preservation:** cancellation does not change original products, configurations,
-  quantities, channel, Combo facts, prices, totals or original consumption snapshots.
+  quantities, channel, payment method, Combo facts, prices, totals or original consumption
+  snapshots.
 - **No refunds:** cancellation does not refund or reverse payments in the MVP because payment
   is not part of PDV.
 - **Multi-tenancy:** cancellation is limited to orders in the current establishment.
@@ -1049,7 +1090,7 @@ consumed by PRQ-10 and future operational history.
 
 - **Detail action:** registered order details show `Cancel order` only to Managers.
 - **Confirmation:** dialog shows order number, date/time, item count, total, optional reason,
-  and a `Devolver ao estoque` / `Registrar como perda` choice for every sold order line. It
+  and a `Return to stock` / `Record as loss` choice for every sold order line. It
   warns that the order remains in history with status `Canceled` while products, channel and
   values remain preserved.
 - **Success:** details show `Canceled`, cancellation timestamp, canceling Manager, optional
@@ -1090,9 +1131,10 @@ operations.
 
 #### Experience
 
-- The successful order-registration view and order-detail pages offer `Imprimir pedido`.
-- The print representation includes the saved order identity, items, quantities, prices and
-  totals, along with the channel and lifecycle status when present.
+- The successful order-registration view and order-detail pages offer `Print order`.
+- The print representation includes the saved order identity, payment method or
+  `Not informed`, items, quantities, prices and totals, along with the channel and lifecycle
+  status when present.
 - The browser or operating-system print dialog lets the user choose the locally configured
   printer and print settings.
 - **Accessibility:** the print action has an accessible name, visible keyboard focus and
@@ -1103,6 +1145,8 @@ operations.
 ## 6. Product Dependency Graph
 
 An edge `A --> B` means B consumes a product capability or authoritative fact provided by A.
+PRQ-12 is a cross-cutting quality requirement that applies to every PDV area, so it neither
+provides nor consumes a capability and has no node.
 
 ```mermaid
 flowchart LR
@@ -1168,6 +1212,9 @@ flowchart LR
     R14 --> R09
     R08 --> R15
     R09 --> R15
+    R11 --> R01
+    R11 --> R10
+    R11 --> R13
     R11 --> R15
     R15 --> R10
     R15 --> Analytics
@@ -1236,8 +1283,8 @@ flowchart LR
 ### Journey E — Operator starts a new sale
 
 1. The Operator accesses `New sale`.
-2. The system presents the grid, search, filters, optional channel selector
-   and the cart is empty.
+2. The system presents the grid, search, filters, optional channel selector,
+   required payment-method selector with no method selected and the cart is empty.
 3. The system uses base prices while no channels are selected.
 4. The Operator searches or filters products.
 5. By default only sellable products are listed; a name search also shows matching
@@ -1279,7 +1326,7 @@ flowchart LR
 3. The Operator changes size, brand, toppings or quantity.
 4. The system recalculates price, consumption and subtotal.
 5. The Operator confirms:
-   - Success: Updates the only existing line for the product.
+   - Success: updates only the edited line; other lines of the same product are unchanged.
    - Failure: preserves the edit and reports the problem.
 6. The journey returns to the cart.
 
@@ -1302,28 +1349,31 @@ flowchart LR
 2. The system displays active channels and `No channel`.
 3. The Operator chooses an option.
 4. The system recalculates all paid components.
-5. The system updates prices, subtotals and total.
+5. The system updates the channel adjustment, Combo savings and total, while lines keep
+   displaying base prices.
 6. In case of failure, keep the previous selection and preserve the cart.
 7. The journey returns to the assembly.
 
 ### Journey K — Operator records an order
 
-1. The Operator selects `Register order`.
-2. The system revalidates channel, Combos, settings and stock.
-3. The system displays number of items, channel or `No channel`, Combos applied,
-   economy and total.
-4. Operator confirms `Register order`.
-5. The system executes in one transaction:
+1. The Operator selects `Pix`, `Credit card`, `Debit card` or `Cash` as the payment method;
+   while none is selected, `Register order` stays disabled and the reason is stated.
+2. The Operator selects `Register order`.
+3. The system revalidates channel, Combos, settings and stock.
+4. The system displays number of items, channel or `No channel`, payment method, Combos
+   applied, economy and total.
+5. Operator confirms `Register order`.
+6. The system executes in one transaction:
    - creation of the order;
    - generation of the sequential number;
-   - recording of snapshots;
+   - recording of snapshots, including the payment method;
    - recording of discounts and Combo links;
    - write-off of all stocks.
-6. The system displays `Order #<number> registered successfully`.
-7. The Operator can select `Imprimir pedido` to print a non-fiscal copy through the local
+7. The system displays `Order #<number> registered successfully`.
+8. The Operator can select `Print order` to print a non-fiscal copy through the local
    browser or operating-system print dialog.
-8. The system cleans the cart.
-9. The journey ends.
+9. The system cleans the cart, including the channel and payment method.
+10. The journey ends.
 
 ### Journey L — Channel changes during assembly
 
@@ -1372,13 +1422,13 @@ flowchart LR
 
 1. The user accesses `Orders`.
 2. The system displays the ice cream shop's most recent orders.
-3. The user searches by order number or snapshotted product name and filters by period and
-   channel, including `No channel`.
+3. The user searches by order number or snapshotted product name and filters by period,
+   channel, including `No channel`, payment method, including `Not informed`, and status.
 4. The system restarts and updates the listing.
 5. The user opens an order.
 6. The system presents complete snapshots of the sale, including Combos,
    economy and participating products.
-7. The user can select `Imprimir pedido` to print the saved non-fiscal order details through
+7. The user can select `Print order` to print the saved non-fiscal order details through
    the local browser or operating-system print dialog.
 8. Operators can view cancellation status and details; only Managers see the
    cancellation action for registered orders.
@@ -1392,8 +1442,8 @@ flowchart LR
    date, item count and total.
 3. The Manager selects `Cancel order`.
 4. The system opens a confirmation dialog with an optional reason and a
-   `Devolver ao estoque` / `Registrar como perda` choice for each sold order
-   line, defaulting each line to `Devolver ao estoque`. It explains that the
+   `Return to stock` / `Record as loss` choice for each sold order
+   line, defaulting each line to `Return to stock`. It explains that the
    order remains in history with status `Canceled`, while products, channel and
    values remain preserved.
 5. The Manager may change the stock outcome for any line, then confirms the
@@ -1403,15 +1453,23 @@ flowchart LR
    restoration skipped for a deleted target, and saves canceled status,
    timestamp, Manager and optional reason.
 7. Success: details show `Canceled` and cancellation metadata.
-8. Failure: order remains `Registered`, no partial stock restoration is
-   maintained, and the Manager can retry.
+8. Failure: order remains `Registered`, no partial stock restoration, loss record or
+   skipped-restoration record is maintained, and the Manager can retry.
 9. A canceled order cannot be edited, reactivated, canceled again or deleted.
 
 ---
 
 ## 8. Out of Scope
 
-- Methods of payment, cash, change, bleeding, supply and reconciliation.
+- Payment processing, Pix QR codes, payment providers, card terminals or payment confirmation;
+  the payment method is a recorded label only.
+- Amount received, change, cash drawer, bleeding, supply and reconciliation.
+- Split payment across more than one payment method in the same order.
+- Payment methods other than `Pix`, `Credit card`, `Debit card` and `Cash`, and any
+  Manager configuration of payment methods.
+- Surcharges or discounts by payment method.
+- Payment-method indicators in Analytics; the method is available in the order snapshot for a
+  future Analytics decision.
 - Payment refunds or payment reversals for canceled orders.
 - Editing or deleting registered orders.
 - Reactivation of canceled orders.
@@ -1439,19 +1497,22 @@ flowchart LR
   of the Sales module.
 - Tables, controls, kitchen, bill division and delivery.
 - Advanced multi-store management for chains and franchises.
-- Physical inventory, batches, validity, losses and waste.
+- Physical inventory, batches and validity.
+- Loss or waste recording outside order cancellation; PRQ-15 records losses only as a
+  per-line cancellation outcome.
 
 ### Discarded during definition
 
 - **Name `POS`:** replaced by `New sale`.
-- **Navigation group `Sales`:** discarded; `New Sale`, `Orders` and
-  `Sales channels` are independent inputs. Non-interactive section labels are allowed and are not
+- **Navigation group `Sales`:** discarded; `New sale`, `Orders`, `Sales channels` and
+  `Discounts` are independent entries. Non-interactive section labels are allowed and are not
   a navigation group.
 - **Generic price modifier:** replaced by `Sales channel`.
 - **Default channel:** discarded; no channels are selected automatically.
 - **Mandatory channel:** discarded; channelless orders use base prices.
 - **Price per product and channel:** postponed; MVP uses a global percentage.
-- **Hide out-of-stock products:** replaced by unavailable display.
+- **Always display unavailable products:** replaced by hiding them by default and revealing
+  them in a name search, disabled and identified with their reason.
 - **Remove and re-add to edit:** replaced by direct edit.
 - **Block deletion of used channel:** replaced by snapshot in the order.
 - **Combo as catalog product:** discarded; the products remain in
@@ -1471,3 +1532,17 @@ flowchart LR
 - **Partial write-off:** discarded; any insufficiency blocks the entire sale.
 - **Persistent draft:** discarded; the cart exists only during the
   current assembly.
+- **No payment information:** replaced by a required payment method recorded on every new
+  order, without payment processing.
+- **Integrated payment or Pix QR code:** discarded; it would require providers, confirmation
+  webhooks and pending, failed or refunded states outside Scoops' scope.
+- **Pre-selected payment method:** discarded because Operators who forget to change it would
+  record wrong methods.
+- **Optional payment method:** discarded so that every new order has reliable payment data.
+- **Only the three card and Pix methods:** replaced by also offering `Cash`, so that cash sales
+  are not recorded under a wrong method.
+- **Manager-configurable payment methods:** postponed; the MVP uses one fixed list.
+- **Choosing the method only in the confirmation dialog:** discarded; the selector stays in the
+  cart beside the channel, and the dialog only displays the choice.
+- **Inferring a method for earlier orders:** discarded because it would rewrite history with
+  data that was never recorded; those orders show `Not informed`.
