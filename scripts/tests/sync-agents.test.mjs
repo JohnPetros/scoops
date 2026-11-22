@@ -24,6 +24,17 @@ test('sync-agents generates the Codex, OpenCode and Claude representations', asy
   await assertFileExists(path.join(ROOT_DIR, '.opencode', 'agents', 'builder-agent.md'))
   await assertFileExists(path.join(ROOT_DIR, '.claude', 'agents', 'builder-agent.md'))
 
+  const claudeResearcher = await readFile(
+    path.join(ROOT_DIR, '.claude', 'agents', 'spec-researcher-agent.md'),
+    'utf8',
+  )
+  assert.match(claudeResearcher, /^disallowedTools: Write, Edit, Agent$/m)
+  const codexResearcher = await readFile(
+    path.join(ROOT_DIR, '.codex', 'agents', 'spec-researcher-agent.toml'),
+    'utf8',
+  )
+  assert.match(codexResearcher, /^sandbox_mode = "read-only"$/m)
+
   const codexConfig = await readFile(path.join(ROOT_DIR, '.codex', 'config.toml'), 'utf8')
   assert.match(codexConfig, /BEGIN GENERATED AGENTS - scripts\/sync-agents\.mjs/)
   assert.doesNotMatch(codexConfig, /BEGIN GENERATED AGENTS - scripts\/sync-agents\.sh/)

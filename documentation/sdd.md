@@ -193,6 +193,11 @@ requires. Builders own disjoint code/test scopes and report results without
 changing acceptance obligations or governing artifacts. Reuse Builders for related
 corrections where possible. Only the Orchestrator creates subagents.
 
+During `create-spec` research, read-only [Spec Researchers](./agents/spec-researcher-agent.md),
+one per affected app or package, report verified repository facts, gaps, risks and candidate
+questions; they are required in `complete` mode. The Orchestrator verifies and reconciles their
+results and keeps every decision.
+
 A [Spec Reviewer](./agents/spec-reviewer-agent.md) independently checks architecture,
 module and Rule compatibility before the draft becomes `open`; repeat that review
 only for material contract amendments. One independent

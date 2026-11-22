@@ -53,8 +53,17 @@ delivery risk, not file or endpoint counts:
 
 #### Direct repository research
 
-The Orchestrator owns consequential decisions and verifies repository facts. Delegate independent
-research lanes when useful and required by AGENTS.md, then reconcile their findings.
+The Orchestrator owns consequential decisions and verifies repository facts. Research runs
+in lanes, one per affected app or package (`apps/web`, `apps/server`, `packages/core`,
+`packages/validation`, `packages/email`). In `complete` mode, delegate every lane to its own
+read-only [Spec Researcher](../agents/spec-researcher-agent.md), launched in parallel with a
+specific lane name; in `compact` mode, research directly or delegate at your discretion.
+Give each Researcher the source, its workspace and modules, the depth mode, the Rules
+selected for that workspace and the cross-workspace edges it should check. Reconcile every
+Researcher result before clarification: verify each fact a question relies on, resolve
+conflicting edge contracts between lanes, and merge the proposed file trees. Resume the same
+Researcher for follow-up facts about its workspace.
+
 Inspect every affected boundary for:
 
 - current paths, declarations, exports, registration, configuration and generated files;
