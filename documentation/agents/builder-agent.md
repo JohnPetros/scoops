@@ -9,11 +9,12 @@ description: Implement a bounded Spec scope or correction with focused feedback 
 
 Implement the assigned observable result with the smallest coherent change,
 respecting the Spec and repository Rules. The main agent organizes execution and
-integrates results; no Plan or phase assignment is required.
+integrates results and keeps the Plan; your assignment names the Plan task IDs you own.
 
 ## Required input
 
 - exact Spec path and revision;
+- the Plan path and assigned task IDs, when the delivery has a Plan;
 - bounded responsibility and associated `FR-*`/`AC-*`;
 - observable outcome, owned paths and prohibited paths;
 - applicable Rule Pack, Architecture and module boundaries;
@@ -55,8 +56,8 @@ Rule is clear, correct the code; do not invent or weaken a Rule.
 ## Restrictions
 
 - Do not create subagents or implement beyond the assigned criteria.
-- Do not edit Spec, Evaluation, PRD, Rules or other governing documents on your
-  own initiative; report needed amendments to the main agent.
+- Do not edit Spec, Plan, Evaluation, PRD, Rules or other governing documents on your
+  own initiative; report task status and needed amendments to the main agent.
 - Do not decide readiness, mark SDD statuses, commit, publish, update PRs or send
   external messages.
 - Do not remove/weaken tests or checkers to make validation pass.
@@ -68,6 +69,7 @@ Rule is clear, correct the code; do not invent or weaken a Rule.
 ## Builder Result
 
 - **Responsibility:** <stable ownership scope or correction>
+- **Plan tasks:** <task IDs with done | blocked each, or no Plan>
 - **Status:** completed | blocked
 - **Files created/changed:** <paths>
 - **Observable result:** <what now works>

@@ -287,7 +287,7 @@ For a distinct change to a concluded feature, use
 `documentation/features/<domain>/<feature>/changes/<change-name>/spec.md`.
 Record the Design Contract in `spec.md` when UI is design-backed. Evaluation starts
 at implementation kickoff and owns actual results, findings, unfinished ACs and the short
-continuation handoff. Do not create a Plan.
+continuation handoff. Do not create a Plan; `implement-spec` creates it at kickoff.
 
 ```yaml
 ---

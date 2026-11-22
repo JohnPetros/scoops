@@ -11,8 +11,8 @@ implementation or local validation merely because conclusion has started.
 
 ## Preconditions and authority
 
-Read the current Spec, `evaluation.md`, `documentation/sdd.md`, applicable Rule Pack and
-`documentation/tooling.md`. Require Spec `in_progress`, Evaluation `ready` in the local
+Read the current Spec, `plan.md` when present, `evaluation.md`, `documentation/sdd.md`,
+applicable Rule Pack and `documentation/tooling.md`. Require Spec `in_progress`, Evaluation `ready` in the local
 working tree, evidence for the current Spec revision and integrated candidate, and no
 blocking finding or unfinished acceptance criterion. Evaluation need not have its `ready`
 status published as a separate PR head. Preserve actual GitHub Issue or direct-request
@@ -59,14 +59,20 @@ according to the change. Delivery PRs must be ready for review; verify `isDraft:
    that predate the current task or appear unrelated; do not exclude them based on ownership or
    assumed scope. Reconcile their behavior, scope and required evidence with the Spec,
    Evaluation and PR summary. Exclude only secrets, credentials, environment-specific local
-   data, or files that cannot safely be shared, and record each exclusion and reason. Spec and
-   Evaluation are review artifacts even when their changes only record evidence or closure.
+   data, or files that cannot safely be shared, and record each exclusion and reason. Spec,
+   Plan and Evaluation are review artifacts even when their changes only record evidence,
+   task state or closure.
 6. Map every in-scope `PRQ-*` through `FR-*` and `AC-*` to current evidence and classify it as
    fully delivered, partially delivered or deferred. Full delivery requires the complete current
    Outcome, Actors, applicable Consumes and Provides, Capabilities and conditional Experience,
    with all mapped obligations passing. After this local preflight passes, and before the
    delivery commit, publication or final PR CI, record the delivery disposition in
    `evaluation.md`.
+
+When the delivery has a `plan.md`, require every task to be `done` or `superseded` with its
+reason, and its Current state to match the candidate. Reconcile an open task before the
+delivery commit: finish it through `implement-spec` or supersede it with the reason recorded.
+Task status is progress only; it never substitutes for the evidence above.
 
 Evaluation `ready` is permission to proceed with closure, not proof of delivery.
 
@@ -172,7 +178,8 @@ canonical prompts or agent definitions with the documented repository commands w
 ## Complete the delivery
 
 After implementation-candidate PR CI passes and no blocking finding remains, record those
-candidate gate results in Evaluation, set Evaluation and Spec `completed`, preserve the full Spec
+candidate gate results in Evaluation, set Evaluation, the Plan when one exists, and Spec
+`completed`, preserve the full Spec
 contract and detailed evidence, and add a concise outcome and Evaluation link. Publish these
 closure changes together in one scoped documentation commit with `commit`, then use
 `open-pr` to update the same PR. Require every applicable live check to pass on this final

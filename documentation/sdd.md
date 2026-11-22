@@ -2,13 +2,13 @@
 
 Scoops uses SDD for features and changes that need an explicit product or technical
 contract. The Spec defines the required outcomes and their checkers. The agent
-organizes implementation autonomously. Evaluation records actual progress,
-findings and verified evidence through pull-request closure.
+organizes implementation autonomously and records its breakdown in a Plan. Evaluation
+records actual progress, findings and verified evidence through pull-request closure.
 
 ```text
-Spec → autonomous implementation → integrated verification → conclusion
-                                      ↑            ↓
-                                      └── fixes ───┘
+Spec → Plan → implementation → integrated verification → conclusion
+                                    ↑            ↓
+                                    └── fixes ───┘
 ```
 
 Behavior-preserving maintenance may use direct implementation when a feature
@@ -56,7 +56,8 @@ technical dependencies, implementation priority, foundation work, execution phas
 parallelism. The implementing agent derives execution dependencies from the Technical Contract and real
 repository boundaries, never from the PRD graph.
 
-PRDs do not record delivery state. Delivery is tracked by Spec and Evaluation evidence, and
+PRDs do not record delivery state. Delivery is tracked by the Plan's task state and by Spec and
+Evaluation evidence, and
 Evaluation `ready` means implementation evidence can enter conclusion.
 
 ### SDD identifier taxonomy
@@ -81,24 +82,45 @@ evidence only to rename an identifier.
 ```text
 documentation/features/<domain>/<feature>/
 ├── spec.md                 # contracts and checkers
-└── evaluation.md           # progress, evidence, findings and current handoff
+├── plan.md                 # phases, tasks, Builders and task status
+└── evaluation.md           # evidence, findings and current handoff
 ```
 
-Use the [Spec](./templates/sdd/spec.md) and [Evaluation](./templates/sdd/evaluation.md)
-templates. New behavior for an already concluded feature uses
+Use the [Spec](./templates/sdd/spec.md), [Plan](./templates/sdd/plan.md) and
+[Evaluation](./templates/sdd/evaluation.md) templates. New behavior for an already concluded
+feature uses
 `changes/<change-name>/` under that feature. The Design Contract lives in `spec.md` and names
 Doop frames; a legacy `design/` folder in an older feature is historical and is not recreated.
 
-Evaluation is created at implementation kickoff, not during Spec authoring.
+Plan and Evaluation are created at implementation kickoff, after the Spec is `open`, not
+during Spec authoring. There is no separate `create-plan` step; `implement-spec` writes the
+Plan before the first feature edit.
 
-There is no separate `plan.md` or `create-plan` step. Execution order, decomposition,
-dependencies and delegation belong to the agent's working context. Existing Plans
-are preserved under `history/legacy-execution.md` for audit and continuation.
-Their task/phase statuses do not gate resumed work. Resume from the current Spec,
-Evaluation and actual diff; consult the archived ledger for unique obligations or
-unfinished work that has not yet been reconciled. Move any unique acceptance
-obligation into the Spec and factual progress/evidence into Evaluation before
-relying on the new handoff. Do not silently discard or weaken earlier obligations.
+### Plan
+
+The Plan records how the Orchestrator broke the delivery into phases and tasks, which Builder
+owns each task and where each task stands. It is required when the Spec's depth is `complete`
+and optional for `compact`, where the Orchestrator may track the work in its own context.
+
+- A phase groups tasks that leave one observable result behind and lists the phases it
+  depends on. A task is one bounded, assignable piece of work with its covered `FR-*`/`AC-*`,
+  owned workspace or boundary, Builder, dependencies and status.
+- Phase and task statuses are `pending`, `in_progress`, `done`, `blocked` and `superseded`.
+- The Plan references Spec identifiers and sections; it never restates behavior, technical
+  contracts, Rules or exhaustive file lists.
+- Task state is progress, not proof. A `done` task does not pass any `AC-*`; only accepted
+  Evaluation evidence does, and Evaluation alone decides `ready`.
+- The Plan belongs to the implementer and changes as the work does. Add, split, reorder,
+  reassign or supersede tasks within the Contract without a Spec amendment, and record each
+  material change in its History.
+- Builder names identify subagent instances, worktrees or the Orchestrator. When a session
+  ends, a resuming Orchestrator reassigns unfinished tasks and records the reassignment.
+
+Plans written before 2026-10-07 were archived under `history/legacy-execution.md` and
+remain historical. Do not move them back to `plan.md`. Resume such a feature from the
+current Spec, Evaluation and actual diff, and create a new Plan only for its remaining work;
+move any unique acceptance obligation from the archived ledger into the Spec and factual
+progress into Evaluation first. Do not silently discard or weaken earlier obligations.
 
 Implementation captures are transient validation artifacts under ignored
 `test-results/` output or CI artifacts. Record state, viewport, comparison result
@@ -186,12 +208,12 @@ declarations use their contracted checkers and a scoped diff/artifact inspection
 
 ## Roles and lifecycle
 
-The Orchestrator owns Spec/Evaluation state, shared decisions, integration and the
+The Orchestrator owns Spec/Plan/Evaluation state, shared decisions, integration and the
 official evidence verdict. It implements coherent scopes directly or delegates
 independent work to bounded [Builders](./agents/builder-agent.md), as `AGENTS.md`
-requires. Builders own disjoint code/test scopes and report results without
-changing acceptance obligations or governing artifacts. Reuse Builders for related
-corrections where possible. Only the Orchestrator creates subagents.
+requires, assigning each Builder its Plan tasks. Builders own disjoint code/test scopes and
+report results per task without changing acceptance obligations or governing artifacts,
+including the Plan. Reuse Builders for related corrections where possible. Only the Orchestrator creates subagents.
 
 During `create-spec` research, read-only [Spec Researchers](./agents/spec-researcher-agent.md),
 one per affected app or package, report verified repository facts, gaps, risks and candidate
@@ -216,23 +238,28 @@ and a mapped correction; the Orchestrator verifies them.
 | Spec | `open` | Authoring integrity and compatibility review passed. |
 | Spec | `in_progress` | Implementation or conclusion active. |
 | Spec | `completed` | Final PR CI passed and closure recorded. |
+| Plan | `in_progress` | Tasks being executed, corrected or reassigned. |
+| Plan | `completed` | Delivery closure recorded; set with Spec and Evaluation. |
 | Evaluation | `in_progress` | Progress and evidence being gathered or corrected. |
 | Evaluation | `ready` | All required proof accepted locally and ready for conclusion, not PRD closure. This transition need not be published as a standalone PR update. |
 | Evaluation | `completed` | Final PR CI and delivery closure recorded. |
 
 Executed validation outcomes are `passed`, `failed` or `blocked`. Evidence lifecycle
 may also use `pending`, `stale` or `not_applicable`; an authorized visual difference
-is recorded explicitly. Findings and incomplete criteria describe failures; do not
-invent phase statuses. Existing historical identifiers, revisions and facts remain stable.
+is recorded explicitly. Findings and incomplete criteria describe failures; phase and task
+statuses belong only to the Plan and never stand in for evidence. Existing historical
+identifiers, revisions and facts remain stable.
 
 ## Implementation and verification
 
-1. Establish or resume the current contract and reconcile Git status/diff with
-   Evaluation. Create its acceptance matrix and concise handoff before editing.
-   Inspect prerequisites without automatically launching baseline integration suites.
-2. Implement within the contract. Organize dependencies and bounded delegation
-   directly; use focused unit/component and static checks for early feedback.
-   Record material findings and meaningful checkpoints, not every edit.
+1. Establish or resume the current contract and reconcile Git status/diff with the
+   Plan and Evaluation. Create the Plan's phases and tasks, and Evaluation's acceptance
+   matrix and concise handoff, before editing. Inspect prerequisites without automatically
+   launching baseline integration suites.
+2. Implement within the contract, phase by phase. Assign tasks to bounded Builders or
+   implement them directly; use focused unit/component and static checks for early feedback.
+   Update task status and Builders at assignment, completion and blocking; record material
+   findings and meaningful checkpoints in Evaluation, not every edit.
 3. Integrate all implementation scopes and generated artifacts. Perform any
    already-authorized delivery-branch synchronization before final verification.
 4. Run applicable static, architecture, type, build and coverage gates and each
@@ -277,22 +304,22 @@ Preserve failed attempts and historical evidence without reporting them as curre
 
 The handoff names the Spec revision, branch/candidate, completed and unfinished
 criteria, interrupted or uncommitted work, latest checker results, blockers and
-next concrete action. A continuing agent reconciles this with Git and the diff
-before choosing execution order. Evaluation describes actual state; it must not
-become a replacement task/phase Plan.
+next concrete action. A continuing agent reconciles the Plan and this handoff with Git
+and the diff before resuming tasks. Evaluation describes actual evidence state; task
+breakdown and status belong in the Plan, not in Evaluation.
 
 ## Amendments and feedback
 
-An implementation correction keeps the Spec revision, reopens Evaluation and
-refreshes affected proof. A changed product, design or consequential technical
-contract returns the Spec to `draft`, reconciles governing authority first,
-increments its revision and refreshes affected design/checkers. Routine internal
+An implementation correction keeps the Spec revision, reopens Evaluation, adds or reopens
+the correcting Plan tasks and refreshes affected proof. A changed product, design or
+consequential technical contract returns the Spec to `draft`, reconciles governing
+authority first, increments its revision and refreshes affected design/checkers. Routine internal
 implementation choices within the contract do not require amendments.
 
 While a PR remains open, `resolve-pr-feedback` owns comment inspection,
 classification, replies and reopening. Explanation or metadata-only feedback does
 not reopen the contract. Implementation corrections reopen the same completed Spec
-as `open` and Evaluation as `in_progress` without a revision increment.
+as `open`, and the Plan and Evaluation as `in_progress`, without a revision increment.
 Contract changes use amendment. Continue implementation and conclusion rather
 than ending with a proposed correction. After merge, defects use the bug workflow
 and changed product behavior uses a new change Spec.
@@ -300,7 +327,9 @@ and changed product behavior uses a new change Spec.
 ## Publication, CI and closure
 
 `conclude-spec` requires Spec `in_progress`, Evaluation `ready` in the local working
-tree, current accepted evidence and no verified blocker. The `ready` transition does
+tree, current accepted evidence and no verified blocker. When a Plan exists, every task must
+be `done` or `superseded`; an open task is reconciled first, either finished or superseded
+with its reason, so the Plan matches the delivered candidate. The `ready` transition does
 not need a separate PR commit. Reconcile source authority, generated artifacts,
 migrations, Doop frame coverage, REST parity and scope. Reuse valid local checks;
 run missing or invalidated proof. Corrections immediately re-enter implementation
@@ -311,14 +340,14 @@ With authorization to commit, push and publish:
 1. resolve every selected `PRQ-*` through FR/AC to evidence and classify it as fully
    delivered, partially delivered or deferred after local closure preflight and before the
    delivery commit;
-2. use `commit` for scoped commits, including delivery-owned Spec/Evaluation
+2. use `commit` for scoped commits, including delivery-owned Spec/Plan/Evaluation
    and required PRD changes; exclude inherited unrelated governance or user work
    unless explicitly authorized, recording its disposition;
 3. invoke `open-pr` when the delivery PR is missing or its publication details
    are stale; update the same PR and record its URL;
 4. publish the integrated implementation candidate and require every applicable
    checked-in GitHub Actions workflow to pass on that candidate PR head;
-5. after candidate CI passes, record those gate results, set Spec/Evaluation
+5. after candidate CI passes, record those gate results, set Spec/Plan/Evaluation
    `completed`, and publish the accumulated evidence and closure state in one scoped
    documentation commit; verify applicable live checks on that final closure head.
 

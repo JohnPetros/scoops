@@ -8,25 +8,25 @@ description: Implement an open or resumed Spec autonomously, integrate the candi
 Use this single implementation entry point in the current chat:
 
 ```text
-Spec → autonomous implementation → integrated verification
-                                      ↓
-                             corrections until passing
-                                      ↓
-                                 conclude-spec
+Spec → Plan → implementation → integrated verification
+                                    ↓
+                           corrections until passing
+                                    ↓
+                               conclude-spec
 ```
 
 The Spec defines behavior, boundaries, consequential decisions and proofs. This prompt
-defines the proof workflow and never prescribes the plan: the agent chooses implementation
-order, decomposition, delegation and isolation. Evaluation records actual
-progress, evidence and findings; it is not a second task plan. Do not create or maintain
-`plan.md`, phase ledgers, dependency waves or task-exit bureaucracy.
+defines the proof workflow; the agent chooses implementation order, decomposition,
+delegation and isolation, and records that breakdown in the colocated `plan.md`, following
+the [Plan rules](../sdd.md#plan). The Plan tracks phases, tasks, Builders and task status;
+Evaluation records evidence and findings. Task status is progress, never proof.
 
 ## Read and establish scope
 
 Read `documentation/sdd.md`, the current Spec, Modules, Architecture,
 `documentation/rules.md`, every selected Rule, and `documentation/tooling.md`.
 Read applicable PRDs and Design documentation for the affected behavior. When resuming,
-read the colocated Evaluation and its continuation handoff before editing.
+read the colocated Plan, Evaluation and its continuation handoff before editing.
 
 Confirm that the Spec is `open` initially or `in_progress` when resuming, its revision is
 current, and no material Contract ambiguity remains. Preserve source and Issue traceability.
@@ -40,24 +40,38 @@ Before the first feature edit:
    [`evaluation.md`](../templates/sdd/evaluation.md), preserving historical results;
 3. inspect current source and the shared worktree; identify scope boundaries, existing
    findings, required services, accounts, fixtures and the Doop frames in the Design Contract;
-4. when browser work applies, run `pnpm --filter web check:playwright` using the documented
+4. create or reconcile `plan.md` from [`plan.md`](../templates/sdd/plan.md). It is required
+   when the Spec's depth is `complete` and optional for `compact`. Break the work into
+   phases that each leave an observable result behind, and phases into bounded tasks with
+   their covered `FR-*`/`AC-*`, owned workspace or boundary, dependencies and Builder. Tasks
+   whose scopes do not overlap and whose inputs are stable belong in the same phase so they
+   can run in parallel. When resuming, mark tasks whose Builder no longer exists `pending`
+   or reassign them, and record the reassignment in the Plan's History;
+5. when browser work applies, run `pnpm --filter web check:playwright` using the documented
    command, correct failures, and record the result before affected implementation;
-5. record a concise current result and known blockers in Evaluation.
+6. record a concise current result and known blockers in Evaluation.
 
 Freeze the Contract, not the agent's internal implementation choices. Exact public APIs,
 required migration artifacts and other explicitly contracted decisions remain authoritative;
-ordinary internal file layout and sequencing are chosen within repository Rules. A historical
-Plan is context only and does not control execution or readiness.
+ordinary internal file layout and sequencing are chosen within repository Rules. A Plan
+archived under `history/legacy-execution.md` is context only and does not control execution
+or readiness; a new Plan covers only the work that remains.
 
 ## Organize and implement
 
-This prompt does not plan the implementation. It defines what must be read, proven and
-recorded; the agent decides how to get there. Implementation order, decomposition, delegation
-and isolation are the agent's own plan, made for the Spec at hand and not dictated here. The
-agent may implement directly, delegate independent workstreams to subagents, or run them in
-parallel in isolated git worktrees when their paths do not overlap and their input contracts
-are stable, then merge and re-verify. No fixed roles, dispatch ledger or execution artifact
-is required.
+This prompt does not dictate the breakdown. It defines what must be read, proven and
+recorded; the agent decides how to get there and writes that decision into the Plan. The
+agent may implement a task directly, assign it to a [Builder](../agents/builder-agent.md)
+subagent, or run independent tasks in parallel in isolated git worktrees when their paths do
+not overlap and their input contracts are stable, then merge and re-verify. Give each Builder
+its task IDs, and name it after its responsibility as `AGENTS.md` requires.
+
+Keep the Plan current at the moments that change it: assigning a task, finishing it, blocking
+it, splitting or superseding it, and finishing a phase. Update the Current state section at
+the same time. Revise phases and tasks as the work teaches you; changes within the Contract
+need no Spec amendment, only a History row. Do not restate Spec behavior, Rules or file
+inventories in the Plan, and do not mark a task `done` until its Builder's diff is
+integrated and its focused checks pass.
 
 Whoever delegates still integrates: inspect delegated diffs together, because a subagent's
 report alone does not establish acceptance.
@@ -203,11 +217,13 @@ requiring a new Rule for every defect.
 
 Keep Evaluation `in_progress` while required criteria, checks or verified blocking findings
 remain open. Set it to `ready` when all required evidence is current, both applicable reviews
-are reconciled and no blocking finding remains. Proceed to `conclude-spec` when publication
+are reconciled, no blocking finding remains and every Plan task is `done` or `superseded`.
+Corrections found by verification or review become new or reopened Plan tasks. Proceed to `conclude-spec` when publication
 authority exists; do not mark the Spec completed here.
 
-Before interruption or handoff, leave a small continuation record: branch/candidate provenance, current progress, interrupted or uncommitted paths,
-unfinished criteria, active blockers, latest checker IDs/results, affected stale evidence and
-the next useful action. Do not turn it
-into a replacement Plan, phase list or dependency graph. Preserve unrelated user changes.
+Before interruption or handoff, update the Plan's Current state and task statuses, and leave
+a small continuation record in Evaluation: branch/candidate provenance, current progress,
+interrupted or uncommitted paths, unfinished criteria, active blockers, latest checker
+IDs/results, affected stale evidence and the next useful action. Keep task breakdown in the
+Plan rather than duplicating it in the handoff. Preserve unrelated user changes.
 Conclusion and later review reuse valid evidence and reopen only affected proofs.
