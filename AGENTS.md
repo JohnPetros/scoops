@@ -49,9 +49,6 @@ visual validation tied to those designs. Drawing or changing frames follows the
   not change existing components without a request, and verify every change by
   capturing the affected frames with `get_frame_screenshot`.
 - Draw a dialog as a standalone frame, never as a full page with a backdrop.
-- Check frames with `pnpm run check:design` (see
-  [`documentation/tooling.md`](documentation/tooling.md)); it reads a saved snapshot,
-  not the live canvas.
 
 Before modifying a Doop frame, classify the request as either a visual-only change or a
 product-behavior change. A change to actors, permissions, workflow, states, validation,
@@ -219,7 +216,7 @@ advice.
 | ------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `impeccable`        | Designing, critiquing, auditing or refining UI: hierarchy, type, color, layout, copy, motion. | In Doop work, use it through `/design` and `/review-design`; its `critique` runs only through them.     |
 | `frontend-design`   | Choosing an aesthetic direction for new UI or a reshaped one.                                 | `documentation/design.md` and the Doop canvas decide; use it only where they leave the direction open.  |
-| `accessibility`     | WCAG 2.2 audits and fixes: contrast, keyboard, focus, screen readers.                         | For Doop frames, `pnpm run check:design --rule contrast` covers contrast (it reads a saved snapshot).   |
+| `accessibility`     | WCAG 2.2 audits and fixes: contrast, keyboard, focus, screen readers.                         | Follow the repository Rules first; the skill's generic advice never overrides them.                     |
 | `performance`       | Load speed, bundle size, caching and rendering cost.                                          |                                                                                                         |
 | `core-web-vitals`   | LCP, INP and CLS problems.                                                                    |                                                                                                         |
 | `best-practices`    | Security, compatibility and code-quality review of web code.                                  | Follow the repository Rules first; the skill's generic advice never overrides them.                     |

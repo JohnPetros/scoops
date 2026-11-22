@@ -215,52 +215,6 @@ against only that workflow's production source (`packages/core`,
 baseline. Changes to the CodeMultiVitals configuration, baseline, dependency
 lockfile, or checker also trigger the relevant jobs.
 
-## Design check for the Doop canvas
-
-`pnpm check:design` checks the frames of the Scoops Doop canvas
-(`https://doop.design/c/ams11lLQ8a`) against the design rules. Doop is reachable only
-through its MCP, so the script fetches nothing: it reads a **snapshot** that an agent
-saved with the Doop MCP and renders each frame in Playwright's Chromium, so contrast,
-spacing, radius and text overflow are measured in the real DOM. The snapshot lives in
-`.design-snapshot/` (ignored by Git; another directory with `--snapshot <dir>` or
-`DESIGN_SNAPSHOT`):
-
-| File | Content |
-| --- | --- |
-| `<frameId>.html` | `html` returned by `get_frame` with `expand_components: true` (it carries the tokens and the components' CSS) |
-| `frames.json` | `{ "canvasId", "pages": { "<pageId>": "<name>" }, "frames": [{ "id", "name", "pageId", "x", "y", "width", "height", "updatedAt" }] }`, copied from `get_frame` |
-| `tokens.json` | the `get_tokens` output (format `json`, all types) |
-| `components.json` | optional: `{ "<componentId>": "<name>" }` from `list_components`, to name layers |
-
-Save the snapshot again after every change to the canvas: a stale snapshot hides the fix
-and produces a stale digest. The script checks five categories:
-
-| Category | Rules | Severity |
-| --- | --- | --- |
-| `contrast` | WCAG AA text (4.5:1; 3:1 for large text) on the composited background; SVG icons 3:1 | error (text), warning (icon) |
-| `tokens` | a color literal with no token, nearly equal to a token or off the palette; a missing `var(--token)` | warning (no token), error (the others) |
-| `typography` | minimum size, scale, family, weight, text outside the frame or cut by a clipping ancestor | error (minimum, family, overflow, clip), warning (scale, weight) |
-| `spacing` | gap and padding off the `--spacing-*` scale; radius off `--radius-*` or fully rounded | warning |
-| `hygiene` | overlapping frames, default name, empty frame, hidden element, instance of a removed component | error or warning |
-
-Component instances (`data-doop-instance`) enter only `contrast`: a component's tokens,
-typography, spacing and radius are checked in the frames of the `🧩 Components` page
-(`componentPages`), where the component's own CSS is also read. The configuration is
-`.design-check.json`: canvas ID, token theme, component pages, excluded frames
-(`excludeFrames`, matched against part of the name), allowed colors (`colorAllow`), the
-typography, spacing and radius scales, and exceptions in `ignore`, each with a `rule`,
-`selector` or `layer` and a mandatory `reason`. `.design-check-baseline.json` records the
-existing findings that new work must not add to.
-
-```bash
-pnpm run check:design
-pnpm run check:design --frame "PDV / Discounts / Desktop" --rule contrast
-pnpm run check:design --page Mobile --all --json
-pnpm run check:design --digest --frame "PDV / Discounts / Desktop"
-```
-
-The first run needs the browser: `pnpm exec playwright install chromium`.
-
 ## Architecture boundaries
 
 Each workspace exposes a `check:architecture` command backed by Dependency Cruiser. Its

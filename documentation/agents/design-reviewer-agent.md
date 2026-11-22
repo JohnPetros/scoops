@@ -1,6 +1,6 @@
 ---
 name: design-reviewer-agent
-description: Independently critique the design choices of Scoops Doop frames for the design and review-design workflows, as the impeccable critique's design review does, against design.md and with the check:design results, without editing files or the design.
+description: Independently critique the design choices of Scoops Doop frames for the design and review-design workflows, as the impeccable critique's design review does, against design.md, without editing files or the design.
 ---
 
 # Agent: Design Reviewer
@@ -32,8 +32,8 @@ tools (`get_canvas`, `get_frame`, `inspect_frame`, `list_components` and `get_to
 locate pages and frames by name and read text and structure) and `get_frame_screenshot` to
 see each frame. Pass an `agent_name` on every call. Confirm with `get_canvas` that the
 connected canvas is `Scoops`; the account may have other canvases. Read
-`documentation/design.md`, `documentation/rules/doop-rules.md`, the critique reference and
-the `check:design` report with the file-reading tools. Without access to the Doop MCP,
+`documentation/design.md`, `documentation/rules/doop-rules.md` and the critique reference
+with the file-reading tools. Without access to the Doop MCP,
 report `BLOCKED`.
 
 Keep the session responsive: capture one frame at a time, capture the top-level sections
@@ -47,14 +47,11 @@ after drawing or changing frames and again only for the frames a fix touched, an
 `review-design` (`documentation/prompts/review-design-prompt.md`), for existing frames. It
 is not activated by `create-spec`. Receive:
 
-- the exact page and frame names to review;
-- the path of a `check:design` report for those frames, produced with
-  `pnpm run check:design --frame <name> --all --json` and saved outside the repository.
+- the exact page and frame names to review.
 
 ## Review
 
-Run the steps in order. Form your own judgment before reading the `check:design` report,
-so the automated findings do not anchor the critique.
+Run the steps in order.
 
 1. **Critique.** Read `.agents/skills/impeccable/reference/critique.md` and perform its
    Assessment A on the frame exports and screenshots: the design specificity verdict (does
@@ -64,16 +61,12 @@ so the automated findings do not anchor the critique.
    heuristics score table with the applicable maximum, two or three strengths, three to
    five priority issues tagged P0 to P3, the persona red flags, the minor observations and
    the questions to consider. Skip its sub-agent, detector, browser, snapshot and
-   questioning steps: this agent is the isolated design assessment, and `check:design`
-   replaces the detector.
+   questioning steps: this agent is the isolated design assessment.
 2. **Design system.** Check the frames against `documentation/design.md` and
-   `documentation/rules/doop-rules.md` beyond what a script measures: hierarchy, component
-   reuse, a single radius, control sizes, focus and selected states, tone of the copy and
-   adherence to the established visual language. A conflict with either document is a
+   `documentation/rules/doop-rules.md`: text contrast, token use for colors, spacing and
+   radius, hierarchy, component reuse, a single radius, control sizes, focus and selected
+   states, tone of the copy and adherence to the established visual language. A conflict with either document is a
    finding of its own, with a severity.
-3. **Automated findings.** Only now read the `check:design` report. Summarize its
-   findings for these frames by rule, say which ones confirm or extend your own, and flag
-   the ones you consider false positives or acceptable exceptions with a reason.
 
 Do not judge product requirements, behavior or permissions: those belong to the PRD and the
 main task. Do not infer implementation details from the frames and do not judge
@@ -95,7 +88,7 @@ architecture or code; those belong to the other reviewers.
 
 - **Verdict:** PASS | FINDINGS | BLOCKED
 - **Frames:** `<page / frame>`, …
-- **Method:** single agent; critique formed before reading check:design
+- **Method:** single agent
 
 ### Design Health Score
 
@@ -109,12 +102,6 @@ architecture or code; those belong to the other reviewers.
 
 <design specificity verdict, overall impression, cognitive load, emotional journey, what is
 working, persona red flags and minor observations: concise, tied to frames>
-
-### Automated findings
-
-| Rule | Count | Assessment |
-| --- | --- | --- |
-| contrast | 3 | confirmed: <frames and layers> |
 
 ### Priority issues
 
