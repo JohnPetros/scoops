@@ -26,17 +26,21 @@ Linux, macOS and WSL (where it starts the Windows Chrome).
 
 ## Canvas pages
 
-The `Scoops` canvas has five pages, each with one role. Put every frame on the page
-that owns it and read page IDs through the Doop MCP (`get_canvas`) instead of
-hard-coding them. Every Doop MCP call takes an `agent_name`.
+The `Scoops` canvas has one page for each business module, a shared page, and two pages
+for the design reference and the presentation. A page is a small board: it holds the
+frames of one module, so it loads fast. Put every frame on the page that owns it and read
+page IDs through the Doop MCP (`get_canvas`) instead of hard-coding them. Every Doop MCP
+call takes an `agent_name`.
 
 | Page | Contains | Frame name |
 | --- | --- | --- |
-| 🖥️ Desktop | Complete desktop screens, 1440 wide (1440 × 900 by default), their states and their dialogs | `<Module> / <Page> / <Component> / <State or variant> / Desktop` |
-| 📱 Mobile | The mobile version of the Desktop screens, 390 × 844 | `<Module> / <Page> / <Component> / <State or variant> / Mobile` |
-| 🧩 Components | Doop components only | Components named by domain, such as `Sales / Cart` and `Button` |
 | 🎨 Design System | The visual reference of the tokens in `design.md` and approved visual proposals | `Design System / <Name>` |
+| 🧩 Shared | The components that more than one module uses (layout, navigation, forms, filters, pagination) | A component name, such as `Sidebar` and `Button Primary` |
+| 🔐 Identity, 💳 Billing, 🧾 PDV, 🍦 MRP, 📈 Analytics, 🔔 Communication | The screens of that module, their states, dialogs and mobile versions, and the components only that module uses | `<Module> / <Page> / <Component> / <State or variant> / <Desktop\|Mobile>` for screens, a component name for components |
 | 📊 Presentation | Presentation slides about the product | `Presentation / <Deck> / Slide <n>` |
+
+A module page has no tab for the viewport: the Desktop and Mobile versions of a screen sit
+next to each other in the same section.
 
 ## Frames and sections
 
@@ -49,14 +53,27 @@ workflow and reviewing them the `review-design` workflow
   guideline (`var(--color-*)`, `var(--font-body)`) and never a raw hex value that a
   token already covers.
 - Use Lucide icons through the `doop.design/icons/iconify/lucide` URLs.
-- A **section** is a background frame named `Section / <Module> / <Page>`, sized to
-  cover the frames of that page, with the frames placed on top of it. Moving a
-  section does not move its frames, so move them together. Keep the section's
-  title and counts in step with its frames when a task adds or removes one.
+- A **section** is a background frame named `Section / <Module> / <Page>` (for a tab of
+  a detail page, `Section / <Module> / <Page> / <Tab>`). Each screen has one section, and
+  it holds every frame of that screen: the Desktop version, its states, its dialogs and
+  its Mobile versions. The section is sized to cover them, with the frames placed on top
+  of it. Moving a section does not move its frames, so move them together.
+- Each module page ends with a `Section / <Module> / Components` section that holds the
+  components only that module uses. The `🧩 Shared` page has a single
+  `Section / Shared / Components` section. A component used by two or more modules
+  belongs on `🧩 Shared`.
+- A section header shows the module, the screen and a count such as
+  `5 screens · 3 dialogs · 2 mobile`. Keep the header and the section size in step with its
+  frames when a task adds, moves or removes one.
+- Lay a section out in rows: the screens and their states first (Desktop first, then the
+  Mobile versions), the dialogs in the row below, `48 px` of padding at the sides and
+  `144 px` above the first row for the header.
+- Keep the sections of a page one under the other with at least `160 px` between them, so
+  they never overlap.
 
 ## Screen frame names
 
-The name of a frame on the Desktop and Mobile pages has up to five segments, in
+The name of a screen frame has up to five segments, in
 this order, separated by ` / `:
 
 1. **Module:** the business module name from [`modules.md`](../modules.md)
@@ -79,26 +96,27 @@ this order, separated by ` / `:
 
 ## Rules per page
 
-- **Desktop and Mobile** contain screens only. Assemble them with `<doop-use>`
-  instances of the components on the Components page and draw an element as plain
-  HTML only when no component fits. Authentication screens are grouped in an
-  `Identity` section on both pages.
+- **Module pages** contain screens and the module's own components. Assemble a screen
+  with `<doop-use>` instances of the components (the module's own and the shared ones) and
+  draw an element as plain HTML only when no component fits. Authentication screens
+  belong to the `🔐 Identity` page.
 - **Mobile version.** When a screen already has a Mobile version, update it in the
-  same task that changes the Desktop version and keep the names paired. Do not
-  create a Mobile version for states that `design.md` excludes; they follow the
-  same components and layout rules. On Mobile screens, use the 44 px control
+  same task that changes the Desktop version, keep the names paired and keep both in the
+  same section. Do not create a Mobile version for states that `design.md` excludes; they
+  follow the same components and layout rules. On Mobile screens, use the 44 px control
   height (`control-height`) as the touch target.
 - **Dialogs** are drawn as independent frames sized to the dialog itself (for
   example `PDV / Sales / Dialog / Empty cart / Desktop`), never as a full screen
-  with a backdrop.
-- **Components** holds reusable elements and nothing else: never place a screen or
-  a loose example on it. Extract an element to this page when it repeats, with the
-  same purpose, three or more times across screens. Use `/` for hierarchy
-  (`Sales / Cart`), and name variant properties and values consistently with the
-  existing components (`Type`, `State`, `Tone`). Edit the component here
-  (`update_component`), never an instance on a screen. After editing it, check
-  the screens that use it and confirm the instance overrides survived, because
-  editing a component can reset an instance's visibility or text.
+  with a backdrop. They sit in the section of the screen that opens them.
+- **Components** are the reusable elements of a module or of the `🧩 Shared` page, and
+  each one is shown once, in the components section of its page: never place a screen or
+  a loose example there. Extract an element to a component when it repeats, with the same
+  purpose, three or more times across screens, and move it to `🧩 Shared` when a second
+  module starts using it. Use `/` for hierarchy (`Sales / Cart`), and name variant
+  properties and values consistently with the existing components (`Type`, `State`,
+  `Tone`). Edit the component there (`update_component`), never an instance on a screen.
+  After editing it, check the screens that use it and confirm the instance overrides
+  survived, because editing a component can reset an instance's visibility or text.
 - **Design System** shows the tokens of `design.md`: colors, typography, spacing,
   radius, shadows and principles, organized in the token sets of the canvas.
   Update it in the same task whenever those sources change and keep the tokens in
@@ -106,5 +124,5 @@ this order, separated by ` / `:
   reference material: do not place screens or components on this page.
 - **Presentation** holds slides only. Rendered previews of product screens in a
   slide point at the Doop frame, so they follow that frame when it changes.
-- Do not create new pages without asking the user. A screen without a matching
-  page keeps belonging to Desktop or Mobile.
+- Do not create new pages without asking the user. A new module gets its own page when
+  it is added to [`modules.md`](../modules.md).
