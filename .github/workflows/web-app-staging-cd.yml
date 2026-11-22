@@ -96,6 +96,8 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: |
           DOCKER_BUILDKIT=1 docker build \
+            --provenance=false \
+            --sbom=false \
             --platform linux/amd64 \
             --target runtime \
             --secret id=sentry_auth_token,env=SENTRY_AUTH_TOKEN \
