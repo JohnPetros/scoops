@@ -211,7 +211,7 @@ when useful; provenance is not a separate status gate. Retain failed and superse
 - **Unfinished criteria:** none.
 - **Blockers and stale evidence:** none blocking. Needs the user: FND-01, FND-20, FND-24 and saving `design/onoreo.pen`. Local seed data was changed by the manual runs; reseed before the next manual run.
 - **Latest checkers:** EV-001–EV-010 passed on the current candidate.
-- **Next useful action:** commit with `commit-code`, publish with `create-pr`, wait for every applicable CI workflow on the exact PR head (Core CI incl. `Mutation`, Server CI, Web CI), record them under PR CI quality gate, then the closure commit.
+- **Next useful action:** commit with `commit`, publish with `open-pr`, wait for every applicable CI workflow on the exact PR head (Core CI incl. `Mutation`, Server CI, Web CI), record them under PR CI quality gate, then the closure commit.
 
 ## History
 

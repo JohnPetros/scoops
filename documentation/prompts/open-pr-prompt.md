@@ -1,12 +1,13 @@
 ---
-name: create-pr
-description: Publish or update a Scoops delivery pull request with GitHub Issue and SDD traceability, current validation evidence, and saved design-reference coverage.
+name: open-pr
+description: Publish or update a Scoops delivery pull request with GitHub Issue and SDD traceability, current validation evidence, and Doop frame coverage.
 ---
 
-# Create or Update a Pull Request
+# Open or Update a Pull Request
 
 Publish one coherent Scoops delivery through GitHub. Use authenticated `gh`, preserve the user's worktree
-and update an existing delivery PR instead of creating a duplicate.
+and update an existing delivery PR instead of creating a duplicate. The PR title is always a plain
+noun phrase with no Conventional Commit prefix (see `## PR title`).
 
 ## Inputs and authority
 
@@ -19,7 +20,7 @@ Preserve only actual GitHub Issue or direct-request traceability; do not invent 
 records.
 
 Require explicit authority to commit, push and create or update the PR. Standalone use may
-invoke `commit-code` for pending scoped changes; when called by `conclude-spec`, reuse its
+invoke `commit` for pending scoped changes; when called by `conclude-spec`, reuse its
 prepared commits.
 
 ## Pull request readiness policy
@@ -32,11 +33,11 @@ a delivery PR in draft status unless the user explicitly changes this repository
 ## Mandatory workflow invocation
 
 This prompt is a publication workflow, not a replacement for the commit or conclusion
-workflows. When pending implementation changes require a commit, invoke `commit-code`
-before publishing. After the commit is created, **invoke `create-pr` again** (including when
+workflows. When pending implementation changes require a commit, invoke `commit`
+before publishing. After the commit is created, **invoke `open-pr` again** (including when
 the current prompt is being resumed by `conclude-spec`) so the PR metadata, body, head SHA
 and traceability are refreshed through this workflow. Do not create commits or edit PR
-metadata ad hoc while claiming that `commit-code` or `create-pr` was invoked.
+metadata ad hoc while claiming that `commit` or `open-pr` was invoked.
 
 When `conclude-spec` calls this prompt, return the exact PR number, URL, base, head SHA and
 check URLs to `conclude-spec`; do not return while publication is only partially complete.
@@ -135,29 +136,25 @@ When HTTP routes are affected, include the matching `.rest` files in that scope 
 confirm their route/example parity is recorded in Evaluation. Do not omit a REST-client file
 from the delivery diff merely because it is manually executed or not compiled by the workspace.
 
-Use `design/handoff.md` for new design bundles. If an existing feature bundle lacks
-it, read its legacy `design/manifest.md` instead; preserve that legacy artifact and
-do not create both files.
+For design-backed UI, use the Doop frames named in the Spec's Design Contract and reuse the
+recorded independent comparison for every frame and every required supplemental frame:
 
-For design-backed UI, use the saved Spec design bundle—not live Pencil—and reuse the recorded independent
-comparison for every supplied screenshot and every required supplemental screenshot:
-
-- route/state and exact saved reference path or source node ID from `design/handoff.md`;
+- route/state and the exact Doop frame name (page and name) from the Design Contract;
 - target viewport;
 - Playwright CLI manual result;
 - implementation screenshot/comparison path;
-- one direct comparison for each supplied and required supplemental reference, recording
+- one direct comparison for each frame, recording
   structure, content, hierarchy, spacing, dimensions, tokens, interaction/state and responsive
   differences;
 - accessibility/DOM observations and resolved visual findings.
 
-The visual evidence must enumerate every supplied screenshot and every required supplemental
-screenshot suggested by the Spec creator or added to close a documented state/viewport gap. Each
-entry must name the original reference, exact viewport/state, transient implementation capture
+The visual evidence must enumerate every Doop frame in the Design Contract, including those
+added to close a documented state/viewport gap. Each
+entry must name the frame, exact viewport/state, transient implementation capture
 or CI artifact identifier and direct comparison result, including missing, extra, altered or
 mismatched elements. Do not publish a
-design-backed PR when a required reference lacks an independent comparison or when a required
-supplemental screenshot decision remains unresolved.
+design-backed PR when a required frame lacks an independent comparison or when a required
+supplemental frame decision remains unresolved.
 
 Review migrations, generated artifacts and lockfile changes when affected. Do not claim a
 check, manual flow, review or deployment that was not observed. For server-backed or database
@@ -231,14 +228,32 @@ reproducible manual coverage; if any is only a generic summary, expand it before
 the PR metadata. Keep the body concise enough to review; it is a traceability and validation
 summary, not a copy of the full diff.
 
-Never include a Conventional Commit type or scope prefix in any PR title, including
-`feat(scope):`, `fix:`, `docs:`, or `chore(scope):`. Use only a concise noun-phrase title
-without a fabricated issue key; commit messages may still use Conventional Commit format.
-For a bug fix, include the evidence-based cause and correction.
+## PR title
+
+A PR title is a concise noun phrase. **Never** start it with a Conventional Commit type or
+scope prefix, whatever the commits look like and whatever the calling command suggests:
+`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `build:`, `ci:`, `perf:`,
+`style:`, `revert:`, with or without a scope such as `feat(web):`, and with or without a
+`!`. Do not add a fabricated issue key either. Commit messages keep the Conventional Commit
+format; only the PR title drops it.
+
+| Rejected | Use instead |
+| --- | --- |
+| `chore: move the design source from Penpot to Doop` | `Doop as the design source, replacing Penpot` |
+| `feat(web): add the discounts list` | `Discounts list in the PDV module` |
+| `fix(server): correct stock rounding` | `Stock rounding correction in production entries` |
+
+For a bug fix, include the evidence-based cause and correction in the noun phrase.
+
+Check the title twice. Before `gh pr create` or `gh pr edit --title`, reject any title that
+starts with a lowercase type word followed by an optional scope and a colon (the pattern
+`^[a-z]+(\([^)]*\))?!?:`) and rewrite it. After publishing, read it back with
+`gh pr view <number> --json title` and fix it with `gh pr edit` when a prefix slipped through.
+When a command or tool proposes a title with a prefix, override it with this rule.
 
 ## Publish and return
 
-Push the prepared branch, create or update the PR, and add the exact comment
+Push the prepared branch, create or update the PR with a title that follows `## PR title`, and add the exact comment
 `@codex review` when it has not already been requested for the current delivery state.
 Then obtain the actual delivery metadata:
 

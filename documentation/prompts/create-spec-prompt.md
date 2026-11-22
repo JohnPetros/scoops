@@ -13,9 +13,9 @@ need a feature Contract.
 
 Follow these stages in order. Research may precede clarification; writing or modifying
 `spec.md` may not. The clarification gate is a hard stop, not a documentation step: never
-create a draft Spec, design handoff or other contract artifact and then ask the user
+create a draft Spec or other contract artifact and then ask the user
 to resolve a material product or technical choice that the artifact already encodes. Research
-outputs such as inspected screenshots or notes may be saved when needed, but the feature
+outputs such as notes may be saved when needed, but the feature
 Spec remains unwritten until the gate passes.
 
 ### 1. Establish repository authority
@@ -155,7 +155,7 @@ unimplemented requirement or a broader redesign. Do not grow the Spec to absorb 
   in the next shared understanding, and show the added FRs, authorities and artifacts separately,
   so scope drift stays visible before authoring.
 - When the user later narrows the scope again, remove every absorbed artifact: Spec sections,
-  design references, PRD, Issue and Pencil changes. Record the withdrawn items only as
+  design references, PRD, Issue and Doop frame changes. Record the withdrawn items only as
   exclusions and in the revision history.
 
 #### Exhaustive questionnaire mode
@@ -276,7 +276,7 @@ Spec, reread the Rule and rebuild the Rule Pack.
 Create `documentation/features/<domain>/<feature>/spec.md` using short kebab-case names.
 For a distinct change to a concluded feature, use
 `documentation/features/<domain>/<feature>/changes/<change-name>/spec.md`.
-Create saved `design/handoff.md` and references when UI is design-backed. Evaluation starts
+Record the Design Contract in `spec.md` when UI is design-backed. Evaluation starts
 at implementation kickoff and owns actual results, findings, unfinished ACs and the short
 continuation handoff. Do not create a Plan.
 
@@ -361,124 +361,61 @@ several restrictions apply.
 
 #### Design Contract — conditional
 
-New design bundles use `design/handoff.md` as the canonical filename. Existing bundles
-may retain `design/manifest.md`; consuming workflows use that legacy file only when
-`design/handoff.md` is absent. Do not create both files for a new bundle.
+For design-backed UI, the design source is the Doop canvas `Scoops`. Define the Design
+Contract in `spec.md`: do not create a design handoff file or save design screenshots. Name
+every frame by page and frame name as `documentation/rules/doop-rules.md` defines, and record
+the required frames and states, exact viewports, responsive behavior, implementation
+surfaces and allowed deviations. Record each frame's Doop `updatedAt` as provenance; a frame
+that changes after the Spec is a Design Contract change.
 
-For design-backed UI, link `design/handoff.md` and define required frames/states,
-screenshot coverage, exact viewports, responsive behavior, implementation surfaces and
-allowed deviations. Keep the detailed frame inventory in the handoff, not `spec.md`.
+Builders and the Visual Reviewer read the named frames, components and tokens through the
+Doop MCP, read-only, and use the Playwright CLI for browser interaction and fresh runtime
+captures. They never edit the canvas. The Spec creator reads the frames the same way and
+uses `/design` when the canvas lacks a state the Spec needs. If a required detail is
+missing from the frames, treat it as a Design Contract gap and resolve it before handing the
+surface to implementation.
 
-#### Implementation-facing design handoff
+#### Mandatory frame analysis and coverage proposal
 
-Implementation and UI-validation agents must not use Pencil MCP or the live canvas.
-Their design inputs are the saved handoff and screenshots; node IDs are provenance only.
-Require Playwright CLI for browser interaction and fresh runtime capture comparisons.
-The Spec authoring workflow may use Pencil to inspect/design and export those inputs.
-If required details are missing, treat them as a Design Contract gap and complete the
-saved handoff/reference bundle before handing the surface to implementation.
-
-`design/handoff.md` must go beyond a screenshot inventory. Preserve the inventory and
-add measured design specifications for the affected regions/components so a Builder can
-implement the visual result without guessing or reopening the design tool:
-
-- source node/component IDs and mapping to existing repository surfaces;
-- container sizing, padding, gaps, alignment, columns and content-driven height;
-- font family, size, weight, line-height when explicitly defined, and text wrapping;
-- color, border, radius, shadow and icon dimensions, mapped to existing tokens;
-- desktop/narrow/paper behavior where applicable, including focus/disabled/error states;
-- differences between inspected design values and existing component defaults, with
-  repository-governed mappings and approved deviations clearly distinguished;
-- comparison checklist tied to the existing AC/MV/evidence targets.
-
-Use concise property tables with `Element/source | Design value | Repository mapping |
-Responsive/state guidance` or equivalent columns. Read actual design properties and
-existing source; never infer exact measurements from screenshots, claim unspecified
-line-height values, or invent tokens. Label measured reference values separately from
-approved responsive assumptions. Keep product/runtime behavior in the Spec; the handoff
-describes its visual realization without introducing new behavior.
-
-#### Mandatory screenshot analysis and coverage proposal
-
-The Spec creator must visually inspect every supplied design screenshot before writing the
-Design Contract. Filenames, dimensions, OCR or a textual description are not substitutes
-for opening and analyzing the image. For each screenshot, record an implementation-facing
-inventory covering:
+The Spec creator must visually inspect every referenced frame (`get_frame_screenshot`,
+`get_frame` and `inspect_frame`) before writing the Design Contract. Frame names, dimensions,
+exported HTML or a textual description are not substitutes for seeing the frame. Never infer
+exact measurements from a screenshot; read the frame's actual properties and the existing
+source, and never invent tokens. For each frame, record an implementation-facing inventory
+covering:
 
 - exact viewport and visible route/surface/state;
 - page regions, containers, columns, cards, rows, controls, icons and status indicators;
 - visible copy, labels, actions, read-only/disabled/selected/error/loading states;
 - hierarchy, alignment, spacing relationships, dimensions, typography, color tokens,
   borders, radii, shadows and responsive implications;
+- differences between the frame's values and existing component defaults, with
+  repository-governed mappings and approved deviations clearly distinguished;
 - elements intentionally absent, ambiguous, or likely to be confused with adjacent scope;
-- the FR/AC criteria and implementation surface that the screenshot must validate.
+- the FR/AC criteria and implementation surface that the frame must validate.
 
-The design handoff must preserve that analysis in a concise table or linked design note:
+Keep the inventory in a concise table in the Design Contract:
 
-| Reference | Route/surface/state | Viewport | Required visible inventory | Interaction/state coverage | Ambiguities or exclusions | Validation target |
-| --- | --- | --- | --- | --- | --- | --- |
-| `<screenshot>` | `<route and state>` | `<width × height>` | `<elements and hierarchy>` | `<controls/states>` | `<explicit notes>` | `<AC/MV/validation-artifact identifier>` |
+| Frame (page / name) | Route/surface/state | Viewport | Required visible inventory | Interaction/state coverage | Ambiguities or exclusions | Tokens/components | Validation target |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `<page / frame name>` | `<route and state>` | `<width × height>` | `<elements and hierarchy>` | `<controls/states>` | `<explicit notes>` | `<mapped primitives>` | `<AC/MV/validation-artifact identifier>` |
 
-After reviewing the supplied screenshots, the Spec creator must decide whether additional
-screenshots are necessary. Suggest them whenever the supplied bundle leaves a material gap,
-including missing loading, error, empty, success, disabled, dialog, dropdown, permission,
-role, tenant, mobile or breakpoint states. Each suggestion must state:
+After reviewing the frames, the Spec creator must decide whether additional frames are
+necessary. Suggest them whenever the canvas leaves a material gap, including missing
+loading, error, empty, success, disabled, dialog, dropdown, permission, role, tenant, mobile
+or breakpoint states. Each suggestion must state:
 
 - the proposed route/surface/state and role or fixture;
 - the exact viewport;
-- why the supplied references are insufficient;
+- why the existing frames are insufficient;
 - the FR/AC/MV criteria it would clarify;
 - whether it is **required before implementation** or **recommended supplemental coverage**.
 
-Required supplemental screenshots must be captured and added to the feature-local design
-bundle before the Spec becomes `open`, or the user must explicitly accept a documented
-visual assumption. Recommended screenshots may be deferred only when the handoff records
-the deferral, rationale and planned validation state.
-
-During Spec research, use the Pencil skill and MCP for `.pen` contents. Never inspect a
-`.pen` file through shell or generic filesystem tools. Before setting the Spec to `open`:
-
-1. inspect editor state/schema and every relevant frame/state, component, variable,
-   viewport and node name;
-2. save one screenshot per relevant frame/state under the feature-local `design/` folder;
-3. create a handoff using this table:
-
-   | Reference | Pencil file/node | State | Viewport | Screenshot | Implementation surface | Tokens/components | Validation |
-   | --- | --- | --- | --- | --- | --- | --- | --- |
-   | `<name>` | `<file and node ID>` | `<state>` | `<width × height>` | `<relative link>` | `<route/widget>` | `<mapped primitives>` | `<required comparison>` |
-
-4. record layout-problem inspection for every mapped node;
-5. define responsive behavior when a required viewport has no Pencil frame.
-
-For every screenshot, verify that the handoff path exists and is non-empty, the file is a
-valid image, visual inspection succeeds, dimensions match the declared viewport or record
-the deliberate export scale, and screenshot count matches handoff coverage. An MCP export
-response alone is not proof that the file exists in the shared workspace. Also verify that
-every supplied screenshot has a completed visual inventory, every required supplemental
-capture is present or explicitly accepted as an assumption, and every reference/state has a
-planned implementation comparison and evidence target.
-
-The Pencil host may resolve the requested output path on a different filesystem than the
-repository checkout (for example a Windows drive instead of the WSL path). After every export,
-compare the absolute paths the export reports with the feature-local `design/` directory. When
-they differ, copy the images into the repository path, verify them there and remove only the
-stray copies the export created. Never treat a reported path on another host as a saved
-reference.
-
-Design edits made through Pencil MCP live in the open editor until the document is saved.
-After editing a `.pen` file, check that the file on disk changed after the last edit (for
-example its modification time or `git status`). If it did not, ask the user to save the
-document in Pencil and report it as an open item; do not claim the design change is saved.
-
-If export cannot reach a shared repository path, keep the Spec `draft` and report the
-artifact blocker. Builders and the Orchestrator use the saved bundle without live Pencil.
-Reopen Pencil only when the Design Contract changes or the user requests a refresh.
-
-For Pencil export, use the available skill and current MCP schema rather than hardcoded
-host paths or API examples. Inspect editor state with `include_schema: true` when unknown,
-export to the shared feature-local design directory, and verify saved images with normal
-image tools. Never inspect `.pen` contents through filesystem tools. Refresh the saved
-bundle when the Design Contract changes.
+Required missing frames must be drawn with `/design` before the Spec becomes `open`, or the
+user must explicitly accept a documented visual assumption. Recommended frames may be
+deferred only when the Design Contract records the deferral, rationale and planned
+validation state. Define responsive behavior when a required viewport has no frame. Every
+frame and state needs a planned implementation comparison and evidence target.
 
 ### 3. Technical Contract
 
@@ -602,7 +539,7 @@ transport distinct from real authenticated/server-backed proof.
 List applicable code/type/architecture/test-integrity, coverage, build and integration checks
 for affected workspaces. Include REST-client route/example parity when HTTP routes change.
 Use Playwright CLI for browser flows, narrow viewport and keyboard coverage, fresh screenshots
-and comparison with every saved design reference. Runtime captures belong in ignored
+and comparison with every Doop frame in the Design Contract. Runtime captures belong in ignored
 `test-results/` or CI artifacts; record paths/results in Evaluation.
 
 Run applicable integration suites after the candidate is integrated. Correct failures and
@@ -652,10 +589,9 @@ Before setting the Spec to `open`, verify:
 - material ambiguities and authority changes are resolved;
 - public boundary/data/migration contracts and consequential decisions are precise, while
   routine internal structure remains agent-owned;
-- saved references exist in the repository path (not only at a path reported by the design
-  host), were visually inspected, cover required states/viewports and map to acceptance checks;
-  required missing design information is resolved; edited `.pen` files are saved, or the unsaved
-  state is reported to the user;
+- the Doop frames in the Design Contract exist, were visually inspected, cover required
+  states/viewports and map to acceptance checks; required missing design information is
+  resolved;
 - every Spec section, reference and authority change traces to the source scope or to a
   user-approved absorption recorded in the decision ledger;
 - commands/prerequisites are real, checker ownership follows Rules, and mocked evidence
@@ -679,7 +615,7 @@ not parsed by a tool. Write them as fluid, readable prose:
 - introduce internal identifiers (FR/AC IDs, node IDs, symbols) with a plain description of what
   they are, and avoid unexplained jargon;
 - separate what is done, what is open and what the user must do next, and end with one clear
-  call to action when one is needed (for example, saving an edited `.pen` file);
+  call to action when one is needed (for example, running `/design` for a missing frame);
 - keep grilling questions in the lettered format required by the grilling protocol; these rules
   govern the surrounding explanation, not the question structure.
 

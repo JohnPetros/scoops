@@ -161,7 +161,7 @@ export function mutationContext(root, environment = process.env) {
   )
 
   for (const path of [...new Set(paths)].sort()) {
-    // Design documents are not runtime inputs and must only be accessed through Pencil.
+    // Design documents are not runtime inputs.
     if (
       path.endsWith('.pen') ||
       /(^|\/)\.env(?:\.|$)/.test(path) ||

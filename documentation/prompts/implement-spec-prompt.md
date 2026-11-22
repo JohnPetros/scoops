@@ -39,7 +39,7 @@ Before the first feature edit:
 2. create or reconcile `evaluation.md` from
    [`evaluation.md`](../templates/sdd/evaluation.md), preserving historical results;
 3. inspect current source and the shared worktree; identify scope boundaries, existing
-   findings, required services, accounts, fixtures and design references;
+   findings, required services, accounts, fixtures and the Doop frames in the Design Contract;
 4. when browser work applies, run `pnpm --filter web check:playwright` using the documented
    command, correct failures, and record the result before affected implementation;
 5. record a concise current result and known blockers in Evaluation.
@@ -102,10 +102,10 @@ Evaluation `ready` authorizes conclusion, not delivery closure; `conclude-spec` 
 
 ## Design-backed UI
 
-Read `documentation/design.md`, applicable UI Rules and every required saved reference.
-Use `design/handoff.md`; for an existing bundle lacking it, use its legacy
-`design/manifest.md` without creating both. Treat node IDs as provenance.
-Implementation and runtime validation consume the saved bundle rather than live Pencil.
+Read `documentation/design.md`, applicable UI Rules and every Doop frame named in the Spec's
+Design Contract, read-only through the Doop MCP (`get_frame`, `inspect_frame`,
+`get_frame_screenshot`). A legacy saved bundle under an older Spec's `design/` folder is
+historical; the Doop frame of the same name is the reference. Never edit the canvas here.
 Missing required design details are Contract gaps; route them for amendment before affected
 work rather than inferring behavior from screenshots.
 
@@ -138,8 +138,8 @@ Once all source and shared/generated artifacts form one coherent candidate:
 5. activate exactly one independent read-only
    [`Implementation Reviewer`](../agents/implementation-reviewer-agent.md) for the complete
    candidate. For a design-backed UI candidate, also activate one
-   [`Visual Reviewer`](../agents/visual-reviewer-agent.md) with fresh captures and saved
-   references. Reviews may run in parallel with verification once their needed inputs exist;
+   [`Visual Reviewer`](../agents/visual-reviewer-agent.md) with fresh captures and the Doop
+   frames to compare them with. Reviews may run in parallel with verification once their needed inputs exist;
 6. verify findings, apply in-Contract corrections automatically, and rerun failed and affected
    checks until every required proof passes.
 

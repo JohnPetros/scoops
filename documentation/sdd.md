@@ -22,7 +22,7 @@ nested `AGENTS.md`, this workflow, [`modules.md`](./modules.md),
 [`architecture.md`](./architecture.md), [`rules.md`](./rules.md) and its selected Rule
 Pack, and [`tooling.md`](./tooling.md). Inspect actual manifests and affected code.
 Read the complete affected module PRD and relevant Issue/report/direct request.
-For UI, also read [`design.md`](./design.md) and the saved design references.
+For UI, also read [`design.md`](./design.md) and the Doop frames named in the Spec's Design Contract.
 
 Reuse complete reads and repository facts already current in the same context.
 Refresh affected sources when scope expands, authority changes or facts become
@@ -81,16 +81,13 @@ evidence only to rename an identifier.
 ```text
 documentation/features/<domain>/<feature>/
 ├── spec.md                 # contracts and checkers
-├── evaluation.md           # progress, evidence, findings and current handoff
-└── design/                 # saved references when material
-    ├── handoff.md
-    └── <reference screenshots>.png
+└── evaluation.md           # progress, evidence, findings and current handoff
 ```
 
 Use the [Spec](./templates/sdd/spec.md) and [Evaluation](./templates/sdd/evaluation.md)
 templates. New behavior for an already concluded feature uses
-`changes/<change-name>/` under that feature. Existing design bundles may retain
-`design/manifest.md`; do not create a duplicate handoff solely to rename it.
+`changes/<change-name>/` under that feature. The Design Contract lives in `spec.md` and names
+Doop frames; a legacy `design/` folder in an older feature is historical and is not recreated.
 
 Evaluation is created at implementation kickoff, not during Spec authoring.
 
@@ -105,8 +102,8 @@ relying on the new handoff. Do not silently discard or weaken earlier obligation
 
 Implementation captures are transient validation artifacts under ignored
 `test-results/` output or CI artifacts. Record state, viewport, comparison result
-and path in Evaluation. Saved design references remain durable; do not create new
-implementation evidence directories under feature documentation.
+and path in Evaluation. Do not create new implementation evidence directories under
+feature documentation; design references are the Doop frames, not saved images.
 
 ## Contract and checkers
 
@@ -118,7 +115,7 @@ It defines:
 - observable `FR-*`, testable Given/When/Then `AC-*`, and traceability to product intent;
 - module ownership, public interfaces, persistent invariants, runtime boundaries,
   migrations and consequential or difficult-to-reverse technical decisions;
-- applicable saved design references, required states and viewports;
+- the applicable Doop frames, required states and viewports;
 - concrete proof for every criterion: commands or test selectors, expected assertions,
   environment/fixtures, manual steps or visual comparisons and evidence limits;
 - the exact Rule Pack and material contract revisions.
@@ -202,7 +199,9 @@ only for material contract amendments. One independent
 [Implementation Reviewer](./agents/implementation-reviewer-agent.md) assesses the
 integrated implementation and proof coverage. For design-backed UI, run the
 [Visual Reviewer](./agents/visual-reviewer-agent.md) in parallel on the same candidate
-using current required captures. Reviewers do not edit files, decide official
+using current required captures. For frames drawn on the Doop canvas, the `design` and
+`review-design` workflows have the [Design Reviewer](./agents/design-reviewer-agent.md)
+review them against the module PRD and `design.md`. Reviewers do not edit files, decide official
 readiness or automatically rerun integration suites. Findings need concrete evidence
 and a mapped correction; the Orchestrator verifies them.
 
@@ -298,7 +297,7 @@ and changed product behavior uses a new change Spec.
 `conclude-spec` requires Spec `in_progress`, Evaluation `ready` in the local working
 tree, current accepted evidence and no verified blocker. The `ready` transition does
 not need a separate PR commit. Reconcile source authority, generated artifacts,
-migrations, saved design coverage, REST parity and scope. Reuse valid local checks;
+migrations, Doop frame coverage, REST parity and scope. Reuse valid local checks;
 run missing or invalidated proof. Corrections immediately re-enter implementation
 and conclusion, subject to documented external blockers and bounded retry limits.
 
@@ -307,10 +306,10 @@ With authorization to commit, push and publish:
 1. resolve every selected `PRQ-*` through FR/AC to evidence and classify it as fully
    delivered, partially delivered or deferred after local closure preflight and before the
    delivery commit;
-2. use `commit-code` for scoped commits, including delivery-owned Spec/Evaluation
+2. use `commit` for scoped commits, including delivery-owned Spec/Evaluation
    and required PRD changes; exclude inherited unrelated governance or user work
    unless explicitly authorized, recording its disposition;
-3. invoke `create-pr` when the delivery PR is missing or its publication details
+3. invoke `open-pr` when the delivery PR is missing or its publication details
    are stale; update the same PR and record its URL;
 4. publish the integrated implementation candidate and require every applicable
    checked-in GitHub Actions workflow to pass on that candidate PR head;
@@ -331,13 +330,13 @@ never reported as passed proof. Do not merge or deploy without an explicit reque
 | Workflow | Canonical source |
 | --- | --- |
 | Define product intent | [create-prd](./prompts/create-prd-prompt.md) |
-| Create feature Issue | [create-feat-issue](./prompts/create-feat-issue.md) |
-| Create refactor Issue | [create-refactor-issue](./prompts/create-refactor-issue-prompt.md) |
+| Open feature Issue | [open-feat-issue](./prompts/open-feat-issue-prompt.md) |
+| Open refactor Issue | [open-refactor-issue](./prompts/open-refactor-issue-prompt.md) |
 | Create or amend Spec | [create-spec](./prompts/create-spec-prompt.md) |
 | Implement and verify | [implement-spec](./prompts/implement-spec-prompt.md) |
 | Increase existing-behavior coverage | [increase-test-coverage](./prompts/increase-test-coverage-prompt.md) |
 | Publish and conclude | [conclude-spec](./prompts/conclude-spec-prompt.md) |
-| Create or update delivery PR | [create-pr](./prompts/create-pr-prompt.md) |
+| Create or update delivery PR | [open-pr](./prompts/open-pr-prompt.md) |
 | Resolve PR feedback | [resolve-pr-feedback](./prompts/resolve-pr-feedback-prompt.md) |
 
 Prompts and agent contracts inherit this workflow. `pnpm sync:commands` and

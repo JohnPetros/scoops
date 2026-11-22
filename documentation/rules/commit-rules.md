@@ -162,4 +162,4 @@ echo "feat(web): add sign-up form" | pnpm exec commitlint
 
 Commit messages follow Conventional Commits (this document). **PR titles do not** —
 they are plain noun phrases without a type prefix. See
-[`documentation/prompts/create-pr-prompt.md`](../prompts/create-pr-prompt.md).
+[`documentation/prompts/open-pr-prompt.md`](../prompts/open-pr-prompt.md).

@@ -184,7 +184,7 @@ No in-scope partial or deferred requirement remains. Local validation and implem
 ### Publication scope preflight
 
 - Feature delivery: exactly39contractedWebpaths; featureSpec/Evaluation/handoff/sevenPNGrefs and user-requested design/onoreo.pen update.
-- Related user-requested handoff/SDD workflow updates: documentation/agents/builder-agent.md, visual-reviewer-agent.md; documentation/prompts/create-spec-prompt.md, create-plan-prompt.md, create-pr-prompt.md, implement-spec-prompt.md, conclude-spec-prompt.md; documentation/sdd.md. They support this same design/handoff delivery and are proposed for intentional inclusion, not accidental staging.
+- Related user-requested handoff/SDD workflow updates: documentation/agents/builder-agent.md, visual-reviewer-agent.md; documentation/prompts/create-spec-prompt.md, create-plan-prompt.md, open-pr-prompt.md, implement-spec-prompt.md, conclude-spec-prompt.md; documentation/sdd.md. They support this same design/handoff delivery and are proposed for intentional inclusion, not accidental staging.
 - Factual closure alignment: documentation/tooling.md authstate guidance and PRQ16checkbox nowchecked afterfinalpreflightpasses.
 - Exclude local auth states, ignored runtimecaptures/PDFs, /tmpscripts/logs and databasefixtures from publication. OriginaltrackedAuthstatesunchanged; no unrelatedsource editsidentified. User authorized conclude-spec publication on 2026-10-01; all listed delivery-owned documentation is included. No unrelated user documentation is excluded.
 
@@ -248,4 +248,4 @@ Core CI, Server CI and Validation CI are inapplicable: their checked-in path fil
 
 | 2026-10-01 | User explicitly authorized conclude-spec commits/push/PR. Fresh path sensor passed39paths; sync:agents unchanged and21script tests passed. Read-only publication audit reconciled PRQ16/revision5/focusedCLI command and registered-long capture descriptions; no implementation or acceptance change. Current origin/main equals validated baseline. |
 
-| 2026-10-01 | Published commits2ce6a729 andedf5c0f8 through commit-code/create-pr, ready PR#50 with main current and @codex review requested. Candidate PR WebCI passed onedf5c0f8048ad1e3360e78b688dbbbe5c651c140 (CI01),558unit/243browser/build; complete documentation and finding disposition audit passed. Spec/Evaluation completed in expected closure commit; final head checks remain authoritative in PR rollup. No unrelated local files included; no merge/deploy. |
+| 2026-10-01 | Published commits2ce6a729 andedf5c0f8 through commit/open-pr, ready PR#50 with main current and @codex review requested. Candidate PR WebCI passed onedf5c0f8048ad1e3360e78b688dbbbe5c651c140 (CI01),558unit/243browser/build; complete documentation and finding disposition audit passed. Spec/Evaluation completed in expected closure commit; final head checks remain authoritative in PR rollup. No unrelated local files included; no merge/deploy. |

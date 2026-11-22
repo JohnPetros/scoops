@@ -10,6 +10,7 @@
     "sync:commands": "node scripts/sync-commands.mjs",
     "sync:agents": "node scripts/sync-agents.mjs",
     "sync": "pnpm sync:commands && pnpm sync:agents",
+    "doop": "node ./scripts/open-doop.mjs",
     "test:scripts": "node --test scripts/tests/*.test.mjs",
     "check:test-integrity": "node scripts/check-test-integrity.mjs",
     "check:complexity": "node scripts/check-complexity.mjs",
