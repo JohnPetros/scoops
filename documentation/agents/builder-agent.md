@@ -69,7 +69,7 @@ Rule is clear, correct the code; do not invent or weaken a Rule.
 ## Builder Result
 
 - **Responsibility:** <stable ownership scope or correction>
-- **Plan tasks:** <task IDs with done | blocked each, or no Plan>
+- **Plan tasks:** <task IDs with completed | in_progress each and the paths delivered, or no Plan>
 - **Status:** completed | blocked
 - **Files created/changed:** <paths>
 - **Observable result:** <what now works>

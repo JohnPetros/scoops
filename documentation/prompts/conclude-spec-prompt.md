@@ -69,10 +69,10 @@ according to the change. Delivery PRs must be ready for review; verify `isDraft:
    delivery commit, publication or final PR CI, record the delivery disposition in
    `evaluation.md`.
 
-When the delivery has a `plan.md`, require every task to be `done` or `superseded` with its
-reason, and its Current state to match the candidate. Reconcile an open task before the
-delivery commit: finish it through `implement-spec` or supersede it with the reason recorded.
-Task status is progress only; it never substitutes for the evidence above.
+Unless the Evaluation declares `plan: none`, require
+`pnpm check:spec-implementation -- <exact-spec-path> --require-plan` to pass on the candidate,
+so every Plan row is `completed` and matches Git. A failing check re-enters `implement-spec`.
+Plan status is progress only; it never substitutes for the evidence above.
 
 Evaluation `ready` is permission to proceed with closure, not proof of delivery.
 
@@ -160,7 +160,8 @@ until passing or an actual authority/external blocker prevents progress.
 Keep Evaluation concise and sufficient for resumption: current revision/status, AC results,
 exact checks and outcomes, runtime/manual/visual evidence, independent review findings,
 unresolved findings and unfinished criteria, and a short continuation handoff. Use its
-canonical shape from `implement-spec`; do not add a task, phase or ownership ledger.
+canonical shape from `implement-spec`; task and ownership progress stays in `plan.md`, not
+in Evaluation.
 
 Before closure, verify the delivery disposition against the same `PRQ-*`/`FR-*`/`AC-*` mapping.
 Review material findings, including resolved failures, for reusable guidance. Record the

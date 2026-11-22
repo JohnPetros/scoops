@@ -8,18 +8,19 @@ description: Implement an open or resumed Spec autonomously, integrate the candi
 Use this single implementation entry point in the current chat:
 
 ```text
-Spec → Plan → implementation → integrated verification
+plan-spec → implementation → integrated verification
                                     ↓
                            corrections until passing
                                     ↓
                                conclude-spec
 ```
 
-The Spec defines behavior, boundaries, consequential decisions and proofs. This prompt
-defines the proof workflow; the agent chooses implementation order, decomposition,
-delegation and isolation, and records that breakdown in the colocated `plan.md`, following
-the [Plan rules](../sdd.md#plan). The Plan tracks phases, tasks, Builders and task status;
-Evaluation records evidence and findings. Task status is progress, never proof.
+The Spec defines behavior, boundaries, consequential decisions and proofs, including the Path
+map. [`plan-spec`](./plan-spec-prompt.md) has already turned that map into the colocated
+`plan.md`, following the [Plan rules](../sdd.md#plan). This prompt executes the Plan's tasks
+and defines the proof workflow; the agent still chooses internal order within `Depends on`,
+delegation and isolation. The Plan tracks tasks, Builders and per-path progress; Evaluation
+records evidence and findings. Plan status is progress, never proof.
 
 ## Read and establish scope
 
@@ -40,13 +41,12 @@ Before the first feature edit:
    [`evaluation.md`](../templates/sdd/evaluation.md), preserving historical results;
 3. inspect current source and the shared worktree; identify scope boundaries, existing
    findings, required services, accounts, fixtures and the Doop frames in the Design Contract;
-4. create or reconcile `plan.md` from [`plan.md`](../templates/sdd/plan.md). It is required
-   when the Spec's depth is `complete` and optional for `compact`. Break the work into
-   phases that each leave an observable result behind, and phases into bounded tasks with
-   their covered `FR-*`/`AC-*`, owned workspace or boundary, dependencies and Builder. Tasks
-   whose scopes do not overlap and whose inputs are stable belong in the same phase so they
-   can run in parallel. When resuming, mark tasks whose Builder no longer exists `pending`
-   or reassign them, and record the reassignment in the Plan's History;
+4. require `plan.md` for the current Spec revision and run
+   `pnpm check:spec-implementation -- <exact-spec-path> --plan-only`. When the Plan is missing
+   or the check fails, run `plan-spec` first; do not start implementation on a failing Plan.
+   Only a delivery whose Evaluation declares `plan: none` proceeds without one. Assign every
+   `unassigned` task a Builder. When resuming, reassign tasks whose Builder no longer exists
+   and record the reason in the task's Notes;
 5. when browser work applies, run `pnpm --filter web check:playwright` using the documented
    command, correct failures, and record the result before affected implementation;
 6. record a concise current result and known blockers in Evaluation.
@@ -59,19 +59,19 @@ or readiness; a new Plan covers only the work that remains.
 
 ## Organize and implement
 
-This prompt does not dictate the breakdown. It defines what must be read, proven and
-recorded; the agent decides how to get there and writes that decision into the Plan. The
-agent may implement a task directly, assign it to a [Builder](../agents/builder-agent.md)
-subagent, or run independent tasks in parallel in isolated git worktrees when their paths do
-not overlap and their input contracts are stable, then merge and re-verify. Give each Builder
-its task IDs, and name it after its responsibility as `AGENTS.md` requires.
+Execute tasks in `Depends on` order. The agent may implement a task directly, assign it to a
+[Builder](../agents/builder-agent.md) subagent, or run tasks with no dependency between them in
+parallel in isolated git worktrees when their paths do not overlap, then merge and re-verify.
+Give each Builder its task IDs and the paths of its rows, and name it after its responsibility
+as `AGENTS.md` requires.
 
-Keep the Plan current at the moments that change it: assigning a task, finishing it, blocking
-it, splitting or superseding it, and finishing a phase. Update the Current state section at
-the same time. Revise phases and tasks as the work teaches you; changes within the Contract
-need no Spec amendment, only a History row. Do not restate Spec behavior, Rules or file
-inventories in the Plan, and do not mark a task `done` until its Builder's diff is
-integrated and its focused checks pass.
+Only the Orchestrator edits the Plan, following the maintenance rules in `plan-spec`. Update
+rows and task status at significant checkpoints, not at every edit. Mark a row `completed`
+only after inspecting the integrated diff for that path. A blocker keeps the row
+`in_progress` with its `FND-*` in Notes. When implementation needs a file the Path map does
+not list, or names one differently, make the non-material Path map correction in the Spec,
+then re-run `plan-spec` to reconcile the Plan; a change to the Contract itself goes through
+amendment.
 
 Whoever delegates still integrates: inspect delegated diffs together, because a subagent's
 report alone does not establish acceptance.
@@ -157,11 +157,11 @@ Once all source and shared/generated artifacts form one coherent candidate:
 6. verify findings, apply in-Contract corrections automatically, and rerun failed and affected
    checks until every required proof passes.
 
-The structural command `pnpm check:spec-implementation -- <exact-spec-path>` applies only
-when the Spec declares exact paths classified as `Create`, `Modify`, `Generate` or `Remove`.
-Record its result where applicable and rerun it when its contracted path state changes. It
-checks disk/Git conformance, not behavior. Lean Specs without such a path contract do not need
-an exhaustive file inventory or this legacy structural gate; do not manufacture one.
+Run `pnpm check:spec-implementation -- <exact-spec-path> --require-plan` on the integrated
+candidate. It checks every Path map row against Git and disk, and requires every Plan row to be
+`completed` and consistent with the Spec. Record its result in Evaluation and rerun it when the
+contracted path state changes. It checks structure, not behavior. A legacy Spec without a Path
+map and with `plan: none` uses its contracted checkers and a scoped diff inspection instead.
 
 Reviewers inspect the Spec, integrated diff and current evidence. They do not automatically
 replay browser/manual scenarios or repeat complete suites. Reuse valid evidence; request a
@@ -217,11 +217,11 @@ requiring a new Rule for every defect.
 
 Keep Evaluation `in_progress` while required criteria, checks or verified blocking findings
 remain open. Set it to `ready` when all required evidence is current, both applicable reviews
-are reconciled, no blocking finding remains and every Plan task is `done` or `superseded`.
-Corrections found by verification or review become new or reopened Plan tasks. Proceed to `conclude-spec` when publication
-authority exists; do not mark the Spec completed here.
+are reconciled, no blocking finding remains and `--require-plan` passes. Corrections found by
+verification or review reopen the affected Plan rows and tasks. Proceed to `conclude-spec`
+when publication authority exists; do not mark the Spec completed here.
 
-Before interruption or handoff, update the Plan's Current state and task statuses, and leave
+Before interruption or handoff, update the Plan's rows and task statuses, and leave
 a small continuation record in Evaluation: branch/candidate provenance, current progress,
 interrupted or uncommitted paths, unfinished criteria, active blockers, latest checker
 IDs/results, affected stale evidence and the next useful action. Keep task breakdown in the

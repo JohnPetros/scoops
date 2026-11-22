@@ -2,13 +2,14 @@
 
 Scoops uses SDD for features and changes that need an explicit product or technical
 contract. The Spec defines the required outcomes and their checkers. The agent
-organizes implementation autonomously and records its breakdown in a Plan. Evaluation
-records actual progress, findings and verified evidence through pull-request closure.
+organizes implementation autonomously, and the Plan tracks that work task by task against
+the Spec's Path map. Evaluation records verified evidence and findings through pull-request
+closure.
 
 ```text
-Spec → Plan → implementation → integrated verification → conclusion
-                                    ↑            ↓
-                                    └── fixes ───┘
+create-spec → plan-spec → implementation → integrated verification → conclusion
+                                               ↑            ↓
+                                               └── fixes ───┘
 ```
 
 Behavior-preserving maintenance may use direct implementation when a feature
@@ -56,7 +57,7 @@ technical dependencies, implementation priority, foundation work, execution phas
 parallelism. The implementing agent derives execution dependencies from the Technical Contract and real
 repository boundaries, never from the PRD graph.
 
-PRDs do not record delivery state. Delivery is tracked by the Plan's task state and by Spec and
+PRDs do not record delivery state. Delivery is tracked by Plan progress and by Spec and
 Evaluation evidence, and
 Evaluation `ready` means implementation evidence can enter conclusion.
 
@@ -82,7 +83,7 @@ evidence only to rename an identifier.
 ```text
 documentation/features/<domain>/<feature>/
 ├── spec.md                 # contracts and checkers
-├── plan.md                 # phases, tasks, Builders and task status
+├── plan.md                 # tasks, Builders and per-path progress
 └── evaluation.md           # evidence, findings and current handoff
 ```
 
@@ -92,35 +93,39 @@ feature uses
 `changes/<change-name>/` under that feature. The Design Contract lives in `spec.md` and names
 Doop frames; a legacy `design/` folder in an older feature is historical and is not recreated.
 
-Plan and Evaluation are created at implementation kickoff, after the Spec is `open`, not
-during Spec authoring. There is no separate `create-plan` step; `implement-spec` writes the
-Plan before the first feature edit.
+The Plan is created by [`plan-spec`](./prompts/plan-spec-prompt.md) after the Spec is
+`open` and before `implement-spec` starts. Evaluation is created at implementation kickoff.
+Neither is created during Spec authoring.
 
 ### Plan
 
-The Plan records how the Orchestrator broke the delivery into phases and tasks, which Builder
-owns each task and where each task stands. It is required when the Spec's depth is `complete`
-and optional for `compact`, where the Orchestrator may track the work in its own context.
+`plan.md` is the single source of implementation progress. Every new Spec has one; only a
+delivery that predates it opts out, with `plan: none` in its Evaluation frontmatter.
 
-- A phase groups tasks that leave one observable result behind and lists the phases it
-  depends on. A task is one bounded, assignable piece of work with its covered `FR-*`/`AC-*`,
-  owned workspace or boundary, Builder, dependencies and status.
-- Phase and task statuses are `pending`, `in_progress`, `done`, `blocked` and `superseded`.
-- The Plan references Spec identifiers and sections; it never restates behavior, technical
-  contracts, Rules or exhaustive file lists.
-- Task state is progress, not proof. A `done` task does not pass any `AC-*`; only accepted
-  Evaluation evidence does, and Evaluation alone decides `ready`.
-- The Plan belongs to the implementer and changes as the work does. Add, split, reorder,
-  reassign or supersede tasks within the Contract without a Spec amendment, and record each
-  material change in its History.
-- Builder names identify subagent instances, worktrees or the Orchestrator. When a session
-  ends, a resuming Orchestrator reassigns unfinished tasks and records the reassignment.
+- The **Tasks** table lists Builder assignments. A task is one cohesive outcome with disjoint
+  ownership, with its Builder (`Direct`, `unassigned` or a kebab-case `<responsibility>-builder`
+  name), the tasks it depends on and its status.
+- The **Progress** table has one row per Spec Path map row, with the same `Path` and `Change`,
+  its task, the `FR-*`/`AC-*` it serves and its status.
+- Statuses are `pending`, `in_progress` and `completed`. A blocker keeps a row `in_progress`
+  and links its `FND-*` in Notes. A task's status follows its rows.
+- There are no phases or waves. `Depends on` is the only ordering, and tasks with no
+  dependency between them can run in parallel.
+- The Plan never restates the Contract and records no evidence. A `completed` row means the
+  contracted change is in the integrated candidate; only Evaluation proves an `AC-*`.
+- Only the Orchestrator edits the Plan. It updates rows at significant checkpoints and
+  records Builder reassignments, for example after a session ends, in the task's Notes.
+- `pnpm check:spec-implementation -- <spec> --plan-only` validates the Plan against the Spec
+  before implementation. `--require-plan` additionally requires every row to be `completed`
+  and to match Git and disk; `implement-spec` runs it before `ready` and `conclude-spec`
+  before closure.
 
 Plans written before 2026-10-07 were archived under `history/legacy-execution.md` and
-remain historical. Do not move them back to `plan.md`. Resume such a feature from the
-current Spec, Evaluation and actual diff, and create a new Plan only for its remaining work;
-move any unique acceptance obligation from the archived ledger into the Spec and factual
-progress into Evaluation first. Do not silently discard or weaken earlier obligations.
+remain historical. Do not move them back to `plan.md`. A resumed delivery that predates the
+Path map either declares `plan: none` in its Evaluation, or gains a Path map through
+`create-spec` and a new Plan through `plan-spec` for its remaining work. Move any unique
+acceptance obligation from the archived ledger into the Spec and factual progress into
+Evaluation first. Do not silently discard or weaken earlier obligations.
 
 Implementation captures are transient validation artifacts under ignored
 `test-results/` output or CI artifacts. Record state, viewport, comparison result
@@ -149,16 +154,21 @@ Routes, REST and Provision; Email composition only when affected. Omit unchanged
 workspaces and layers rather than adding empty or "No changes" inventories.
 Document ownership, public contracts, runtime flow and consequential constraints
 inside their owning sections, connecting cross-layer flows where needed.
-Expected file trees and Action/Path tables may clarify affected artifacts; mark
-proposed names and illustrative, source-backed Core snippets explicitly. Include
-applicable database tables, fields, constraints, mappings and migration semantics.
-These details do not require an exhaustive future private-file inventory.
+Expected file trees may clarify affected artifacts; mark proposed names and
+illustrative, source-backed Core snippets explicitly. Include applicable database
+tables, fields, constraints, mappings and migration semantics.
 
-Specify constraints that affect correctness. Ordinary helper names, internal file
-placement, widget decomposition, exhaustive declaration inventories, task lists
-and execution waves belong to the implementer following repository conventions.
-A Spec may name an existing boundary or a required artifact without prescribing
-every future internal file. Migration semantics, atomicity, compatibility and data
+Every Spec that changes repository files has a required **Path map** in its Technical
+Contract: one `Path | Change | Serves | Purpose` table per affected app or package listing
+every file the delivery creates, modifies, generates or removes, tests included, with an
+exact path, a `Create`, `Modify`, `Generate` or `Remove` change and the `FR-*`/`AC-*` it
+serves. A move is a `Remove` plus a `Create`. Proposed internal names stay adjustable: a
+rename or added file that leaves the Contract unchanged is a non-material Path map
+correction in the same revision, followed by `plan-spec` reconciliation, not an amendment.
+
+Specify constraints that affect correctness. Ordinary helper names, widget decomposition,
+declaration inventories and execution order belong to the implementer following repository
+conventions; the Plan, not the Spec, records task breakdown. Migration semantics, atomicity, compatibility and data
 preservation must be explicit; generated metadata stays generator-owned.
 
 Every FR maps to product requirements and every AC to FR and concrete proof.
@@ -198,13 +208,11 @@ Execution errors and actionable assertion gaps require correction, not a blanket
 waiver or reduced scope. Keep mutation results in ordinary `EV-*` evidence rows
 and findings in `FND-*`; do not introduce another identifier or artifact system.
 
-`pnpm check:spec-implementation -- <spec-path>` remains available for legacy or
-new Specs that explicitly classify exact required artifact paths as `Create`,
-`Modify`, `Generate` or `Remove`. It proves only those declared artifacts, not
-behavior or exhaustive scope. Do not add an internal path inventory merely to
-satisfy this tool. If applicable, run it on the integrated candidate and repeat
-only after changes that invalidate its structural claims. Specs without those
-declarations use their contracted checkers and a scoped diff/artifact inspection.
+`pnpm check:spec-implementation -- <spec-path>` checks every Path map row against Git and
+disk, and with `--plan-only` or `--require-plan` also checks the sibling Plan. It proves the
+declared artifacts and their progress, not behavior. Run `--require-plan` on the integrated
+candidate and repeat it only after changes that invalidate its structural claims. A legacy
+Spec without a Path map uses its contracted checkers and a scoped diff/artifact inspection.
 
 ## Roles and lifecycle
 
@@ -213,7 +221,8 @@ official evidence verdict. It implements coherent scopes directly or delegates
 independent work to bounded [Builders](./agents/builder-agent.md), as `AGENTS.md`
 requires, assigning each Builder its Plan tasks. Builders own disjoint code/test scopes and
 report results per task without changing acceptance obligations or governing artifacts,
-including the Plan. Reuse Builders for related corrections where possible. Only the Orchestrator creates subagents.
+including the Plan. Reuse Builders for related corrections where possible. Only the
+Orchestrator creates subagents.
 
 During `create-spec` research, read-only [Spec Researchers](./agents/spec-researcher-agent.md),
 one per affected app or package, report verified repository facts, gaps, risks and candidate
@@ -238,7 +247,7 @@ and a mapped correction; the Orchestrator verifies them.
 | Spec | `open` | Authoring integrity and compatibility review passed. |
 | Spec | `in_progress` | Implementation or conclusion active. |
 | Spec | `completed` | Final PR CI passed and closure recorded. |
-| Plan | `in_progress` | Tasks being executed, corrected or reassigned. |
+| Plan | `in_progress` | Created by `plan-spec`; rows being implemented, corrected or reassigned. |
 | Plan | `completed` | Delivery closure recorded; set with Spec and Evaluation. |
 | Evaluation | `in_progress` | Progress and evidence being gathered or corrected. |
 | Evaluation | `ready` | All required proof accepted locally and ready for conclusion, not PRD closure. This transition need not be published as a standalone PR update. |
@@ -246,20 +255,20 @@ and a mapped correction; the Orchestrator verifies them.
 
 Executed validation outcomes are `passed`, `failed` or `blocked`. Evidence lifecycle
 may also use `pending`, `stale` or `not_applicable`; an authorized visual difference
-is recorded explicitly. Findings and incomplete criteria describe failures; phase and task
+is recorded explicitly. Findings and incomplete criteria describe failures; task and row
 statuses belong only to the Plan and never stand in for evidence. Existing historical
 identifiers, revisions and facts remain stable.
 
 ## Implementation and verification
 
 1. Establish or resume the current contract and reconcile Git status/diff with the
-   Plan and Evaluation. Create the Plan's phases and tasks, and Evaluation's acceptance
-   matrix and concise handoff, before editing. Inspect prerequisites without automatically
-   launching baseline integration suites.
-2. Implement within the contract, phase by phase. Assign tasks to bounded Builders or
-   implement them directly; use focused unit/component and static checks for early feedback.
-   Update task status and Builders at assignment, completion and blocking; record material
-   findings and meaningful checkpoints in Evaluation, not every edit.
+   Plan and Evaluation. Require a Plan that passes `--plan-only` for the current Spec
+   revision, and create Evaluation's acceptance matrix and concise handoff before editing.
+   Inspect prerequisites without automatically launching baseline integration suites.
+2. Implement within the contract, task by task in `Depends on` order, running independent
+   tasks in parallel. Assign tasks to bounded Builders or implement them directly; use
+   focused unit/component and static checks for early feedback. Update Plan rows and Builders
+   at significant checkpoints; record material findings in Evaluation, not every edit.
 3. Integrate all implementation scopes and generated artifacts. Perform any
    already-authorized delivery-branch synchronization before final verification.
 4. Run applicable static, architecture, type, build and coverage gates and each
@@ -310,10 +319,11 @@ breakdown and status belong in the Plan, not in Evaluation.
 
 ## Amendments and feedback
 
-An implementation correction keeps the Spec revision, reopens Evaluation, adds or reopens
-the correcting Plan tasks and refreshes affected proof. A changed product, design or
+An implementation correction keeps the Spec revision, reopens Evaluation, reopens the
+affected Plan rows and refreshes affected proof. A changed product, design or
 consequential technical contract returns the Spec to `draft`, reconciles governing
-authority first, increments its revision and refreshes affected design/checkers. Routine internal
+authority first, increments its revision, refreshes affected design/checkers and re-runs
+`plan-spec` to reconcile the Plan with the new revision. Routine internal
 implementation choices within the contract do not require amendments.
 
 While a PR remains open, `resolve-pr-feedback` owns comment inspection,
@@ -327,9 +337,9 @@ and changed product behavior uses a new change Spec.
 ## Publication, CI and closure
 
 `conclude-spec` requires Spec `in_progress`, Evaluation `ready` in the local working
-tree, current accepted evidence and no verified blocker. When a Plan exists, every task must
-be `done` or `superseded`; an open task is reconciled first, either finished or superseded
-with its reason, so the Plan matches the delivered candidate. The `ready` transition does
+tree, current accepted evidence and no verified blocker. Unless the Evaluation declares
+`plan: none`, `pnpm check:spec-implementation -- <spec> --require-plan` must pass, so every
+Plan row is `completed` and matches the delivered candidate. The `ready` transition does
 not need a separate PR commit. Reconcile source authority, generated artifacts,
 migrations, Doop frame coverage, REST parity and scope. Reuse valid local checks;
 run missing or invalidated proof. Corrections immediately re-enter implementation
@@ -367,6 +377,7 @@ never reported as passed proof. Do not merge or deploy without an explicit reque
 | Open feature Issue | [open-feat-issue](./prompts/open-feat-issue-prompt.md) |
 | Open refactor Issue | [open-refactor-issue](./prompts/open-refactor-issue-prompt.md) |
 | Create or amend Spec | [create-spec](./prompts/create-spec-prompt.md) |
+| Create or reconcile Plan | [plan-spec](./prompts/plan-spec-prompt.md) |
 | Implement and verify | [implement-spec](./prompts/implement-spec-prompt.md) |
 | Increase existing-behavior coverage | [increase-test-coverage](./prompts/increase-test-coverage-prompt.md) |
 | Publish and conclude | [conclude-spec](./prompts/conclude-spec-prompt.md) |

@@ -13,7 +13,8 @@ Evaluation of Spec revision `<revision>` against the current implementation.
 
 Current result: `<validated progress, unfinished criteria and blocking findings>`.
 
-<!-- Record actual results; phases, tasks and Builder assignments belong in plan.md. Preserve historical
+<!-- Record actual results; tasks, Builder assignments and path progress belong in plan.md.
+Declare plan: none in the frontmatter only for a delivery that predates plan.md. Preserve historical
 attempts. Executed check outcomes: passed, failed, blocked. Evidence lifecycle statuses:
 pending, passed, failed, blocked, stale, not_applicable. Explain blocked proof with a finding.
 Visual evidence additionally allows passed_with_authorized_difference. Findings:

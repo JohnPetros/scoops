@@ -54,7 +54,7 @@ Spec or Rules while the PR remains open:
    active, preserve its current revision and reopen the affected evidence;
 2. set `evaluation.md` to `status: in_progress`, append a review-cycle entry and record the
    comment URL as a mapped finding; when the delivery has a `plan.md`, set it to
-   `in_progress` and add a correction task referencing that finding;
+   `in_progress` and reopen the affected rows and tasks with that finding in Notes;
 3. verify the finding against the delivered product and its `PRQ-*`/`FR-*`/`AC-*` mapping. If
    it proves an affected PRD requirement is not delivered, record it as not delivered in
    `evaluation.md`; if it is only an evidence gap or transient CI/infrastructure issue
@@ -88,8 +88,8 @@ boundaries while the delivery PR remains open:
 5. update Rules, Architecture, Modules, Design or Tooling first when required;
 6. increment the Spec revision, reconcile the Design Contract and validation, set
    `evaluation.md` to `status: in_progress`, preserving unaffected evidence as current and
-   invalidated evidence as historical, and set any `plan.md` to `in_progress` with tasks for the
-   amended scope; run the applicable Spec Reviewer
+   invalidated evidence as historical, and re-run `plan-spec` to reconcile any `plan.md` with the
+   new revision; run the applicable Spec Reviewer
    inside the `create-spec` integrity gate, and return the Spec to `open` after verified findings
    are resolved without a separate user-facing approval stage;
 7. invoke `implement-spec` to autonomously implement and verify the amended contract;

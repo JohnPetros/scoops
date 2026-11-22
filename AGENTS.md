@@ -249,7 +249,7 @@ subagents through `scripts/sync-agents.mjs` (`pnpm sync:agents`); `pnpm sync` ru
 | Issues        | `open-feat-issue`, `open-bug-issue`, `open-refactor-issue`                             | Opening a scoped GitHub issue from a requirement, failure or technical debt.   |
 | PRD           | `create-prd`                                                                           | Researching, creating or refining a module PRD.                                |
 | Design        | `design`, `review-design`                                                              | Drawing the Doop frames a PRD needs, or critiquing existing frames.            |
-| SDD delivery  | `interview`, `create-spec`, `implement-spec`, `conclude-spec`                          | Specifying, implementing and closing a feature delivery.                       |
+| SDD delivery  | `interview`, `create-spec`, `plan-spec`, `implement-spec`, `conclude-spec`             | Specifying, planning, implementing and closing a feature delivery.             |
 | Bugs          | `create-bug-report`                                                                    | Diagnosing a GitHub bug issue into an evidence-based report.                   |
 | Git and PRs   | `commit`, `open-pr`, `resolve-pr-feedback`, `open-release-pr`                          | Committing, publishing a PR, resolving review feedback and releasing.          |
 | Tests         | `increase-test-coverage`                                                               | Raising coverage with behavior-focused tests without weakening baselines.      |
