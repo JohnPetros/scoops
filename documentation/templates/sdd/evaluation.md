@@ -2,6 +2,7 @@
 feature: "<domain>/<feature>"
 spec: ./spec.md
 spec_revision: 1
+plan: ./plan.md
 status: in_progress
 updated_at: YYYY-MM-DD
 ---
@@ -12,7 +13,8 @@ Evaluation of Spec revision `<revision>` against the current implementation.
 
 Current result: `<validated progress, unfinished criteria and blocking findings>`.
 
-<!-- Record actual results, not future phases or task assignments. Preserve historical
+<!-- Record actual results; tasks, Builder assignments and path progress belong in plan.md.
+Declare plan: none in the frontmatter only for a delivery that predates plan.md. Preserve historical
 attempts. Executed check outcomes: passed, failed, blocked. Evidence lifecycle statuses:
 pending, passed, failed, blocked, stale, not_applicable. Explain blocked proof with a finding.
 Visual evidence additionally allows passed_with_authorized_difference. Findings:
@@ -67,7 +69,7 @@ when useful; provenance is not a separate status gate. Retain failed and superse
 
 ## Continuation handoff
 
-<!-- Keep this short and current. It is a resumption aid, not an execution plan. -->
+<!-- Keep this short and current. It is a resumption aid; task state lives in plan.md. -->
 
 - **Branch/candidate:** `<branch and diff/checkpoint or useful commit provenance>`
 - **Progress:** `<current integrated/unfinished state>`

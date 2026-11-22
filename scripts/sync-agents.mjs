@@ -91,6 +91,14 @@ function isReviewer(name) {
   return name.endsWith('-reviewer-agent')
 }
 
+function isResearcher(name) {
+  return name.endsWith('-researcher-agent')
+}
+
+function isReadOnly(name) {
+  return isReviewer(name) || isResearcher(name)
+}
+
 function generatedMarker(sourcePath) {
   return `<!-- Auto-generated from ${relativePath(sourcePath)} -->`
 }
@@ -173,7 +181,7 @@ const codexRoles = [CURRENT_BEGIN_MARKER]
 for (const { name, description, body, source } of agents) {
   const sourceRelative = relativePath(source)
   const codexPromptRelative = path.posix.join('../..', sourceRelative)
-  const sandboxMode = isJudge(name) || isReviewer(name) ? 'read-only' : 'workspace-write'
+  const sandboxMode = isJudge(name) || isReadOnly(name) ? 'read-only' : 'workspace-write'
 
   const codexRole =
     `# Auto-generated from ${sourceRelative}\n` +
@@ -200,7 +208,7 @@ for (const { name, description, body, source } of agents) {
   } else if (isJudge(name)) {
     opencodeMode = 'subagent'
     opencodePermissions = '  edit: deny\n  bash: deny\n  task: deny'
-  } else if (isReviewer(name)) {
+  } else if (isReadOnly(name)) {
     opencodeMode = 'subagent'
     opencodePermissions = '  edit: deny\n  bash: allow\n  task: deny'
   } else if (name === 'builder-agent') {
@@ -233,7 +241,7 @@ for (const { name, description, body, source } of agents) {
   ]
   if (isJudge(name)) {
     claudeFields.push('tools: Read, Glob, Grep', 'permissionMode: plan')
-  } else if (isReviewer(name)) {
+  } else if (isReadOnly(name)) {
     claudeFields.push('disallowedTools: Write, Edit, Agent')
   } else if (name === 'builder-agent') {
     claudeFields.push('disallowedTools: Agent')

@@ -53,8 +53,17 @@ delivery risk, not file or endpoint counts:
 
 #### Direct repository research
 
-The Orchestrator owns consequential decisions and verifies repository facts. Delegate independent
-research lanes when useful and required by AGENTS.md, then reconcile their findings.
+The Orchestrator owns consequential decisions and verifies repository facts. Research runs
+in lanes, one per affected app or package (`apps/web`, `apps/server`, `packages/core`,
+`packages/validation`, `packages/email`). In `complete` mode, delegate every lane to its own
+read-only [Spec Researcher](../agents/spec-researcher-agent.md), launched in parallel with a
+specific lane name; in `compact` mode, research directly or delegate at your discretion.
+Give each Researcher the source, its workspace and modules, the depth mode, the Rules
+selected for that workspace and the cross-workspace edges it should check. Reconcile every
+Researcher result before clarification: verify each fact a question relies on, resolve
+conflicting edge contracts between lanes, and merge the proposed file trees. Resume the same
+Researcher for follow-up facts about its workspace.
+
 Inspect every affected boundary for:
 
 - current paths, declarations, exports, registration, configuration and generated files;
@@ -134,7 +143,8 @@ it. Work the tree in rounds:
 - The shared understanding must show one expected file tree per affected app/package and for
   the documentation/design artifacts. Verify existing paths against the current checkout,
   mark each entry `[create]`, `[modify]`, `[move]`, `[generate]` or `[remove]` with a short note
-  on the change, and label proposed internal names as adjustable under the Rules.
+  on the change, and label proposed internal names as adjustable under the Rules. This tree
+  becomes the Spec's Path map, so list every file the delivery will touch, tests included.
 
 #### Source scope guard
 
@@ -278,7 +288,7 @@ For a distinct change to a concluded feature, use
 `documentation/features/<domain>/<feature>/changes/<change-name>/spec.md`.
 Record the Design Contract in `spec.md` when UI is design-backed. Evaluation starts
 at implementation kickoff and owns actual results, findings, unfinished ACs and the short
-continuation handoff. Do not create a Plan.
+continuation handoff. Do not create a Plan; `plan-spec` creates it once the Spec is `open`.
 
 ```yaml
 ---
@@ -440,10 +450,9 @@ in entities/structures. Keep a cross-layer flow and consequential decision table
 
 Within each affected layer, provide source-backed detail proportional to risk:
 
-- show an expected file tree and an **Action | Path** table for known changes; distinguish
-  `Modify`, `Create`, `Move`, `Move + Modify`, `Generate` and `Remove` as applicable;
-- verify existing paths; label proposed files and move destinations explicitly, identify move
-  sources, and let generation commands assign unknown migration/snapshot filenames;
+- show an expected file tree where it clarifies the layer; every changed file also goes in the
+  Path map described below;
+- verify existing paths and label proposed files explicitly;
 - document applicable physical database tables, fields, types, relations, tenant scope,
   constraints/indexes, changed versus preserved data, mappings and migration semantics;
 - include illustrative Core TypeScript snippets where they clarify changed data contracts,
@@ -453,9 +462,34 @@ Within each affected layer, provide source-backed detail proportional to risk:
   rather than relying only on file trees or screenshots.
 
 These are expected changes, not completed implementation. A reused interface may expose changed
-underlying data types without requiring an artificial edit to its declaration. Keep proposed
-private filenames/decomposition adjustable under Rules; do not manufacture file changes just
-to fill a table. Show approved provider-directory organization when applicable without turning
+underlying data types without requiring an artificial edit to its declaration. Do not manufacture
+file changes just to fill a table.
+
+#### Path map
+
+Every Spec that changes repository files has a required `### Path map` in its Technical
+Contract, one table per affected app or package, using the
+[Spec template](../templates/sdd/spec.md) columns `Path | Change | Serves | Purpose`. It is
+the machine-readable contract that [`plan-spec`](./plan-spec-prompt.md) derives Plan rows from
+and that `pnpm check:spec-implementation` checks against Git:
+
+- list every file the delivery creates, modifies, generates or removes, including tests,
+  fixtures, `.rest` examples, migrations and documentation the delivery owns;
+- write each path exact and repository-relative in backticks, with no placeholders or
+  wildcards, and give each path one row;
+- use only `Create`, `Modify`, `Generate` or `Remove` as plain text in `Change`. A move is a
+  `Remove` row for the source plus a `Create` row for the destination;
+- for generated files whose names the generator assigns, such as migration SQL and snapshots,
+  run the generation command during authoring when it is safe and record the real names;
+  otherwise list the stable generated files (for example the journal) and say in `Purpose`
+  that the generator adds the new file, then add its row through a Path map correction once
+  it exists;
+- fill `Serves` with every `FR-*`/`AC-*` the path delivers; every row has at least one.
+
+Proposed internal names stay adjustable under the Rules. When implementation renames, adds or
+drops an internal file without changing the Contract, correct the Path map row in the same
+revision, record it as a non-material correction in the revision history and re-run
+`plan-spec` to reconcile the Plan. That correction needs no amendment or Spec Reviewer pass. Show approved provider-directory organization when applicable without turning
 an unrelated existing provider layout into a mandatory refactor.
 
 Include applicable contracts:
@@ -472,11 +506,11 @@ Include applicable contracts:
 
 Give exact details where compatibility or correctness depends on them. Public names,
 payload fields and required migration/artifact locations may be contracts. New internal
-paths, private signatures, widget trees, hook names, task ownership and phase order remain
-agent decisions governed by Rules. Keep the requested trees and Action/Path tables focused
-on affected contracts; do not inventory unchanged schemas, duplicate wiring or require
-per-file execution plans. A missing
-invented future private path is not a material ambiguity.
+paths, private signatures, widget trees and hook names remain agent decisions governed by
+Rules, and task ownership and order belong to the Plan. Keep trees and the Path map to files the delivery actually
+changes; do not inventory unchanged schemas or duplicate wiring. The exact name of a future
+private file is not a material ambiguity: propose it in the Path map and correct it later if
+needed.
 
 Record only consequential choices with credible alternatives:
 
@@ -597,10 +631,14 @@ Before setting the Spec to `open`, verify:
 - commands/prerequisites are real, checker ownership follows Rules, and mocked evidence
   cannot be mistaken for real integration proof;
 - authority links, tables and artifact structure are valid;
+- the Path map lists every expected changed file with an exact path, a valid `Change` and at
+  least one existing `FR-*`/`AC-*` in `Serves`, and every `AC-*` is reachable through a row or
+  stated as verified against existing behavior;
 - the current draft passed independent compatibility review with verified blockers resolved.
 
 Return the clickable Spec path, revision/status, outcome and exclusions, important decisions,
-design/checker coverage and accepted risks. The next workflow is `implement-spec`. Write this
+design/checker coverage and accepted risks. The next workflow is
+[`plan-spec`](./plan-spec-prompt.md), then `implement-spec`. Write this
 handoff following the user-facing communication rules below.
 
 ## User-facing communication

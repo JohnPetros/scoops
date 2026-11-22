@@ -254,7 +254,7 @@ When a command or tool proposes a title with a prefix, override it with this rul
 ## Publish and return
 
 Push the prepared branch, create or update the PR with a title that follows `## PR title`, and add the exact comment
-`@codex review` when it has not already been requested for the current delivery state.
+`@claude review` when it has not already been requested for the current delivery state.
 Then obtain the actual delivery metadata:
 
 ```bash

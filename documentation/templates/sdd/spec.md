@@ -124,14 +124,23 @@ repository/mapping contracts, atomicity, historical data and migration/generatio
 
 <Include only changed templates, rendering contracts and exports; delivery stays with its owner.>
 
-<!-- Within affected sections, optionally include expected file trees and the table below.
-Identify existing versus proposed paths; Create/Modify/Move/Generate/Remove describe changes.
-Proposed names and illustrative snippets do not prescribe routine private decomposition.
-No blanket file inventory or provider refactor is required. -->
+<!-- Expected file trees may still clarify a section. Proposed names and illustrative
+snippets do not prescribe routine private decomposition beyond the path map below. -->
 
-| Action | Path |
-| --- | --- |
-| <Create / Modify / Move / Generate / Remove> | <affected path; label proposed names and move destination> |
+### Path map
+
+<!-- Required. One table per affected app or package, in the order of the sections above.
+List every file the delivery creates, modifies, generates or removes, tests included, as an
+exact repository-relative path. The first two cells are machine-read by
+`pnpm check:spec-implementation` and plan-spec: Path in backticks, then Change as plain
+Create, Modify, Generate or Remove. A move is a Remove row plus a Create row. Serves lists
+every FR-*/AC-* the path delivers. -->
+
+#### <app or package>
+
+| Path | Change | Serves | Purpose |
+| --- | --- | --- | --- |
+| `<exact/repository/path.ts>` | <Create / Modify / Generate / Remove> | <FR-01, AC-01> | <what changes in this file> |
 
 ### Cross-layer flow and decisions
 
