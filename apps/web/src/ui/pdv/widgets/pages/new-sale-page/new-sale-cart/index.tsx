@@ -22,12 +22,14 @@ import {
 import { Icon } from '@/ui/shared/widgets/components/icon'
 import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 
+import { PaymentMethodSelector } from './payment-method-selector'
 import type { NewSaleCartProps } from './use-new-sale-cart'
 import { useNewSaleCart } from './use-new-sale-cart'
 
 export type { NewSaleCartProps }
 
 const PERCENTAGE_FORMATTER = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 })
+const PAYMENT_METHOD_REASON_ID = 'new-sale-payment-method-reason'
 
 export const NewSaleCart = (props: NewSaleCartProps) => {
   const formatCurrency = useFormatCurrency()
@@ -42,9 +44,11 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
     handleRegister,
     handleRemoveLine,
     isClearConfirmationOpen,
+    isRegisterDisabled,
     lineInputs,
     previewCart,
     productsById,
+    shouldShowPaymentMethodReason,
   } = useNewSaleCart(props)
   const selectedChannelId = props.selectedChannelId ?? props.previewCart?.channelId ?? ''
   const selectedChannel = props.channels.find(
@@ -114,6 +118,13 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
         <p className='mt-2 text-xs text-muted-foreground'>
           Todos os itens usam o ajuste do canal.
         </p>
+
+        <div className='mt-5'>
+          <PaymentMethodSelector
+            onPaymentMethodChange={props.onPaymentMethodChange}
+            paymentMethod={props.paymentMethod}
+          />
+        </div>
 
         {hasLines ? (
           <div className='mt-5 space-y-3'>
@@ -302,13 +313,25 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
           </div>
         ) : null}
         <Button
-          className='mt-4 w-full shadow-primary'
-          disabled={!props.canRegister || props.isPreviewPending}
+          aria-describedby={
+            shouldShowPaymentMethodReason ? PAYMENT_METHOD_REASON_ID : undefined
+          }
+          className='mt-4 w-full enabled:shadow-primary disabled:bg-muted disabled:text-text-tertiary disabled:opacity-100'
+          disabled={isRegisterDisabled}
           onClick={handleRegister}
           type='button'
         >
           <Icon name='plus' /> Registrar pedido
         </Button>
+        {shouldShowPaymentMethodReason ? (
+          <p
+            className='mt-2 flex items-center justify-center gap-1.5 text-[11px] font-semibold text-muted-foreground'
+            id={PAYMENT_METHOD_REASON_ID}
+          >
+            <Icon className='size-3' name='lock' />
+            Falta escolher a forma de pagamento.
+          </p>
+        ) : null}
       </div>
 
       <AlertDialog

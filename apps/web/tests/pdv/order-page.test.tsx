@@ -5,6 +5,7 @@ const ORDER_ID = '00000000-0000-4000-8000-000000000010'
 function orderResponse(
   status: 'registered' | 'canceled' = 'registered',
   includeChannel = true,
+  paymentMethod?: 'pix' | 'credit-card' | 'debit-card' | 'cash',
 ) {
   return {
     id: ORDER_ID,
@@ -14,6 +15,7 @@ function orderResponse(
     createdBy: 'browser-manager-id',
     createdByName: 'Maria Manager',
     status,
+    ...(paymentMethod ? { paymentMethod } : {}),
     ...(includeChannel
       ? {
           channel: {
@@ -177,6 +179,73 @@ test.describe('OrderPage', () => {
       expect(diagnostics).toEqual([])
     })
   }
+
+  const PAYMENT_LABELS = {
+    pix: 'Pix',
+    'credit-card': 'Cartão de crédito',
+    'debit-card': 'Cartão de débito',
+    cash: 'Dinheiro',
+  } as const
+
+  for (const method of Object.keys(PAYMENT_LABELS) as (keyof typeof PAYMENT_LABELS)[]) {
+    for (const status of ['registered', 'canceled'] as const) {
+      test(`shows the ${status} order paid by ${method} with the long label between Itens and Registrado por`, async ({
+        page,
+        identityFixture,
+        pdvFixture,
+      }) => {
+        await identityFixture.mockManagerSession()
+        await identityFixture.mockManagerAccount()
+        await pdvFixture.mockOrders({
+          detail: { body: orderResponse(status, true, method) },
+        })
+
+        await page.setViewportSize({ width: 1481, height: 1050 })
+        await page.goto(`/orders/${ORDER_ID}`)
+        const panel = page.locator('[data-slot="accordion-panel"]').first()
+        const paymentRow = panel
+          .locator('div')
+          .filter({ has: page.getByText('Forma de pagamento', { exact: true }) })
+          .last()
+        await expect(paymentRow).toContainText(PAYMENT_LABELS[method])
+        await expect(paymentRow.locator('svg')).toBeVisible()
+        const text = await panel.innerText()
+        expect(text.indexOf('Itens')).toBeLessThan(text.indexOf('Forma de pagamento'))
+        expect(text.indexOf('Forma de pagamento')).toBeLessThan(
+          text.indexOf('Registrado por'),
+        )
+        if (method !== 'pix') {
+          await expect(panel.getByText('Não informado')).toHaveCount(0)
+        }
+
+        await page.setViewportSize({ width: 390, height: 844 })
+        await expect(panel.getByText(PAYMENT_LABELS[method])).toBeVisible()
+        await expect(
+          page.evaluate(
+            () =>
+              document.documentElement.scrollWidth <=
+              document.documentElement.clientWidth,
+          ),
+        ).resolves.toBe(true)
+      })
+    }
+  }
+
+  test('shows Não informado for an order registered before payment methods existed', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await pdvFixture.mockOrders({ detail: { body: orderResponse('registered') } })
+
+    await page.setViewportSize({ width: 1481, height: 1050 })
+    await page.goto(`/orders/${ORDER_ID}`)
+    const panel = page.locator('[data-slot="accordion-panel"]').first()
+    await expect(panel).toContainText('Forma de pagamento')
+    await expect(panel.getByText('Não informado')).toBeVisible()
+  })
 
   test('protects unknown detail URLs and renders a safe not-found state', async ({
     page,
@@ -733,6 +802,49 @@ test.describe('Order printing', () => {
         expect(box!.x + box!.width).toBeLessThanOrEqual(390)
         await page.goto('/orders')
         await expect(page.locator('body > .order-print-document')).toHaveCount(0)
+      })
+    }
+  }
+
+  for (const width of [794, 302] as const) {
+    for (const [label, method] of [
+      ['Cartão de crédito', 'credit-card'],
+      ['Não informado', undefined],
+    ] as const) {
+      test(`prints Pagamento as ${label} between Canal and Status at ${width}px without cutting it`, async ({
+        page,
+        identityFixture,
+        pdvFixture,
+      }) => {
+        await identityFixture.mockManagerSession()
+        await identityFixture.mockManagerAccount()
+        await pdvFixture.mockOrders({
+          detail: { body: orderResponse('registered', true, method) },
+        })
+        await page.setViewportSize({ width: 1481, height: 1050 })
+        await page.goto(`/orders/${ORDER_ID}`)
+        const document = page.locator('body > .order-print-document')
+        const text = (await document.textContent()) ?? ''
+        expect(text.indexOf('Canal')).toBeLessThan(text.indexOf('Pagamento'))
+        expect(text.indexOf('Pagamento')).toBeLessThan(text.indexOf('Status'))
+        await expect(document).toContainText(`Pagamento${label}`)
+        await expect(document).not.toContainText('Crédito Pagamento')
+
+        await page.setViewportSize({ width, height: 1100 })
+        await page.emulateMedia({ media: 'print' })
+        const pair = document
+          .locator('.order-print-pair')
+          .filter({ hasText: 'Pagamento' })
+        await expect(pair).toBeVisible()
+        const fits = await pair.evaluate((element) => {
+          const value = element.querySelector('dd') as HTMLElement
+          return (
+            value.scrollWidth <= value.clientWidth &&
+            element.scrollWidth <= element.clientWidth
+          )
+        })
+        expect(fits).toBe(true)
+        await expect(pair.locator('dd')).toHaveText(label)
       })
     }
   }

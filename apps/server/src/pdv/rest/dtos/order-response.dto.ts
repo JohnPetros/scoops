@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import type { OrderDetails } from '@scoops/core/pdv/domain/structures'
-import { OrderStatus } from '@scoops/core/pdv/domain/structures'
+import { OrderPaymentMethod, OrderStatus } from '@scoops/core/pdv/domain/structures'
 
 class OrderRestorationResponseDto {
   @ApiPropertyOptional({ minimum: 0, description: 'Omitted for legacy outcomes.' })
@@ -32,6 +32,8 @@ export class OrderResponseDto {
   @ApiProperty() createdByName!: string
   @ApiProperty({ enum: Object.values(OrderStatus) }) status!: OrderStatus
   @ApiPropertyOptional({ type: Object }) channel?: object
+  @ApiPropertyOptional({ enum: Object.values(OrderPaymentMethod) })
+  paymentMethod?: OrderPaymentMethod
   @ApiProperty({ type: Object, isArray: true }) lines!: readonly object[]
   @ApiProperty({ type: Object, isArray: true }) discounts!: readonly object[]
   @ApiProperty() subtotal!: number

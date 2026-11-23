@@ -41,7 +41,7 @@ import type {
   SalesChannelCreate,
 } from '@scoops/core/pdv/domain/entities'
 import type { Combo } from '@scoops/core/pdv/domain/entities'
-import type { ComboCreate } from '@scoops/core/pdv/domain/structures'
+import type { ComboCreate, OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
 import type { AppError } from '@scoops/core/shared/domain/errors'
 import type { Event } from '@scoops/core/shared/domain/events'
 import type { EventsRepository } from '@scoops/core/shared/interfaces'
@@ -87,6 +87,7 @@ type RegisterPortionOrderInput = {
   readonly productName: string
   readonly idempotencyKey: string
   readonly channelId?: string
+  readonly paymentMethod?: OrderPaymentMethod
   readonly quantity?: number
   readonly stockQuantity?: number
 }
@@ -571,6 +572,15 @@ export class PdvModuleFixture {
       .where(eq(orderModel.id, orderId))
   }
 
+  /** Stages an order registered before payment methods existed. */
+  async clearOrderPaymentMethod(orderId: string) {
+    await this.get(DrizzleClient)
+      .requireDatabase()
+      .update(orderModel)
+      .set({ paymentMethod: null })
+      .where(eq(orderModel.id, orderId))
+  }
+
   setStockConsumeFailure(error?: AppError) {
     this.stockConsumeFailure.error = error
   }
@@ -684,6 +694,7 @@ export class PdvModuleFixture {
       authorization,
       channelId,
       idempotencyKey,
+      paymentMethod = 'pix',
       productName,
       quantity,
       stockQuantity,
@@ -720,6 +731,7 @@ export class PdvModuleFixture {
       preview.body.previewToken,
       channel,
       lines,
+      paymentMethod,
     )
 
     return { product, size, order }
@@ -732,11 +744,12 @@ export class PdvModuleFixture {
     previewToken: string,
     channel: { readonly channelId?: string },
     lines: PortionOrderLine[],
+    paymentMethod: OrderPaymentMethod,
   ): Promise<Order> {
     const response = await request(this.app.getHttpServer())
       .post('/orders')
       .set('Cookie', authorization)
-      .send({ idempotencyKey, previewToken, ...channel, lines })
+      .send({ idempotencyKey, previewToken, paymentMethod, ...channel, lines })
     return response.body.order as Order
   }
 

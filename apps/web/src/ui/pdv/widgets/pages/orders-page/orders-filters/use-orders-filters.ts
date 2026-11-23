@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
-import type { OrderStatus } from '@scoops/core/pdv/domain/structures'
+import type { OrderPaymentMethod, OrderStatus } from '@scoops/core/pdv/domain/structures'
 import type { OrdersSearch } from '@scoops/validation'
 
 export type OrdersFiltersProps = {
@@ -37,6 +37,15 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     })
   }
 
+  function handlePaymentMethodChange(value: string | null) {
+    if (value === null) return
+    onSearchChange({
+      ...search,
+      paymentMethod: value === 'all' ? undefined : (value as OrderPaymentMethod | 'none'),
+      page: 1,
+    })
+  }
+
   function handleStatusChange(value: string | null) {
     if (value === null) return
     onSearchChange({
@@ -52,6 +61,7 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
       onSearchChange({
         search: search.search,
         channelId: search.channelId,
+        paymentMethod: search.paymentMethod,
         status: search.status,
         period: 'last-30-days',
         page: 1,
@@ -64,6 +74,7 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     onSearchChange({
       search: search.search,
       channelId: search.channelId,
+      paymentMethod: search.paymentMethod,
       status: search.status,
       period: 'custom',
       from: customSearch?.from ?? today,
@@ -85,6 +96,7 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
   return {
     handleChannelChange,
     handleFromChange,
+    handlePaymentMethodChange,
     handlePeriodChange,
     handleStatusChange,
     handleToChange,
@@ -98,4 +110,14 @@ function formatDateOnly(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function hasActiveFilters(search: OrdersSearch) {
+  return Boolean(
+    search.search ||
+      search.channelId ||
+      search.paymentMethod ||
+      search.status ||
+      search.period === 'custom',
+  )
 }

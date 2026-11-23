@@ -87,6 +87,7 @@ export class DrizzleOrdersRepository
             input.channel?.percentage === undefined
               ? null
               : String(input.channel.percentage),
+          paymentMethod: input.paymentMethod,
           subtotal: String(input.subtotal),
           totalDiscount: String(input.totalDiscount),
           total: String(input.total),
@@ -275,6 +276,13 @@ export class DrizzleOrdersRepository
         input.channelId === null
           ? isNull(orderModel.channelId)
           : eq(orderModel.channelId, input.channelId),
+      )
+    }
+    if (input.paymentMethod !== undefined) {
+      filters.push(
+        input.paymentMethod === null
+          ? isNull(orderModel.paymentMethod)
+          : eq(orderModel.paymentMethod, input.paymentMethod),
       )
     }
     if (input.status) filters.push(eq(orderModel.status, input.status))

@@ -5,6 +5,7 @@ import { UserProfile } from '#identity/domain/structures/user-profile.ts'
 import { ComboFaker, OrderFaker } from '#pdv/domain/entities/fakers/index.ts'
 import type { PdvDatabase, PdvDatabaseRepositories } from '#pdv/interfaces/index.ts'
 import { OrderRegisteredEvent } from '#pdv/domain/events/order-registered-event.ts'
+import { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import type { OrderRegistrationInput } from '#pdv/domain/structures/order-registration-input.ts'
 import type { DiscountsRepository } from '#pdv/interfaces/discounts-repository.ts'
 import type { OrdersRepository } from '#pdv/interfaces/orders-repository.ts'
@@ -42,6 +43,7 @@ const request = {
   },
   idempotencyKey: 'key-1',
   previewToken: 'preview-token',
+  paymentMethod: OrderPaymentMethod.Pix,
   lines: [
     {
       productId: 'product-1',
@@ -139,6 +141,50 @@ describe('Register Order Use Case', () => {
       createdByName: 'Operator',
     })
     expect(orders.add.mock.calls[0][0]).not.toHaveProperty('status')
+  })
+
+  it.each(Object.values(OrderPaymentMethod))(
+    'persists the %s payment method inside the transaction and keeps the preview method-free',
+    async (paymentMethod) => {
+      await expect(useCase.execute({ ...request, paymentMethod })).resolves.toMatchObject(
+        { kind: 'registered', replayed: false },
+      )
+
+      expect(orders.add.mock.calls[0][0]).toMatchObject({ paymentMethod })
+      expect(tokenService.verify).toHaveBeenCalledTimes(1)
+      for (const argument of tokenService.verify.mock.calls[0])
+        expect(argument).not.toHaveProperty('paymentMethod')
+      expect(tokenService.verify.mock.calls[0]).toContain('preview-token')
+    },
+  )
+
+  it('does not put the payment method in a stale preview token or its facts', async () => {
+    tokenService.verify.mockReturnValue('stale')
+    tokenService.issue.mockReturnValue('fresh-preview-token')
+    tokenService.getFacts.mockReturnValue({
+      cart: {
+        establishmentId: 'establishment-1',
+        lines: [],
+        discounts: [],
+        subtotal: 10,
+        totalDiscount: 0,
+        total: 10,
+      },
+    })
+
+    const result = await useCase.execute({
+      ...request,
+      paymentMethod: OrderPaymentMethod.Cash,
+    })
+
+    expect(result.kind).toBe('repriced')
+    expect(tokenService.issue).toHaveBeenCalledTimes(1)
+    const issueArguments = tokenService.issue.mock.calls[0]
+    expect(issueArguments).toContain('establishment-1')
+    for (const argument of issueArguments)
+      expect(argument).not.toHaveProperty('paymentMethod')
+    expect(issueArguments[2]).toBeDefined()
+    expect(orders.add).not.toHaveBeenCalled()
   })
 
   it('returns a committed order for a replay without reading current facts or dispatching stock', async () => {
@@ -243,6 +289,68 @@ describe('Register Order Use Case', () => {
     expect(stockProvider.consume).not.toHaveBeenCalled()
   })
 
+  it('replays the same content and payment method without a conflict', async () => {
+    const existing = OrderFaker.fake({
+      id: 'existing-order',
+      establishmentId: 'establishment-1',
+      idempotencyKey: 'key-1',
+      paymentMethod: OrderPaymentMethod.Cash,
+      lines: [
+        {
+          product: { productId: 'product-1', name: 'Produto', kind: 'resale' },
+          accompaniments: [],
+          quantity: 1,
+          baseUnitPrice: 12.5,
+          finalUnitPrice: 12.5,
+          subtotal: 12.5,
+          allocatedNetSalesCents: 1250,
+          costComponents: [],
+          cogsCents: null,
+          consumptions: [{ productId: 'product-1', quantity: 1 }],
+        },
+      ],
+    })
+    orders.findByIdempotencyKey.mockResolvedValue(existing)
+
+    await expect(
+      useCase.execute({ ...request, paymentMethod: OrderPaymentMethod.Cash }),
+    ).resolves.toMatchObject({ kind: 'registered', replayed: true })
+
+    await expect(
+      useCase.execute({ ...request, paymentMethod: OrderPaymentMethod.Pix }),
+    ).rejects.toBeInstanceOf(ConflictError)
+    expect(orders.add).not.toHaveBeenCalled()
+    expect(orderSequences.next).not.toHaveBeenCalled()
+    expect(stockProvider.consume).not.toHaveBeenCalled()
+  })
+
+  it('treats a replay of an order without a payment method as a conflict', async () => {
+    orders.findByIdempotencyKey.mockResolvedValue(
+      OrderFaker.fake({
+        establishmentId: 'establishment-1',
+        idempotencyKey: 'key-1',
+        paymentMethod: undefined,
+        lines: [
+          {
+            product: { productId: 'product-1', name: 'Produto', kind: 'resale' },
+            accompaniments: [],
+            quantity: 1,
+            baseUnitPrice: 12.5,
+            finalUnitPrice: 12.5,
+            subtotal: 12.5,
+            allocatedNetSalesCents: 1250,
+            costComponents: [],
+            cogsCents: null,
+            consumptions: [{ productId: 'product-1', quantity: 1 }],
+          },
+        ],
+      }),
+    )
+
+    await expect(useCase.execute(request)).rejects.toBeInstanceOf(ConflictError)
+    expect(orders.add).not.toHaveBeenCalled()
+  })
+
   it('rejects a conflicting idempotency key without replaying the stored order', async () => {
     orders.findByIdempotencyKey.mockResolvedValue(
       OrderFaker.fake({
@@ -280,6 +388,24 @@ describe('Register Order Use Case', () => {
     )
     expect(database.run).not.toHaveBeenCalled()
   })
+
+  it.each([
+    { label: 'missing', paymentMethod: undefined },
+    { label: 'empty', paymentMethod: '' },
+    { label: 'unknown', paymentMethod: 'boleto' },
+    { label: 'a non-string', paymentMethod: 1 },
+  ])(
+    'rejects a $label payment method before entering the database',
+    async ({ paymentMethod }) => {
+      await expect(
+        useCase.execute({ ...request, paymentMethod } as unknown as typeof request),
+      ).rejects.toThrow('A forma de pagamento é obrigatória e deve ser válida.')
+      expect(database.run).not.toHaveBeenCalled()
+      expect(orders.add).not.toHaveBeenCalled()
+      expect(orderSequences.next).not.toHaveBeenCalled()
+      expect(stockProvider.consume).not.toHaveBeenCalled()
+    },
+  )
 
   it('rejects missing registration providers and does not replay another establishment order', async () => {
     database.run.mockImplementationOnce(async (operation) =>

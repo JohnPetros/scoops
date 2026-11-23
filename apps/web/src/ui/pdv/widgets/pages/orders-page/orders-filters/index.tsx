@@ -1,5 +1,10 @@
 import { OrderStatus } from '@scoops/core/pdv/domain/structures'
 
+import {
+  PAYMENT_METHODS,
+  PAYMENT_METHOD_NOT_INFORMED_PRESENTATION,
+  PAYMENT_METHOD_PRESENTATION,
+} from '@/ui/pdv/constants/payment-method-presentation'
 import { Button } from '@/ui/shadcn/button'
 import { Input } from '@/ui/shadcn/input'
 import { Label } from '@/ui/shadcn/label'
@@ -11,8 +16,13 @@ import {
   SelectValue,
 } from '@/ui/shadcn/select'
 import { Icon } from '@/ui/shared/widgets/components/icon'
+import type { IconName } from '@/ui/shared/widgets/components/icon/types'
 
-import { type OrdersFiltersProps, useOrdersFilters } from './use-orders-filters'
+import {
+  type OrdersFiltersProps,
+  hasActiveFilters,
+  useOrdersFilters,
+} from './use-orders-filters'
 
 export type { OrdersFiltersProps }
 
@@ -20,6 +30,7 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
   const {
     handleChannelChange,
     handleFromChange,
+    handlePaymentMethodChange,
     handlePeriodChange,
     handleStatusChange,
     handleToChange,
@@ -30,7 +41,7 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
 
   return (
     <div className='grid gap-2 md:grid-cols-2 xl:flex xl:flex-wrap'>
-      <Label className='flex h-10 min-w-0 items-center gap-2 rounded-xl border bg-card px-3.5 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 xl:min-w-[330px] xl:flex-1'>
+      <Label className='flex h-10 min-w-0 items-center gap-2 rounded-xl border bg-card px-3.5 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/20 xl:min-w-[300px] xl:flex-1'>
         <Icon className='size-4 shrink-0 text-muted-foreground' name='search' />
         <Input
           aria-label='Buscar pedidos'
@@ -65,6 +76,36 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
               {channel.name}
             </SelectItem>
           ))}
+        </SelectContent>
+      </Select>
+      <Select
+        onValueChange={handlePaymentMethodChange}
+        value={search.paymentMethod ?? 'all'}
+      >
+        <SelectTrigger
+          aria-label='Filtrar por forma de pagamento'
+          className={`h-10 rounded-xl px-3.5 xl:w-[285px] xl:shrink-0 ${
+            search.paymentMethod
+              ? 'outline-solid outline-1 -outline-offset-1 outline-primary'
+              : ''
+          }`}
+        >
+          <Icon
+            className='size-4 shrink-0 text-muted-foreground'
+            name={getPaymentMethodFilterIcon(search.paymentMethod)}
+          />
+          <SelectValue>{getPaymentMethodFilterLabel(search.paymentMethod)}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='all'>Todas as formas de pagamento</SelectItem>
+          {PAYMENT_METHODS.map((method) => (
+            <SelectItem key={method} value={method}>
+              {PAYMENT_METHOD_PRESENTATION[method].label}
+            </SelectItem>
+          ))}
+          <SelectItem value='none'>
+            {PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label}
+          </SelectItem>
         </SelectContent>
       </Select>
       <Select onValueChange={handleStatusChange} value={search.status ?? 'all'}>
@@ -126,10 +167,7 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
           </Label>
         </div>
       ) : null}
-      {props.search.search ||
-      props.search.channelId ||
-      props.search.status ||
-      props.search.period === 'custom' ? (
+      {hasActiveFilters(search) ? (
         <Button
           className='justify-start text-muted-foreground'
           onClick={onClear}
@@ -141,4 +179,20 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
       ) : null}
     </div>
   )
+}
+
+function getPaymentMethodFilterLabel(
+  paymentMethod: OrdersFiltersProps['search']['paymentMethod'],
+) {
+  if (paymentMethod === undefined) return 'Todas as formas de pagamento'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].label
+}
+
+function getPaymentMethodFilterIcon(
+  paymentMethod: OrdersFiltersProps['search']['paymentMethod'],
+): IconName {
+  if (paymentMethod === undefined) return 'wallet'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.icon
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].icon
 }

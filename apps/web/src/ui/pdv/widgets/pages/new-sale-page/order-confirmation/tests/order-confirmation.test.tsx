@@ -23,7 +23,12 @@ describe('OrderConfirmation', () => {
     useOrderConfirmationMock.mockReturnValue({
       breakdown: [['Subtotal', 'R$ 20,00']],
       sequence: '0042',
-      metadata: [['Canal de venda', 'Sem canal']],
+      metadata: [
+        ['Data e hora', '1 de jan. de 2026, 09:00'],
+        ['Canal de venda', 'Sem canal'],
+        ['Forma de pagamento', 'Cartão de crédito', 'credit-card'],
+        ['Quantidade', '1 itens'],
+      ],
       lines: [{ name: 'Pote pronto', details: 'Unidade · 1 un.', subtotal: 'R$ 20,00' }],
       total: 'R$ 20,00',
       handleNewSale: vi.fn(),
@@ -43,6 +48,19 @@ describe('OrderConfirmation', () => {
     expect(
       screen.getByRole('button', { name: 'Imprimir pedido' }).hasAttribute('disabled'),
     ).toBe(false)
+    const metadataLabels = screen.getAllByRole('term').map((term) => term.textContent)
+    expect(metadataLabels.slice(0, 4)).toEqual([
+      'Data e hora',
+      'Canal de venda',
+      'Forma de pagamento',
+      'Quantidade',
+    ])
+    expect(screen.getByText('Forma de pagamento').nextElementSibling?.textContent).toBe(
+      'Cartão de crédito',
+    )
+    expect(
+      screen.getByText('Forma de pagamento').nextElementSibling?.querySelector('svg'),
+    ).toBeInstanceOf(SVGElement)
     fireEvent.click(screen.getByRole('button', { name: 'Iniciar nova venda' }))
     expect(
       useOrderConfirmationMock.mock.results.at(-1)?.value.handleNewSale,

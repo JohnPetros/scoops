@@ -1,3 +1,4 @@
+import type { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import type { OrderStatus } from '#pdv/domain/structures/order-status.ts'
 
 export type OrderListParams = {
@@ -7,6 +8,7 @@ export type OrderListParams = {
   readonly createdTo?: Date
   readonly channelId?: string | null
   readonly status?: OrderStatus
+  readonly paymentMethod?: OrderPaymentMethod | null
   readonly page: number
   readonly pageSize: number
 }

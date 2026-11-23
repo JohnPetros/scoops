@@ -33,6 +33,7 @@ export const NewSalePage = () => {
     handleEditLine,
     handleFeedbackAction,
     handleNewSale,
+    handlePaymentMethodChange,
     handleRefreshPreview,
     handleRegister,
     handleRemoveLine,
@@ -44,14 +45,17 @@ export const NewSalePage = () => {
     isLoadingActiveSalesChannels,
     isRefreshingActiveSalesChannels,
     isPreviewPending,
+    isRegistrationChannelUnresolved,
     isRegistrationOpen,
     isRegistrationPending,
     isVerification,
     lineInputs,
+    paymentMethod,
     previewCart,
     previewError,
     previewToken,
     registeredOrder,
+    registrationChannel,
     registrationError,
     registrationFeedback,
     registrationResult,
@@ -101,9 +105,11 @@ export const NewSalePage = () => {
             onChannelChange={handleChannelChange}
             onClear={handleClear}
             onEditLine={handleEditLine}
+            onPaymentMethodChange={handlePaymentMethodChange}
             onQuantityChange={handleQuantityChange}
             onRegister={handleRegister}
             onRemoveLine={handleRemoveLine}
+            paymentMethod={paymentMethod}
             previewCart={previewCart}
             previewError={previewError}
             products={catalogProducts}
@@ -131,12 +137,15 @@ export const NewSalePage = () => {
       {!isVerification ? (
         <OrderRegistrationDialog
           cart={previewCart}
+          channel={registrationChannel}
+          isChannelUnresolved={isRegistrationChannelUnresolved}
           isOpen={isRegistrationOpen}
           isPending={isRegistrationPending}
           onConfirm={handleConfirmRegistration}
           onOpenChange={(open) => {
             if (!open) handleFeedbackAction()
           }}
+          paymentMethod={paymentMethod}
         />
       ) : null}
 

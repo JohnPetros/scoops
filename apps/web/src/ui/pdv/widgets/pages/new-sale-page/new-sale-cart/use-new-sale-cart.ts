@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import type {
   Cart,
   CartLineInput,
+  OrderPaymentMethod,
   SalesCatalogProduct,
 } from '@scoops/core/pdv/domain/structures'
 import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
@@ -15,9 +16,11 @@ export type NewSaleCartProps = {
   products: readonly SalesCatalogProduct[]
   previewCart?: Cart
   previewError?: string
+  paymentMethod?: OrderPaymentMethod
   selectedChannelId?: string
   onChannelChange: (channelId: string | undefined) => void
   onClear: () => void
+  onPaymentMethodChange: (paymentMethod: OrderPaymentMethod) => void
   onEditLine: (
     line: CartLineInput,
     product: SalesCatalogProduct | undefined,
@@ -38,15 +41,9 @@ export function useNewSaleCart({
   previewCart,
   ...props
 }: NewSaleCartProps) {
+  const hasPaymentMethod = Boolean(props.paymentMethod)
   const [isClearConfirmationOpen, setIsClearConfirmationOpen] = useState(false)
-  const baseSubtotalCents = (previewCart?.lines ?? []).reduce(
-    (total, line) => total + Math.round(line.baseUnitPrice * 100) * line.quantity,
-    0,
-  )
-  const baseSubtotal = baseSubtotalCents / 100
-  const channelAdjustment = previewCart
-    ? (Math.round(previewCart.subtotal * 100) - baseSubtotalCents) / 100
-    : 0
+  const { baseSubtotal, channelAdjustment } = getCartTotals(previewCart)
   const productsById = useMemo(
     () => new Map(props.products.map((product) => [product.productId, product])),
     [props.products],
@@ -78,7 +75,7 @@ export function useNewSaleCart({
   }
 
   function handleRegister() {
-    if (props.canRegister) onRegister()
+    if (props.canRegister && hasPaymentMethod) onRegister()
   }
 
   return {
@@ -92,8 +89,22 @@ export function useNewSaleCart({
     handleRegister,
     handleRemoveLine,
     isClearConfirmationOpen,
+    isRegisterDisabled: !props.canRegister || props.isPreviewPending || !hasPaymentMethod,
     lineInputs,
     previewCart,
     productsById,
+    shouldShowPaymentMethodReason: !hasPaymentMethod,
   }
+}
+
+function getCartTotals(previewCart: Cart | undefined) {
+  const baseSubtotalCents = (previewCart?.lines ?? []).reduce(
+    (total, line) => total + Math.round(line.baseUnitPrice * 100) * line.quantity,
+    0,
+  )
+  const channelAdjustment = previewCart
+    ? (Math.round(previewCart.subtotal * 100) - baseSubtotalCents) / 100
+    : 0
+
+  return { baseSubtotal: baseSubtotalCents / 100, channelAdjustment }
 }

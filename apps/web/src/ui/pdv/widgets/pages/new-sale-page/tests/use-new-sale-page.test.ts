@@ -1,3 +1,4 @@
+import { OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -356,6 +357,7 @@ describe('useNewSalePage', () => {
       }),
     )
     await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
     act(() => result.current.handleRegister())
     await act(async () => {
       await result.current.handleConfirmRegistration()
@@ -519,6 +521,7 @@ describe('useNewSalePage', () => {
       }),
     )
     await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
     act(() => result.current.handleRegister())
     await act(async () => result.current.handleConfirmRegistration())
 
@@ -628,6 +631,7 @@ describe('useNewSalePage', () => {
       }),
     )
     await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
     act(() => result.current.handleRegister())
     await act(async () => result.current.handleConfirmRegistration())
 
@@ -649,5 +653,359 @@ describe('useNewSalePage', () => {
       channelId: 'channel-1',
       previewToken: 'channel-preview',
     })
+  })
+})
+
+const previewCart = {
+  establishmentId: 'establishment-1',
+  lines: [],
+  discounts: [],
+  subtotal: 10,
+  totalDiscount: 0,
+  total: 10,
+}
+const resaleLine = {
+  accompanimentIds: [],
+  kind: 'resale' as const,
+  productId: product.productId,
+  quantity: 1,
+}
+const registeredResponse = {
+  response: {
+    body: { kind: 'registered', order: { id: 'order-1' }, replayed: false },
+    isFailure: false,
+    statusCode: 201,
+  },
+}
+
+function setupPaymentMethodHook(
+  registerOrder = vi.fn().mockResolvedValue(registeredResponse),
+) {
+  const previewOrder = vi.fn().mockResolvedValue({
+    response: {
+      body: { cart: previewCart, previewToken: 'preview-token' },
+      isFailure: false,
+      statusCode: 200,
+    },
+  })
+  useActiveSalesChannelsQueryMock.mockReturnValue({
+    activeSalesChannels: [],
+    isActiveSalesChannelsError: false,
+    isLoadingActiveSalesChannels: false,
+    isRefreshingActiveSalesChannels: false,
+  } as never)
+  usePreviewOrderActionMock.mockReturnValue({
+    error: null,
+    isPending: false,
+    previewOrder,
+  } as never)
+  useRegisterOrderActionMock.mockReturnValue({
+    error: null,
+    isPending: false,
+    registerOrder,
+  } as never)
+  return { previewOrder, registerOrder, ...renderHook(() => useNewSalePage()) }
+}
+
+function readStoredCart() {
+  const raw = window.localStorage.getItem(
+    getNewSaleCartStorageKey(account.establishmentId),
+  )
+  return raw ? JSON.parse(raw) : null
+}
+
+describe('useNewSalePage payment method', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+    useAuthContextMock.mockReturnValue({ account } as never)
+  })
+
+  afterEach(() => {
+    window.localStorage.clear()
+    vi.clearAllMocks()
+  })
+
+  it('starts without a method and never lets a method change reach the preview', async () => {
+    const { previewOrder, result } = setupPaymentMethodHook()
+    expect(result.current.paymentMethod).toBeUndefined()
+    act(() => result.current.handleSaveLine(resaleLine))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    expect(previewOrder).toHaveBeenCalledTimes(1)
+    const keyBeforeChange = result.current.idempotencyKey
+
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.CreditCard))
+
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.CreditCard)
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(previewOrder).toHaveBeenCalledTimes(1)
+    expect(result.current.previewToken).toBe('preview-token')
+    expect(result.current.previewCart).toEqual(previewCart)
+    expect(result.current.idempotencyKey).not.toBe(keyBeforeChange)
+    for (const [request] of previewOrder.mock.calls) {
+      expect(request).not.toHaveProperty('paymentMethod')
+    }
+  })
+
+  it('does not open registration or send a request while no method is chosen', async () => {
+    const { registerOrder, result } = setupPaymentMethodHook()
+    act(() => result.current.handleSaveLine(resaleLine))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+
+    act(() => result.current.handleRegister())
+    await act(async () => result.current.handleConfirmRegistration())
+
+    expect(result.current.isRegistrationOpen).toBe(false)
+    expect(registerOrder).not.toHaveBeenCalled()
+  })
+
+  it('posts the selected method and rotates the key when the method changes after a failure', async () => {
+    const registerOrder = vi
+      .fn()
+      .mockResolvedValueOnce({ response: { isFailure: true, statusCode: 503 } })
+      .mockResolvedValueOnce({ response: { isFailure: true, statusCode: 503 } })
+      .mockResolvedValueOnce(registeredResponse)
+    const { result } = setupPaymentMethodHook(registerOrder)
+    act(() => result.current.handleSaveLine(resaleLine))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
+    act(() => result.current.handleRegister())
+    await act(async () => result.current.handleConfirmRegistration())
+
+    expect(registerOrder.mock.calls[0]?.[0]).toMatchObject({
+      paymentMethod: OrderPaymentMethod.Pix,
+      previewToken: 'preview-token',
+    })
+    expect(result.current.registrationFeedback).toBe('rollback')
+
+    act(() => result.current.handleFeedbackAction())
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Cash))
+    act(() => result.current.handleRegister())
+    await act(async () => result.current.handleConfirmRegistration())
+
+    const firstRequest = registerOrder.mock.calls[0]?.[0]
+    const secondRequest = registerOrder.mock.calls[1]?.[0]
+    expect(secondRequest.paymentMethod).toBe(OrderPaymentMethod.Cash)
+    expect(secondRequest.idempotencyKey).not.toBe(firstRequest.idempotencyKey)
+
+    act(() => result.current.handleRetryRegistration())
+    await waitFor(() => expect(result.current.registeredOrder).toBeDefined())
+    expect(registerOrder.mock.calls[2]?.[0]).toEqual(secondRequest)
+  })
+
+  it('keeps the method through item edits, removals, quantity and channel changes and recalculation', async () => {
+    const { result } = setupPaymentMethodHook()
+    act(() => result.current.handleSelectProduct(product))
+    act(() => result.current.handleSaveLine(resaleLine))
+    act(() => result.current.handleSaveLine({ ...resaleLine, quantity: 3 }))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.DebitCard))
+
+    act(() => result.current.handleQuantityChange(0, 2))
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.DebitCard)
+    act(() => result.current.handleEditLine(resaleLine, product, 1))
+    act(() => result.current.handleSaveLine({ ...resaleLine, quantity: 4 }))
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.DebitCard)
+    act(() => result.current.handleChannelChange('channel-1'))
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.DebitCard)
+    act(() => result.current.handleRefreshPreview())
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.DebitCard)
+    act(() => result.current.handleRemoveLine(0))
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.DebitCard)
+    expect(result.current.lineInputs).toHaveLength(1)
+  })
+
+  it.each([
+    ['rollback after a 5xx', { isFailure: true, statusCode: 503 }],
+    ['an invalid preview token', { isFailure: true, statusCode: 400 }],
+    ['an unprocessable body', { isFailure: true, statusCode: 422 }],
+    [
+      'a repriced result',
+      {
+        body: {
+          kind: 'repriced',
+          recalculatedCart: {
+            ...previewCart,
+            lines: [
+              { ...resaleLine, baseUnitPrice: 12, finalUnitPrice: 12, subtotal: 12 },
+            ],
+          },
+          previewToken: 'new-preview',
+          changes: [],
+        },
+        isFailure: true,
+        statusCode: 409,
+      },
+    ],
+    [
+      'a review-required result',
+      {
+        body: { kind: 'review-required', shortages: [], changes: [] },
+        isFailure: true,
+        statusCode: 409,
+      },
+    ],
+    [
+      'a correction-required result',
+      {
+        body: {
+          kind: 'correction-required',
+          invalidConfigurations: [],
+          shortages: [],
+          changes: [],
+        },
+        isFailure: true,
+        statusCode: 409,
+      },
+    ],
+    ['a lost connection', { isFailure: true, statusCode: 0 }],
+  ] as const)('keeps the selected method after %s', async (_name, response) => {
+    const registerOrder = vi.fn().mockResolvedValue({ response })
+    const { result } = setupPaymentMethodHook(registerOrder)
+    act(() => result.current.handleSaveLine(resaleLine))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.CreditCard))
+    act(() => result.current.handleRegister())
+
+    await act(async () => result.current.handleConfirmRegistration())
+
+    expect(registerOrder).toHaveBeenCalled()
+    expect(result.current.registeredOrder).toBeUndefined()
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.CreditCard)
+    expect(result.current.lineInputs.length).toBeGreaterThan(0)
+  })
+
+  it('keeps the method after a registration that rejects with an exception', async () => {
+    const registerOrder = vi.fn().mockRejectedValue(new Error('Falha de rede'))
+    const { result } = setupPaymentMethodHook(registerOrder)
+    act(() => result.current.handleSaveLine(resaleLine))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Cash))
+    act(() => result.current.handleRegister())
+
+    await act(async () => result.current.handleConfirmRegistration())
+
+    expect(result.current.registrationError).toBe('Falha de rede')
+    expect(result.current.paymentMethod).toBe(OrderPaymentMethod.Cash)
+  })
+
+  it('saves the method in the version 2 cart and restores it after a reload', async () => {
+    const first = setupPaymentMethodHook()
+    act(() => first.result.current.handleSelectProduct(product))
+    act(() => first.result.current.handleSaveLine(resaleLine))
+    act(() => first.result.current.handleChannelChange('channel-1'))
+    act(() => first.result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
+    await waitFor(() => expect(readStoredCart()?.paymentMethod).toBe('pix'))
+    expect(readStoredCart()).toMatchObject({ version: 2, channelId: 'channel-1' })
+    first.unmount()
+
+    const reloaded = setupPaymentMethodHook()
+
+    await waitFor(() => expect(reloaded.result.current.lineInputs).toEqual([resaleLine]))
+    expect(reloaded.result.current.paymentMethod).toBe(OrderPaymentMethod.Pix)
+    expect(reloaded.result.current.channelId).toBe('channel-1')
+  })
+
+  it('restores a version 1 cart with its items and channel but no method', async () => {
+    window.localStorage.setItem(
+      getNewSaleCartStorageKey(account.establishmentId),
+      JSON.stringify({
+        version: 1,
+        lineInputs: [resaleLine],
+        products: [product],
+        channelId: 'channel-1',
+      }),
+    )
+
+    const { result } = setupPaymentMethodHook()
+
+    await waitFor(() => expect(result.current.lineInputs).toEqual([resaleLine]))
+    expect(result.current.channelId).toBe('channel-1')
+    expect(result.current.paymentMethod).toBeUndefined()
+    await waitFor(() => expect(readStoredCart()?.version).toBe(2))
+    expect(readStoredCart()).not.toHaveProperty('paymentMethod')
+  })
+
+  it('discards a stored cart whose method is not one of the four values', async () => {
+    window.localStorage.setItem(
+      getNewSaleCartStorageKey(account.establishmentId),
+      JSON.stringify({
+        version: 2,
+        lineInputs: [resaleLine],
+        products: [product],
+        paymentMethod: 'voucher',
+      }),
+    )
+
+    const { result } = setupPaymentMethodHook()
+
+    await waitFor(() =>
+      expect(
+        window.localStorage.getItem(getNewSaleCartStorageKey(account.establishmentId)),
+      ).toBeNull(),
+    )
+    expect(result.current.lineInputs).toEqual([])
+    expect(result.current.paymentMethod).toBeUndefined()
+  })
+
+  it('clears items, channel and method after a successful registration', async () => {
+    const { result } = setupPaymentMethodHook()
+    act(() => result.current.handleSelectProduct(product))
+    act(() => result.current.handleSaveLine(resaleLine))
+    act(() => result.current.handleChannelChange('channel-1'))
+    await waitFor(() => expect(result.current.previewToken).toBe('preview-token'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.Pix))
+    act(() => result.current.handleRegister())
+
+    await act(async () => result.current.handleConfirmRegistration())
+
+    expect(result.current.registeredOrder).toEqual({ id: 'order-1' })
+    expect(result.current.lineInputs).toEqual([])
+    expect(result.current.channelId).toBeUndefined()
+    expect(result.current.paymentMethod).toBeUndefined()
+    expect(readStoredCart()).toBeNull()
+
+    act(() => result.current.handleNewSale())
+
+    expect(result.current.registeredOrder).toBeUndefined()
+    expect(result.current.channelId).toBeUndefined()
+    expect(result.current.paymentMethod).toBeUndefined()
+  })
+
+  it('clears the items and the method but keeps the channel on Limpar pedido', async () => {
+    const { result } = setupPaymentMethodHook()
+    act(() => result.current.handleSelectProduct(product))
+    act(() => result.current.handleSaveLine(resaleLine))
+    act(() => result.current.handleChannelChange('channel-1'))
+    act(() => result.current.handlePaymentMethodChange(OrderPaymentMethod.DebitCard))
+    await waitFor(() => expect(readStoredCart()?.paymentMethod).toBe('debit-card'))
+
+    act(() => result.current.handleClear())
+
+    expect(result.current.lineInputs).toEqual([])
+    expect(result.current.paymentMethod).toBeUndefined()
+    expect(result.current.channelId).toBe('channel-1')
+    expect(readStoredCart()).toBeNull()
+  })
+
+  it('resolves the registration channel only from the active channels', async () => {
+    const { result, rerender } = setupPaymentMethodHook()
+    expect(result.current.isRegistrationChannelUnresolved).toBe(false)
+
+    act(() => result.current.handleChannelChange('channel-1'))
+    expect(result.current.registrationChannel).toBeUndefined()
+    expect(result.current.isRegistrationChannelUnresolved).toBe(true)
+
+    const channel = { id: 'channel-1', name: 'Balcão', percentage: 0 }
+    useActiveSalesChannelsQueryMock.mockReturnValue({
+      activeSalesChannels: [channel],
+      isActiveSalesChannelsError: false,
+      isLoadingActiveSalesChannels: false,
+      isRefreshingActiveSalesChannels: false,
+    } as never)
+    rerender()
+
+    expect(result.current.registrationChannel).toEqual(channel)
+    expect(result.current.isRegistrationChannelUnresolved).toBe(false)
   })
 })

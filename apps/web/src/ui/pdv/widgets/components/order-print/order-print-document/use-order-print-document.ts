@@ -1,5 +1,6 @@
 import { OrderStatus, type OrderDetails } from '@scoops/core/pdv/domain/structures'
 
+import { getPaymentMethodPresentation } from '@/ui/pdv/constants/payment-method-presentation'
 import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 import { useFormatDate } from '@/ui/shared/hooks/use-format-date'
 import { useFormatQuantity } from '@/ui/shared/hooks/use-format-quantity'
@@ -67,6 +68,7 @@ function getMetadata(
     ['Registrado em', formatDate(order.createdAt, DATE_OPTIONS)],
     ['Registrado por', order.createdByName],
     ['Canal', getChannelLabel(order, formatDecimal)],
+    ['Pagamento', getPaymentMethodPresentation(order.paymentMethod).label],
     ['Status', order.status === OrderStatus.Canceled ? 'Cancelado' : 'Registrado'],
   ] as const
 }

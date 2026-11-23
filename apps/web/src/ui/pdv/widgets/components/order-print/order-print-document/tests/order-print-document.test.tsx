@@ -16,6 +16,7 @@ describe('OrderPrintDocument', () => {
         ['Registrado em', '30/09/2026'],
         ['Registrado por', 'Carlo'],
         ['Canal', 'Sem canal'],
+        ['Pagamento', 'Cartão de crédito'],
         ['Status', 'Registrado'],
       ],
       lines: [
@@ -52,6 +53,8 @@ describe('OrderPrintDocument', () => {
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.queryByRole('region', { name: 'Pedido cancelado' })).toBeNull()
     expect(screen.queryByText('Desconto total')).toBeNull()
+    expect(screen.getByText('Pagamento')).toBeInstanceOf(HTMLElement)
+    expect(screen.getByText('Cartão de crédito')).toBeInstanceOf(HTMLElement)
   })
   it('renders discounts and saved cancellation facts with optional reason', () => {
     useOrderPrintDocumentMock.mockReturnValue({

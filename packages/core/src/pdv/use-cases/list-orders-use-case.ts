@@ -39,6 +39,7 @@ export class ListOrdersUseCase
       createdTo: request.createdTo,
       channelId: request.channelId,
       status: request.status,
+      paymentMethod: request.paymentMethod,
       page,
       pageSize,
     })

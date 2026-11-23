@@ -11,6 +11,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
+import { orderPaymentMethodModel } from '@/pdv/database/drizzle/models/order-payment-method-model'
 import { orderStatusModel } from '@/pdv/database/drizzle/models/order-status-model'
 
 export const orderModel = pgTable(
@@ -26,6 +27,7 @@ export const orderModel = pgTable(
     channelId: uuid('channel_id'),
     channelName: text('channel_name'),
     channelPercentage: numeric('channel_percentage', { precision: 5, scale: 2 }),
+    paymentMethod: orderPaymentMethodModel('payment_method'),
     subtotal: numeric('subtotal', { precision: 18, scale: 2 }).notNull(),
     totalDiscount: numeric('total_discount', { precision: 18, scale: 2 }).notNull(),
     total: numeric('total', { precision: 18, scale: 2 }).notNull(),

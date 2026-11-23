@@ -39,6 +39,7 @@ export {
 } from './pdv/cancel-order-schema.ts'
 export type CancelOrderLineDisposition =
   import('./pdv/cancel-order-schema.ts').CancelOrderInput['lineDispositions'][number]
+export { orderPaymentMethodSchema } from './pdv/order-payment-method-schema.ts'
 export { previewOrderSchema } from './pdv/preview-order-schema.ts'
 export { registerOrderSchema } from './pdv/register-order-schema.ts'
 export { comboCatalogQuerySchema } from './pdv/combo-catalog-query-schema.ts'

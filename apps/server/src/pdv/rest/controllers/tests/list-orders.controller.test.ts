@@ -76,6 +76,97 @@ describe('List Orders Controller [GET /orders]', () => {
     expect(operator.body.items[0].createdAt).toMatch(/Z$/)
   })
 
+  it('filters orders by payment method, none and combined filters inside the tenant', async () => {
+    const pix = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Pix Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000111',
+      paymentMethod: 'pix',
+    })
+    const cash = await fixture.registerPortionOrder({
+      authorization: operatorRequestAuthorization(),
+      productName: 'Cash Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000112',
+      paymentMethod: 'cash',
+    })
+    const legacy = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Legacy Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000113',
+    })
+    await fixture.clearOrderPaymentMethod(legacy.order.id)
+    await fixture.registerPortionOrder({
+      authorization: foreignManagerRequestAuthorization(),
+      establishmentId: PdvModuleFixture.accounts.foreignEstablishmentId,
+      productName: 'Foreign Pix Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000114',
+      paymentMethod: 'pix',
+    })
+    const foreignLegacy = await fixture.registerPortionOrder({
+      authorization: foreignManagerRequestAuthorization(),
+      establishmentId: PdvModuleFixture.accounts.foreignEstablishmentId,
+      productName: 'Foreign Legacy Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000115',
+    })
+    await fixture.clearOrderPaymentMethod(foreignLegacy.order.id)
+    const channel = await fixture.addSalesChannel({
+      establishmentId: PdvModuleFixture.accounts.establishmentId,
+      name: 'Delivery',
+      percentage: 10,
+      status: 'active',
+    })
+    const channeledPix = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Channeled Pix Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000116',
+      paymentMethod: 'pix',
+      channelId: channel.id,
+    })
+    const ids = (response: { body: { items: { id: string }[] } }) =>
+      response.body.items.map((item) => item.id)
+
+    const byPix = await listOrders(fixture, 'paymentMethod=pix')
+    const byCash = await listOrders(fixture, 'paymentMethod=cash', true)
+    const byNone = await listOrders(fixture, 'paymentMethod=none')
+    const combined = await listOrders(
+      fixture,
+      'paymentMethod=cash&search=Cash&status=registered',
+    )
+    const empty = await listOrders(fixture, 'paymentMethod=cash&search=Pix')
+    const byPixAndChannel = await listOrders(
+      fixture,
+      `paymentMethod=pix&channelId=${channel.id}`,
+    )
+    const byNoneInPeriod = await listOrders(
+      fixture,
+      'paymentMethod=none&createdFrom=2026-01-01T00:00:00.000Z&createdTo=2100-01-01T00:00:00.000Z',
+    )
+    const byPixBeforeOrders = await listOrders(
+      fixture,
+      'paymentMethod=pix&createdFrom=2020-01-01T00:00:00.000Z&createdTo=2020-01-02T00:00:00.000Z',
+    )
+    const invalid = await listOrders(fixture, 'paymentMethod=voucher')
+    const all = await listOrders(fixture, '')
+
+    expect(ids(byPix).sort()).toEqual([pix.order.id, channeledPix.order.id].sort())
+    expect(byPix.body.total).toBe(2)
+    expect(ids(byCash)).toEqual([cash.order.id])
+    expect(ids(byNone)).toEqual([legacy.order.id])
+    expect(byNone.body.total).toBe(1)
+    expect(ids(combined)).toEqual([cash.order.id])
+    expect(empty.body.items).toEqual([])
+    expect(ids(byPixAndChannel)).toEqual([channeledPix.order.id])
+    expect(ids(byNoneInPeriod)).toEqual([legacy.order.id])
+    expect(byPixBeforeOrders.body.items).toEqual([])
+    expect(invalid.status).toBe(422)
+    expect(invalid.body).not.toHaveProperty('items')
+    const legacyItem = all.body.items.find(
+      (item: { id: string }) => item.id === legacy.order.id,
+    )
+    expect(legacyItem).not.toHaveProperty('paymentMethod')
+    expect(byPix.body.items[0].paymentMethod).toBe('pix')
+  })
+
   it('rejects malformed queries and unauthenticated requests', async () => {
     const malformed = await request(fixture.app.getHttpServer())
       .get('/orders?createdFrom=2026-01-01T00:00:00.000Z')
@@ -92,3 +183,12 @@ describe('List Orders Controller [GET /orders]', () => {
     expect(foreign.body.items).toEqual([])
   })
 })
+
+async function listOrders(fixture: PdvModuleFixture, query: string, asOperator = false) {
+  return request(fixture.app.getHttpServer())
+    .get(query ? `/orders?${query}` : '/orders')
+    .set(
+      'Cookie',
+      asOperator ? operatorRequestAuthorization() : managerRequestAuthorization(),
+    )
+}

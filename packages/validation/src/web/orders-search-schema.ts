@@ -1,6 +1,8 @@
 import { OrderStatus } from '@scoops/core/pdv/domain/structures'
 import { z } from 'zod'
 
+import { orderPaymentMethodSchema } from '../pdv/order-payment-method-schema.ts'
+
 const ORDER_PERIODS = ['last-30-days', 'custom'] as const
 
 const dateOnlyInputSchema = z.string().optional().catch(undefined)
@@ -11,6 +13,10 @@ const ordersSearchInputSchema = z.object({
     .union([z.uuid(), z.literal('none')])
     .optional()
     .catch(undefined),
+  paymentMethod: z
+    .union([orderPaymentMethodSchema, z.literal('none')])
+    .optional()
+    .catch(undefined),
   status: z.enum(OrderStatus).optional().catch(undefined),
   period: z.enum(ORDER_PERIODS).catch('last-30-days'),
   from: dateOnlyInputSchema,
@@ -19,8 +25,8 @@ const ordersSearchInputSchema = z.object({
 })
 
 export const ordersSearchSchema = ordersSearchInputSchema.transform(
-  ({ search, channelId, status, period, from, to, page }) => {
-    const commonSearch = { search, channelId, status }
+  ({ search, channelId, paymentMethod, status, period, from, to, page }) => {
+    const commonSearch = { search, channelId, paymentMethod, status }
 
     if (
       period === 'custom' &&

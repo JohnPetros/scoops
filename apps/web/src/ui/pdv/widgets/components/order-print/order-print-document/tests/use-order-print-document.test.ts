@@ -86,6 +86,7 @@ describe('useOrderPrintDocument', () => {
       { initialProps: order },
     )
     expect(result.current.metadata).toContainEqual(['Canal', 'Sem canal'])
+    expect(result.current.metadata).toContainEqual(['Pagamento', 'Não informado'])
     expect(result.current.lines[0].configurations).toEqual([])
     expect(result.current.discounts).toEqual([])
     expect(result.current.totalDiscount).toBeNull()
@@ -121,6 +122,28 @@ describe('useOrderPrintDocument', () => {
     })
     expect(result.current.metadata).toContainEqual(['Canal', 'Balcão · -5,00%'])
     expect(result.current.count).toBe('0 produtos · 0 unidades')
+  })
+
+  it('places Pagamento between Canal and Status with the long label for every method', () => {
+    const labels = {
+      pix: 'Pix',
+      'credit-card': 'Cartão de crédito',
+      'debit-card': 'Cartão de débito',
+      cash: 'Dinheiro',
+    } as const
+    const { result, rerender } = renderHook(
+      (currentOrder) => useOrderPrintDocument(currentOrder),
+      { initialProps: makeOrder({ paymentMethod: 'pix' }) },
+    )
+    for (const [method, label] of Object.entries(labels)) {
+      rerender(makeOrder({ paymentMethod: method as keyof typeof labels }))
+      const names = result.current.metadata.map(([name]) => name)
+      expect(names.indexOf('Pagamento')).toBe(names.indexOf('Canal') + 1)
+      expect(names.indexOf('Status')).toBe(names.indexOf('Pagamento') + 1)
+      expect(result.current.metadata).toContainEqual(['Pagamento', label])
+    }
+    rerender(makeCanceledOrder({ paymentMethod: 'credit-card' }))
+    expect(result.current.metadata).toContainEqual(['Pagamento', 'Cartão de crédito'])
   })
 })
 

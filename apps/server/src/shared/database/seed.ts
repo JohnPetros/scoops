@@ -25,7 +25,11 @@ import type {
   ProductSizesRepository,
 } from '@scoops/core/mrp/interfaces'
 import type { OrderCreate } from '@scoops/core/pdv/domain/entities'
-import { SaleItemKind, type ComboCreate } from '@scoops/core/pdv/domain/structures'
+import {
+  OrderPaymentMethod,
+  SaleItemKind,
+  type ComboCreate,
+} from '@scoops/core/pdv/domain/structures'
 import type { SalesChannelsRepository } from '@scoops/core/pdv/interfaces'
 
 import { AppModule } from '@/app.module'
@@ -735,6 +739,8 @@ async function buildSeedOrders(
     2, 4,
   ]
 
+  const paymentMethods = Object.values(OrderPaymentMethod)
+
   return Array.from({ length: currentDay }, (_, dayIndex) => {
     const day = dayIndex + 1
     const createdAt =
@@ -754,6 +760,7 @@ async function buildSeedOrders(
         createdBy: SEED_USERS.manager.id,
         createdByName: SEED_USERS.manager.name,
         channel: template.channel,
+        paymentMethod: paymentMethods[(dayIndex + orderIndex) % paymentMethods.length],
         lines: template.lines,
         discounts: [],
         subtotal,

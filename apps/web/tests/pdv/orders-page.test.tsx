@@ -46,6 +46,27 @@ const pageBody = {
   totalPages: 1,
 }
 
+const PAYMENT_ROWS = [
+  { sequenceNumber: 126, paymentMethod: 'pix', label: 'Pix' },
+  { sequenceNumber: 125, paymentMethod: 'credit-card', label: 'Cartão de crédito' },
+  { sequenceNumber: 124, paymentMethod: 'debit-card', label: 'Cartão de débito' },
+  { sequenceNumber: 123, paymentMethod: 'cash', label: 'Dinheiro' },
+  { sequenceNumber: 122, paymentMethod: undefined, label: 'Não informado' },
+] as const
+
+const paymentPageBody = {
+  items: PAYMENT_ROWS.map((row, index) => ({
+    ...order,
+    id: `00000000-0000-4000-8000-0000000001${index}0`,
+    sequenceNumber: row.sequenceNumber,
+    ...(row.paymentMethod ? { paymentMethod: row.paymentMethod } : {}),
+  })),
+  page: 1,
+  pageSize: 6,
+  total: 30,
+  totalPages: 5,
+}
+
 test.describe('OrdersPage', () => {
   test('redirects anonymous users to login', async ({ page }) => {
     await page.goto('/orders')
@@ -155,6 +176,162 @@ test.describe('OrdersPage', () => {
     expect(channelsMock.requests.some((request) => request.method === 'GET')).toBe(true)
     expect(consoleErrors).toEqual([])
     expect(failedRequests).toEqual([])
+  })
+
+  test('shows the Pagamento column and card cell with long labels and icons', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await pdvFixture.mockSalesChannels()
+    await pdvFixture.mockOrders({ list: { body: paymentPageBody } })
+
+    await page.setViewportSize({ width: 1481, height: 1050 })
+    await page.goto('/orders')
+    await expect(page.getByRole('cell', { name: '#00126' })).toBeVisible()
+    const headers = await page.getByRole('columnheader').allTextContents()
+    expect(headers.indexOf('Pagamento')).toBe(headers.indexOf('Canal') + 1)
+    expect(headers.indexOf('Itens')).toBe(headers.indexOf('Pagamento') + 1)
+    for (const row of PAYMENT_ROWS) {
+      const tableRow = page.getByRole('row').filter({
+        hasText: `#${String(row.sequenceNumber).padStart(5, '0')}`,
+      })
+      const cell = tableRow.getByRole('cell').nth(4)
+      await expect(cell).toHaveText(row.label)
+      await expect(cell.locator('svg')).toBeVisible()
+    }
+
+    await page.setViewportSize({ width: 390, height: 844 })
+    const card = page.getByRole('article').filter({ hasText: '#00125' }).first()
+    await expect(card).toContainText('Pagamento')
+    await expect(card).toContainText('Cartão de crédito')
+    await expect(
+      page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).resolves.toBe(true)
+  })
+
+  test('filters by payment method, keeps it through period changes and clears it', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await pdvFixture.mockSalesChannels()
+    const ordersMock = await pdvFixture.mockOrders({
+      list: { body: paymentPageBody },
+    })
+    const lastParam = () => ordersMock.requests.at(-1)?.url.searchParams
+    const urlParam = (name: string) => new URL(page.url()).searchParams.get(name)
+
+    await page.setViewportSize({ width: 1481, height: 1050 })
+    await page.goto('/orders?page=3')
+    await expect(page.getByRole('cell', { name: '#00126' })).toBeVisible()
+    expect(ordersMock.requests[0]?.url.searchParams.has('paymentMethod')).toBe(false)
+
+    const paymentFilter = page.getByRole('combobox', {
+      name: 'Filtrar por forma de pagamento',
+    })
+    await expect(paymentFilter).toContainText('Todas as formas de pagamento')
+    await paymentFilter.click()
+    await expect(page.getByRole('option')).toHaveText([
+      'Todas as formas de pagamento',
+      'Pix',
+      'Cartão de crédito',
+      'Cartão de débito',
+      'Dinheiro',
+      'Não informado',
+    ])
+    await page.getByRole('option', { name: 'Cartão de crédito' }).click()
+    await expect.poll(() => urlParam('paymentMethod')).toBe('credit-card')
+    expect(urlParam('page')).toBe('1')
+    await expect.poll(() => lastParam()?.get('paymentMethod')).toBe('credit-card')
+    await expect(paymentFilter).toContainText('Cartão de crédito')
+
+    await paymentFilter.click()
+    await page.getByRole('option', { name: 'Não informado' }).click()
+    await expect.poll(() => urlParam('paymentMethod')).toBe('none')
+    await expect.poll(() => lastParam()?.get('paymentMethod')).toBe('none')
+
+    await paymentFilter.click()
+    await page.getByRole('option', { name: 'Dinheiro' }).click()
+    await expect.poll(() => lastParam()?.get('paymentMethod')).toBe('cash')
+
+    await page.getByRole('combobox', { name: 'Filtrar por período' }).click()
+    await page.getByRole('option', { name: 'Período personalizado' }).click()
+    await expect.poll(() => urlParam('period')).toBe('custom')
+    expect(urlParam('paymentMethod')).toBe('cash')
+    await expect.poll(() => lastParam()?.get('paymentMethod')).toBe('cash')
+
+    await page.getByRole('button', { name: 'Limpar filtros' }).click()
+    await expect.poll(() => urlParam('paymentMethod')).toBeNull()
+    await expect(paymentFilter).toContainText('Todas as formas de pagamento')
+    await expect.poll(() => lastParam()?.has('paymentMethod')).toBe(false)
+  })
+
+  test('falls back to all methods for an invalid URL value and follows the tab order', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await pdvFixture.mockSalesChannels()
+    const ordersMock = await pdvFixture.mockOrders({
+      list: { body: paymentPageBody },
+    })
+
+    await page.setViewportSize({ width: 1481, height: 1050 })
+    await page.goto('/orders?paymentMethod=voucher')
+    await expect(page.getByRole('cell', { name: '#00126' })).toBeVisible()
+    await expect(
+      page.getByRole('combobox', { name: 'Filtrar por forma de pagamento' }),
+    ).toContainText('Todas as formas de pagamento')
+    expect(
+      ordersMock.requests.every(
+        (request) => !request.url.searchParams.has('paymentMethod'),
+      ),
+    ).toBe(true)
+
+    await page.getByRole('textbox', { name: 'Buscar pedidos' }).focus()
+    for (const name of [
+      'Filtrar por canal',
+      'Filtrar por forma de pagamento',
+      'Filtrar por status',
+      'Filtrar por período',
+    ]) {
+      await page.keyboard.press('Tab')
+      await expect(page.getByRole('combobox', { name })).toBeFocused()
+    }
+  })
+
+  test('names the payment method in the filtered empty state', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await pdvFixture.mockSalesChannels()
+    await pdvFixture.mockOrders()
+
+    await page.setViewportSize({ width: 1481, height: 1050 })
+    await page.goto('/orders?paymentMethod=cash')
+    await expect(
+      page.getByRole('heading', { name: 'Nenhum pedido encontrado' }),
+    ).toBeVisible()
+    await expect(
+      page.getByText(
+        'Não encontramos pedidos com a busca, o canal, a forma de pagamento, o status e o período selecionados.',
+      ),
+    ).toBeVisible()
+    await page.getByRole('button', { name: 'Limpar filtros' }).last().click()
+    await expect(page).toHaveURL(/\/orders\/?\?search=&period=last-30-days&page=1$/)
   })
 
   test('keeps loading and recovers from a failed list request', async ({

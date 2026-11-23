@@ -12,7 +12,8 @@ export const OrdersFilteredEmptyState = ({ onClear }: OrdersFilteredEmptyStatePr
       />
       <h2 className='mt-5 text-lg font-extrabold'>Nenhum pedido encontrado</h2>
       <p className='mx-auto mt-2 max-w-md text-sm text-muted-foreground'>
-        Não encontramos pedidos com a busca, o canal, o status e o período selecionados.
+        Não encontramos pedidos com a busca, o canal, a forma de pagamento, o status e o
+        período selecionados.
       </p>
       <Button className='mt-5' onClick={onClear} type='button' variant='outline'>
         <Icon name='x' /> Limpar filtros

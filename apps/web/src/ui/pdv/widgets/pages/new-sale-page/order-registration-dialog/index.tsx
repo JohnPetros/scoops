@@ -1,4 +1,5 @@
-import type { Cart } from '@scoops/core/pdv/domain/structures'
+import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
+import type { Cart, OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
 
 import { Button } from '@/ui/shadcn/button'
 import {
@@ -10,72 +11,86 @@ import {
   DialogTitle,
 } from '@/ui/shadcn/dialog'
 import { Icon } from '@/ui/shared/widgets/components/icon'
-import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
+
+import { OrderRegistrationSummary } from './order-registration-summary'
 
 export type OrderRegistrationDialogProps = {
   cart?: Cart
+  channel?: SalesChannel
+  isChannelUnresolved?: boolean
   isOpen: boolean
   isPending: boolean
   onConfirm: () => void
   onOpenChange: (open: boolean) => void
+  paymentMethod?: OrderPaymentMethod
 }
 
 export const OrderRegistrationDialog = ({
   cart,
+  channel,
+  isChannelUnresolved = false,
   isOpen,
   isPending,
   onConfirm,
   onOpenChange,
-}: OrderRegistrationDialogProps) => {
-  const formatCurrency = useFormatCurrency()
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-lg'>
-        <DialogHeader className='border-b border-border-soft p-6 pr-16'>
-          <span className='row-span-2 grid size-11 place-items-center rounded-xl bg-accent text-primary'>
-            <Icon name='clipboard-list' className='size-6' />
-          </span>
-          <DialogTitle>Confirmar pedido</DialogTitle>
-          <DialogDescription>
-            Revise os valores antes de registrar a venda.
-          </DialogDescription>
-        </DialogHeader>
-        <div className='space-y-3 p-6'>
-          {cart ? (
-            <>
-              <div className='flex justify-between gap-4 text-sm'>
-                <span className='text-muted-foreground'>Itens</span>
-                <strong>
-                  {cart.lines.reduce((total, line) => total + line.quantity, 0)}
-                </strong>
-              </div>
-              <div className='flex justify-between gap-4 text-sm'>
-                <span className='text-muted-foreground'>Subtotal</span>
-                <strong>{formatCurrency(cart.subtotal)}</strong>
-              </div>
-              <div className='flex justify-between gap-4 border-t border-border-soft pt-3'>
-                <span className='font-extrabold'>Total</span>
-                <strong className='text-2xl font-black'>
-                  {formatCurrency(cart.total)}
-                </strong>
-              </div>
-            </>
+  paymentMethod,
+}: OrderRegistrationDialogProps) => (
+  <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <DialogContent className='max-w-lg sm:max-w-[560px]'>
+      <DialogHeader className='border-b border-border-soft p-6 pr-16'>
+        <span className='row-span-2 grid size-11 place-items-center rounded-xl bg-accent text-primary'>
+          <Icon name='receipt-text' className='size-6' />
+        </span>
+        <DialogTitle>Registrar pedido?</DialogTitle>
+        <DialogDescription>
+          A venda é registrada e o estoque é baixado. Não há reembolso nem estorno; só um
+          gerente pode cancelar depois.
+        </DialogDescription>
+      </DialogHeader>
+      <div className='px-6 py-4'>
+        {cart ? (
+          <OrderRegistrationSummary
+            cart={cart}
+            channel={channel}
+            isChannelUnresolved={isChannelUnresolved}
+            paymentMethod={paymentMethod}
+          />
+        ) : (
+          <p className='text-sm text-muted-foreground'>
+            Atualizando os valores do pedido…
+          </p>
+        )}
+        {isChannelUnresolved ? (
+          <p
+            className='mt-3 text-xs font-semibold text-destructive'
+            id='order-registration-channel-reason'
+            role='alert'
+          >
+            Não foi possível carregar o canal de venda. Volte ao carrinho e tente de novo.
+          </p>
+        ) : null}
+      </div>
+      <DialogFooter className='sm:flex-row sm:justify-end'>
+        <Button onClick={() => onOpenChange(false)} type='button' variant='outline'>
+          Voltar ao carrinho
+        </Button>
+        <Button
+          aria-describedby={
+            isChannelUnresolved ? 'order-registration-channel-reason' : undefined
+          }
+          disabled={!cart || isPending || isChannelUnresolved}
+          onClick={onConfirm}
+          type='button'
+        >
+          {isPending ? (
+            'Registrando…'
           ) : (
-            <p className='text-sm text-muted-foreground'>
-              Atualizando os valores do pedido…
-            </p>
+            <>
+              <Icon name='check' /> Registrar pedido
+            </>
           )}
-        </div>
-        <DialogFooter className='sm:flex-row sm:justify-end'>
-          <Button onClick={() => onOpenChange(false)} type='button' variant='outline'>
-            Cancelar
-          </Button>
-          <Button disabled={!cart || isPending} onClick={onConfirm} type='button'>
-            {isPending ? 'Registrando…' : 'Confirmar registro'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+)

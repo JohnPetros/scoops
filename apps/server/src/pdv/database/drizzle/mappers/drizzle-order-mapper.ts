@@ -81,6 +81,7 @@ export class DrizzleOrderMapper {
             },
           }
         : {}),
+      ...(record.paymentMethod ? { paymentMethod: record.paymentMethod } : {}),
       lines: DrizzleOrderMapper.sortByPosition(lines).map((line) =>
         DrizzleOrderMapper.toOrderLine(
           line,

@@ -42,6 +42,7 @@ function createOrderSeed(input: {
     idempotencyKey: crypto.randomUUID(),
     createdBy: input.createdBy,
     createdByName: input.createdByName,
+    paymentMethod: 'pix',
     lines: [
       {
         product: {

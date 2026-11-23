@@ -7,6 +7,7 @@ import type { PdvFixture } from '../fixtures/pdv-module-fixture'
 const PRODUCT_ID = 'product-portion'
 const SIZE_ID = 'size-medium'
 const INITIAL_PAGE_READY_TIMEOUT_MS = 30_000
+const CART_STORAGE_KEY = 'scoops.pdv.new-sale-cart.browser-establishment-id'
 
 const product = {
   productId: PRODUCT_ID,
@@ -68,6 +69,54 @@ const resaleProduct = {
     },
   ],
 }
+
+const REGISTERED_PIX_RESPONSE = {
+  body: {
+    kind: 'registered',
+    order: {
+      id: 'order-registered-1',
+      establishmentId: 'establishment-1',
+      idempotencyKey: 'registration-key-1',
+      sequenceNumber: 42,
+      createdBy: 'manager-1',
+      createdByName: 'Maria Manager',
+      status: 'registered',
+      channel: {
+        channelId: 'channel-balcao',
+        name: 'Balcão',
+        percentage: 0,
+      },
+      lines: [
+        {
+          product: {
+            productId: PRODUCT_ID,
+            name: 'Taça de morango',
+            kind: 'portion',
+          },
+          size: { sizeId: SIZE_ID, name: 'Médio', quantity: 2 },
+          brand: undefined,
+          accompaniments: [],
+          quantity: 1,
+          baseUnitPrice: 20,
+          finalUnitPrice: 20,
+          subtotal: 20,
+          consumptions: [],
+        },
+      ],
+      discounts: [],
+      subtotal: 20,
+      totalDiscount: 0,
+      total: 20,
+      paymentMethod: 'pix',
+      createdAt: '2026-08-27T12:00:00.000Z',
+    },
+    replayed: false,
+  },
+  heading: 'Pedido registrado',
+  name: 'registered',
+  status: 201,
+  viewport: { width: 1481, height: 1050 },
+} satisfies RegistrationMock
 
 test.describe('NewSalePage', () => {
   for (const viewport of [
@@ -280,7 +329,7 @@ test.describe('NewSalePage', () => {
     })
   }
 
-  test('restores the in-progress cart after reloading the sale route', async ({
+  test('restores the in-progress cart and its payment method after reloading the sale route', async ({
     page,
     identityFixture,
     pdvFixture,
@@ -299,14 +348,300 @@ test.describe('NewSalePage', () => {
       .getByRole('dialog', { name: 'Taça de morango' })
       .getByRole('button', { name: 'Adicionar ao carrinho' })
       .click()
+    await page.getByRole('radio', { name: 'Crédito' }).click()
     await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeEnabled({
       timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
     })
+    await expect
+      .poll(() =>
+        page.evaluate((key) => window.localStorage.getItem(key), CART_STORAGE_KEY),
+      )
+      .toContain('"paymentMethod":"credit-card"')
     await page.reload()
     await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeEnabled({
       timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
     })
+    await expect(page.getByRole('radio', { name: 'Crédito' })).toBeChecked()
     await expect(page.getByText('Taça de morango').last()).toBeVisible()
+  })
+
+  test('restores a cart saved in the previous storage format without a payment method', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await page.addInitScript(([key, cart]) => window.localStorage.setItem(key, cart), [
+      CART_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        channelId: 'channel-delivery',
+        lineInputs: [
+          {
+            accompanimentIds: [],
+            kind: 'portion',
+            productId: PRODUCT_ID,
+            quantity: 1,
+            sizeId: SIZE_ID,
+          },
+        ],
+        products: [product],
+      }),
+    ] as const)
+
+    await prepareSale(
+      page,
+      identityFixture,
+      pdvFixture,
+      { width: 1481, height: 1050 },
+      undefined,
+      false,
+    )
+
+    await expect(page.getByText('Taça de morango').last()).toBeVisible({
+      timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
+    })
+    await expect(page.getByRole('combobox', { name: 'Canal de venda' })).toContainText(
+      'Delivery próprio',
+    )
+    for (const radio of await page.getByRole('radio').all()) {
+      await expect(radio).not.toBeChecked()
+    }
+    await expect(page.getByText('Falta escolher a forma de pagamento.')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeDisabled()
+  })
+
+  for (const viewport of [
+    { height: 1050, width: 1481, name: 'desktop' },
+    { height: 844, width: 390, name: 'narrow' },
+  ]) {
+    test(`selects a payment method with the keyboard in 44 px targets at ${viewport.name} viewport`, async ({
+      page,
+      identityFixture,
+      pdvFixture,
+    }) => {
+      const consoleErrors: string[] = []
+      page.on('console', (message) => {
+        if (message.type() === 'error') consoleErrors.push(message.text())
+      })
+      await prepareSale(
+        page,
+        identityFixture,
+        pdvFixture,
+        viewport,
+        undefined,
+        true,
+        undefined,
+        null,
+      )
+
+      const group = page.getByRole('radiogroup', { name: 'Forma de pagamento' })
+      await group.scrollIntoViewIfNeeded()
+      await expect(group.getByRole('radio')).toHaveCount(4)
+      for (const radio of await group.getByRole('radio').all()) {
+        const box = await radio.boundingBox()
+        expect(box?.width).toBeGreaterThanOrEqual(44)
+        expect(box?.height).toBeGreaterThanOrEqual(44)
+        await expect(radio).not.toBeChecked()
+      }
+
+      await page.getByRole('combobox', { name: 'Canal de venda' }).focus()
+      await page.keyboard.press('Tab')
+      const pix = group.getByRole('radio', { name: 'Pix' })
+      await expect(pix).toBeFocused()
+      await page.keyboard.press('ArrowRight')
+      const credit = group.getByRole('radio', { name: 'Crédito' })
+      await expect(credit).toBeChecked()
+      await expect(credit).toBeFocused()
+      await expect(pix).not.toBeChecked()
+      await page.keyboard.press('ArrowRight')
+      await expect(group.getByRole('radio', { name: 'Débito' })).toBeChecked()
+      await page.keyboard.press('ArrowLeft')
+      await expect(credit).toBeChecked()
+      await page.keyboard.press('Tab')
+      await expect(page.getByRole('button', { name: /^Editar / })).toBeFocused()
+      const hasHorizontalScroll = await page.evaluate(
+        () => document.documentElement.scrollWidth > window.innerWidth,
+      )
+      expect(hasHorizontalScroll).toBe(false)
+      expect(consoleErrors).toEqual([])
+    })
+  }
+
+  test('blocks registration until a method is chosen and keeps it out of the preview', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    const previewBodies: unknown[] = []
+    const registrationBodies: unknown[] = []
+    page.on('request', (request) => {
+      const { pathname } = new URL(request.url())
+      if (request.method() !== 'POST') return
+      if (pathname === '/orders/preview') previewBodies.push(request.postDataJSON())
+      if (pathname === '/orders') registrationBodies.push(request.postDataJSON())
+    })
+    await prepareSale(
+      page,
+      identityFixture,
+      pdvFixture,
+      { width: 1481, height: 1050 },
+      REGISTERED_PIX_RESPONSE,
+      true,
+      undefined,
+      null,
+    )
+
+    const registerButton = page.getByRole('button', { name: 'Registrar pedido' })
+    const reason = page.getByText('Falta escolher a forma de pagamento.')
+    await expect(registerButton).toBeDisabled()
+    await expect(
+      page.getByText('Escolha como o cliente vai pagar para registrar o pedido.'),
+    ).toBeVisible()
+    await expect(reason).toBeVisible()
+    await expect(registerButton).toHaveAttribute(
+      'aria-describedby',
+      (await reason.getAttribute('id')) ?? '',
+    )
+    const previewCount = previewBodies.length
+
+    await page.getByRole('radio', { name: 'Débito' }).click()
+    await page.getByRole('radio', { name: 'Crédito' }).click()
+    await expect(registerButton).toBeEnabled()
+    await expect(reason).toHaveCount(0)
+    await expect(
+      page.getByText('Escolha como o cliente vai pagar para registrar o pedido.'),
+    ).toHaveCount(0)
+    await page.waitForTimeout(500)
+    expect(previewBodies).toHaveLength(previewCount)
+    for (const body of previewBodies) expect(body).not.toHaveProperty('paymentMethod')
+    await expect(page.getByRole('main').getByText('R$ 20,00').last()).toBeVisible()
+
+    await registerButton.click()
+    const dialog = page.getByRole('dialog', { name: 'Registrar pedido?' })
+    await expect(dialog).toContainText('Canal de venda')
+    await expect(dialog).toContainText('Sem canal')
+    await expect(dialog).toContainText('Forma de pagamento')
+    await expect(dialog).toContainText('Cartão de crédito')
+    await expect(dialog).toContainText('1 item · 1 unidade')
+    await dialog.getByRole('button', { name: 'Registrar pedido' }).click()
+    await expect(page.getByRole('heading', { name: 'Pedido registrado' })).toBeVisible()
+
+    expect(registrationBodies).toHaveLength(1)
+    expect(registrationBodies[0]).toMatchObject({
+      idempotencyKey: expect.any(String),
+      paymentMethod: 'credit-card',
+      previewToken: 'preview-token',
+    })
+    expect(previewBodies).toHaveLength(previewCount)
+    await expect(page.getByRole('main').getByText('Forma de pagamento')).toBeVisible()
+    await expect(
+      page.getByRole('main').getByRole('definition').filter({ hasText: 'Pix' }),
+    ).toHaveCount(1)
+  })
+
+  test('clears the channel and method after a registration and keeps the channel on Limpar pedido', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    await prepareSale(
+      page,
+      identityFixture,
+      pdvFixture,
+      { width: 1481, height: 1050 },
+      REGISTERED_PIX_RESPONSE,
+    )
+    const channelField = page.getByRole('combobox', { name: 'Canal de venda' })
+    await channelField.click()
+    await page.getByRole('option', { name: /Balcão/ }).click()
+    await expect(channelField).toContainText('Balcão')
+
+    await page.getByRole('button', { name: 'Limpar pedido' }).click()
+    await page
+      .getByRole('alertdialog')
+      .getByRole('button', { name: 'Limpar pedido' })
+      .click()
+    await expect(page.getByText('Nenhum item adicionado')).toBeVisible()
+    await expect(channelField).toContainText('Balcão')
+    for (const radio of await page.getByRole('radio').all()) {
+      await expect(radio).not.toBeChecked()
+    }
+
+    await page.getByRole('button', { name: 'Adicionar Taça de morango' }).click()
+    await page
+      .getByRole('dialog', { name: 'Taça de morango' })
+      .getByRole('button', { name: 'Adicionar ao carrinho' })
+      .click()
+    await page.getByRole('radio', { name: 'Pix' }).click()
+    await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeEnabled({
+      timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
+    })
+    await page.getByRole('button', { name: 'Registrar pedido' }).click()
+    await page
+      .getByRole('dialog', { name: 'Registrar pedido?' })
+      .getByRole('button', { name: 'Registrar pedido' })
+      .click()
+    await expect(page.getByRole('heading', { name: 'Pedido registrado' })).toBeVisible()
+    await page.getByRole('button', { name: 'Iniciar nova venda' }).click()
+
+    await expect(page.getByRole('heading', { name: 'Nova venda' })).toBeVisible()
+    await expect(page.getByText('Nenhum item adicionado')).toBeVisible()
+    await expect(channelField).toContainText('Sem canal')
+    for (const radio of await page.getByRole('radio').all()) {
+      await expect(radio).not.toBeChecked()
+    }
+  })
+
+  test('sends a new idempotency key when the method changes after a failed registration', async ({
+    page,
+    identityFixture,
+    pdvFixture,
+  }) => {
+    const registrationBodies: { idempotencyKey: string; paymentMethod: string }[] = []
+    await page.route('**/orders', async (route) => {
+      if (route.request().method() !== 'POST') {
+        await route.fallback()
+        return
+      }
+      registrationBodies.push(route.request().postDataJSON())
+      await route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Falha temporária' }),
+        status: 503,
+      })
+    })
+    await prepareSale(page, identityFixture, pdvFixture, {
+      width: 1481,
+      height: 1050,
+    })
+
+    await page.getByRole('button', { name: 'Registrar pedido' }).click()
+    await page
+      .getByRole('dialog', { name: 'Registrar pedido?' })
+      .getByRole('button', { name: 'Registrar pedido' })
+      .click()
+    await page
+      .getByRole('dialog', { name: 'Não foi possível registrar' })
+      .getByRole('button', { name: 'Voltar ao pedido' })
+      .click()
+    await expect(page.getByRole('radio', { name: 'Pix' })).toBeChecked()
+    await page.getByRole('radio', { name: 'Dinheiro' }).click()
+    await page.getByRole('button', { name: 'Registrar pedido' }).click()
+    await page
+      .getByRole('dialog', { name: 'Registrar pedido?' })
+      .getByRole('button', { name: 'Registrar pedido' })
+      .click()
+    const failureDialog = page.getByRole('dialog', { name: 'Não foi possível registrar' })
+    await expect(failureDialog).toBeVisible()
+    await failureDialog.getByRole('button', { name: 'Voltar ao pedido' }).click()
+
+    expect(registrationBodies).toHaveLength(2)
+    expect(registrationBodies[0]?.paymentMethod).toBe('pix')
+    expect(registrationBodies[1]?.paymentMethod).toBe('cash')
+    expect(registrationBodies[1]?.idempotencyKey).not.toBe(
+      registrationBodies[0]?.idempotencyKey,
+    )
+    await expect(page.getByRole('radio', { name: 'Dinheiro' })).toBeChecked()
   })
 
   test('shows product card skeletons while the catalog loads', async ({
@@ -389,7 +724,11 @@ test.describe('NewSalePage', () => {
         catalogQueries.push(query)
         const isSearching = Boolean(query.get('search'))
         const items = isSearching
-          ? [{ ...product, availability: 'available' }, outOfStockProduct, missingPriceProduct]
+          ? [
+              { ...product, availability: 'available' },
+              outOfStockProduct,
+              missingPriceProduct,
+            ]
           : [product]
         await route.fulfill({
           contentType: 'application/json',
@@ -438,7 +777,11 @@ test.describe('NewSalePage', () => {
 
       await searchInput.focus()
       for (let step = 0; step < 12; step += 1) {
-        if (await missingPriceButton.evaluate((element) => element === document.activeElement)) {
+        if (
+          await missingPriceButton.evaluate(
+            (element) => element === document.activeElement,
+          )
+        ) {
           break
         }
         await page.keyboard.press('Tab')
@@ -456,7 +799,8 @@ test.describe('NewSalePage', () => {
       await expect(page).toHaveURL(/\/sales\/new$/)
       expect(
         await page.evaluate(
-          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+          () =>
+            document.documentElement.scrollWidth <= document.documentElement.clientWidth,
         ),
       ).toBe(true)
 
@@ -605,9 +949,7 @@ test.describe('NewSalePage', () => {
     await page.getByRole('button', { name: 'Página 2' }).click()
     await expect.poll(() => catalogQueries.at(-1)?.get('page')).toBe('2')
     await page.getByRole('textbox', { name: 'Buscar produto por nome' }).fill('taça')
-    await expect
-      .poll(() => catalogQueries.at(-1)?.get('search'))
-      .toBe('taça')
+    await expect.poll(() => catalogQueries.at(-1)?.get('search')).toBe('taça')
     expect(catalogQueries.at(-1)?.get('page')).toBe('1')
     expect(
       catalogQueries.some(
@@ -712,69 +1054,27 @@ test.describe('NewSalePage', () => {
       identityFixture,
       pdvFixture,
       { width: 1481, height: 1050 },
-      {
-        body: {
-          kind: 'registered',
-          order: {
-            id: 'order-registered-1',
-            establishmentId: 'establishment-1',
-            idempotencyKey: 'registration-key-1',
-            sequenceNumber: 42,
-            createdBy: 'manager-1',
-            createdByName: 'Maria Manager',
-            status: 'registered',
-            channel: {
-              channelId: 'channel-balcao',
-              name: 'Balcão',
-              percentage: 0,
-            },
-            lines: [
-              {
-                product: {
-                  productId: PRODUCT_ID,
-                  name: 'Taça de morango',
-                  kind: 'portion',
-                },
-                size: { sizeId: SIZE_ID, name: 'Médio', quantity: 2 },
-                brand: undefined,
-                accompaniments: [],
-                quantity: 1,
-                baseUnitPrice: 20,
-                finalUnitPrice: 20,
-                subtotal: 20,
-                consumptions: [],
-              },
-            ],
-            discounts: [],
-            subtotal: 20,
-            totalDiscount: 0,
-            total: 20,
-            createdAt: '2026-08-27T12:00:00.000Z',
-          },
-          replayed: false,
-        },
-        heading: 'Pedido registrado',
-        name: 'registered',
-        status: 201,
-        viewport: { width: 1481, height: 1050 },
-      },
+      REGISTERED_PIX_RESPONSE,
     )
     const registerButton = page.getByRole('button', { name: 'Registrar pedido' })
     await registerButton.focus()
     await expect(registerButton).toBeFocused()
     await registerButton.press('Enter')
-    const confirmationDialog = page.getByRole('dialog', { name: 'Confirmar pedido' })
+    const confirmationDialog = page.getByRole('dialog', { name: 'Registrar pedido?' })
     await expect(confirmationDialog).toBeVisible()
     const confirmButton = confirmationDialog.getByRole('button', {
-      name: 'Confirmar registro',
+      name: 'Registrar pedido',
     })
     await confirmButton.focus()
     await expect(confirmButton).toBeFocused()
     await confirmButton.press('Enter')
 
     await expect(page.getByRole('heading', { name: 'Pedido registrado' })).toBeVisible()
-    await expect(page.getByRole('dialog', { name: 'Confirmar pedido' })).toHaveCount(0)
+    await expect(page.getByRole('dialog', { name: 'Registrar pedido?' })).toHaveCount(0)
     await expect(page.getByText('#0042')).toBeVisible()
+    const metadata = page.getByRole('main').getByRole('definition')
+    await expect(page.getByRole('main').getByText('Forma de pagamento')).toBeVisible()
+    await expect(metadata.filter({ hasText: 'Pix' })).toHaveCount(1)
     await expect(page.getByText('Taça de morango').first()).toBeVisible()
     await expect(page.getByRole('main').getByText('R$ 20,00').last()).toBeVisible()
     await expect(page.getByRole('button', { name: 'Iniciar nova venda' })).toBeVisible()
@@ -961,10 +1261,8 @@ test.describe('NewSalePage', () => {
       )
       await expect(page).toHaveURL('/sales/new')
       await page.getByRole('button', { name: 'Registrar pedido' }).click()
-      const initialConfirmation = page.getByRole('dialog', { name: 'Confirmar pedido' })
-      await initialConfirmation
-        .getByRole('button', { name: 'Confirmar registro' })
-        .click()
+      const initialConfirmation = page.getByRole('dialog', { name: 'Registrar pedido?' })
+      await initialConfirmation.getByRole('button', { name: 'Registrar pedido' }).click()
 
       const reviewDialog = page.getByRole('dialog', { name: 'Revise os preços' })
       await expect(reviewDialog).toBeVisible()
@@ -1017,18 +1315,20 @@ test.describe('NewSalePage', () => {
       await reviewButton.focus()
       await expect(reviewButton).toBeFocused()
       await reviewButton.press('Enter')
-      const renewedConfirmation = page.getByRole('dialog', { name: 'Confirmar pedido' })
+      const renewedConfirmation = page.getByRole('dialog', { name: 'Registrar pedido?' })
       await expect(renewedConfirmation).toBeVisible()
       expect(registrationRequests).toHaveLength(1)
 
       const renewedConfirmButton = renewedConfirmation.getByRole('button', {
-        name: 'Confirmar registro',
+        name: 'Registrar pedido',
       })
       await renewedConfirmButton.focus()
       await renewedConfirmButton.press('Enter')
 
       await expect.poll(() => registrationRequests.length).toBe(2)
-      await expect(page.getByRole('heading', { name: 'Pedido registrado' })).toHaveCount(0)
+      await expect(page.getByRole('heading', { name: 'Pedido registrado' })).toHaveCount(
+        0,
+      )
       await expect(reviewDialog).toBeVisible()
       await expect(reviewDialog).toContainText('Granola: R$ 4,00 → R$ 5,00')
       await expect(reviewDialog).toContainText('Açaí tradicional: R$ 24,00 → R$ 25,00')
@@ -1041,12 +1341,12 @@ test.describe('NewSalePage', () => {
       await expect(secondReviewButton).toBeFocused()
       await secondReviewButton.press('Enter')
       const secondRenewedConfirmation = page.getByRole('dialog', {
-        name: 'Confirmar pedido',
+        name: 'Registrar pedido?',
       })
       await expect(secondRenewedConfirmation).toBeVisible()
       expect(registrationRequests).toHaveLength(2)
       const secondConfirmButton = secondRenewedConfirmation.getByRole('button', {
-        name: 'Confirmar registro',
+        name: 'Registrar pedido',
       })
       await secondConfirmButton.focus()
       await secondConfirmButton.press('Enter')
@@ -1069,9 +1369,9 @@ test.describe('NewSalePage', () => {
         registrationRequests[1]?.idempotencyKey,
       )
       expect(consoleErrors).toHaveLength(2)
-      expect(consoleErrors.every((error) => error.includes('status of 409 (Conflict)'))).toBe(
-        true,
-      )
+      expect(
+        consoleErrors.every((error) => error.includes('status of 409 (Conflict)')),
+      ).toBe(true)
       expect(failedRequests).toEqual([])
       expect(failedResponses).toEqual(['409 /orders', '409 /orders'])
     })
@@ -1186,10 +1486,10 @@ test.describe('NewSalePage', () => {
       await registerButton.focus()
       await expect(registerButton).toBeFocused()
       await registerButton.press('Enter')
-      const confirmationDialog = page.getByRole('dialog', { name: 'Confirmar pedido' })
+      const confirmationDialog = page.getByRole('dialog', { name: 'Registrar pedido?' })
       await expect(confirmationDialog).toBeVisible()
       const confirmButton = confirmationDialog.getByRole('button', {
-        name: 'Confirmar registro',
+        name: 'Registrar pedido',
       })
       await confirmButton.focus()
       await expect(confirmButton).toBeFocused()
@@ -1256,15 +1556,15 @@ test.describe('NewSalePage', () => {
       await prepareSale(page, identityFixture, pdvFixture, viewport)
       await page.getByRole('button', { name: 'Registrar pedido' }).click()
       await page
-        .getByRole('dialog', { name: 'Confirmar pedido' })
-        .getByRole('button', { name: 'Confirmar registro' })
+        .getByRole('dialog', { name: 'Registrar pedido?' })
+        .getByRole('button', { name: 'Registrar pedido' })
         .click()
       await expect(
         page.getByRole('status', { name: 'Verificando registro' }),
       ).toBeVisible({
         timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
       })
-      await expect(page.getByRole('dialog', { name: 'Confirmar pedido' })).toHaveCount(0)
+      await expect(page.getByRole('dialog', { name: 'Registrar pedido?' })).toHaveCount(0)
       await expect(page.getByRole('dialog')).toHaveCount(0)
       await expect(
         page.getByRole('status', { name: 'Verificando registro' }),
@@ -1302,6 +1602,7 @@ async function prepareSale(
   registration?: RegistrationMock,
   addToCart = true,
   previewResponse?: (requestNumber: number) => unknown,
+  paymentMethodLabel: string | null = 'Pix',
 ) {
   await identityFixture.mockManagerSession()
   await identityFixture.mockManagerAccount()
@@ -1353,8 +1654,15 @@ async function prepareSale(
       .getByRole('dialog', { name: 'Taça de morango' })
       .getByRole('button', { name: 'Adicionar ao carrinho' })
       .click()
-    await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeEnabled({
-      timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
-    })
+    if (paymentMethodLabel) {
+      await page.getByRole('radio', { name: paymentMethodLabel }).click()
+      await expect(page.getByRole('button', { name: 'Registrar pedido' })).toBeEnabled({
+        timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
+      })
+    } else {
+      await expect(page.getByText('R$ 20,00').first()).toBeVisible({
+        timeout: INITIAL_PAGE_READY_TIMEOUT_MS,
+      })
+    }
   }
 }

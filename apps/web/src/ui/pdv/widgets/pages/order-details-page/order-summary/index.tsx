@@ -8,6 +8,7 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from '@/ui/shadcn/accordion'
+import { getPaymentMethodPresentation } from '@/ui/pdv/constants/payment-method-presentation'
 import { Badge } from '@/ui/shadcn/badge'
 import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 import { useFormatDate } from '@/ui/shared/hooks/use-format-date'
@@ -18,6 +19,7 @@ export type OrderSummaryProps = { order: OrderDetails }
 export const OrderSummary = ({ order }: OrderSummaryProps) => {
   const formatCurrency = useFormatCurrency()
   const formatDate = useFormatDate()
+  const payment = getPaymentMethodPresentation(order.paymentMethod)
   const totalItems = order.lines.reduce((total, line) => total + line.quantity, 0)
 
   return (
@@ -67,6 +69,26 @@ export const OrderSummary = ({ order }: OrderSummaryProps) => {
               <div>
                 <p className='text-xs text-muted-foreground'>Itens</p>
                 <p className='mt-1 font-semibold'>{totalItems} unidades</p>
+              </div>
+              <div>
+                <p className='text-xs text-muted-foreground'>Forma de pagamento</p>
+                <p
+                  className={
+                    order.paymentMethod
+                      ? 'mt-1 flex items-center gap-2 font-semibold'
+                      : 'mt-1 flex items-center gap-2 font-semibold text-text-tertiary'
+                  }
+                >
+                  <Icon
+                    className={
+                      order.paymentMethod
+                        ? 'size-[15px] shrink-0 text-primary'
+                        : 'size-[15px] shrink-0'
+                    }
+                    name={payment.icon}
+                  />
+                  {payment.label}
+                </p>
               </div>
               <div>
                 <p className='text-xs text-muted-foreground'>Registrado por</p>

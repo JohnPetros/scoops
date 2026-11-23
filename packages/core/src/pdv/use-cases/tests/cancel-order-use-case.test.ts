@@ -3,6 +3,7 @@ import { mock, type MockProxy } from 'vitest-mock-extended'
 
 import { UserProfile } from '#identity/domain/structures/user-profile.ts'
 import { OrderFaker } from '#pdv/domain/entities/fakers/order-faker.ts'
+import { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import { OrderStatus } from '#pdv/domain/structures/order-status.ts'
 import type {
   PdvDatabase,
@@ -357,6 +358,42 @@ describe('Cancel Order Use Case', () => {
     })
     expect(orders.findByIdForUpdate).toHaveBeenCalledWith(actor.establishmentId, order.id)
     expect(datetime.now).toHaveBeenCalledTimes(1)
+  })
+
+  it('passes only the cancellation to the repository so the payment method is preserved', async () => {
+    const order = OrderFaker.fake({
+      establishmentId: actor.establishmentId,
+      paymentMethod: OrderPaymentMethod.CreditCard,
+    })
+    orders.findByIdForUpdate.mockResolvedValue(order)
+    stockProvider.restore.mockResolvedValue([
+      {
+        linePosition: 0,
+        productId: order.lines[0].product.productId,
+        productName: order.lines[0].product.name,
+        quantity: 1,
+        outcome: 'restored',
+      },
+    ])
+    orders.cancel.mockImplementation(
+      async (_establishmentId, _orderId, cancellation) => ({
+        ...order,
+        status: OrderStatus.Canceled,
+        cancellation,
+      }),
+    )
+
+    const result = await useCase.execute({
+      actor,
+      orderId: order.id,
+      lineDispositions: [{ linePosition: 0, disposition: 'return' }],
+    })
+
+    expect(result.paymentMethod).toBe(OrderPaymentMethod.CreditCard)
+    expect(orders.cancel).toHaveBeenCalledTimes(1)
+    const cancelArgs = orders.cancel.mock.calls[0]
+    expect(cancelArgs).toHaveLength(3)
+    expect(cancelArgs[2]).not.toHaveProperty('paymentMethod')
   })
 
   it('records each loss consumption without calling the stock provider', async () => {

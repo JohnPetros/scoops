@@ -96,6 +96,28 @@ describe('Cancel Order Controller [PATCH /orders/:orderId/cancel]', () => {
     ).toHaveLength(alertsBeforeCancellation)
   })
 
+  it('keeps the payment method on the canceled order', async () => {
+    const registered = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Canceled Method Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000308',
+      paymentMethod: 'cash',
+    })
+
+    const response = await request(fixture.app.getHttpServer())
+      .patch(`/orders/${registered.order.id}/cancel`)
+      .set('Cookie', managerRequestAuthorization())
+      .send({ lineDispositions: [{ linePosition: 0, disposition: 'return' }] })
+    const detail = await request(fixture.app.getHttpServer())
+      .get(`/orders/${registered.order.id}`)
+      .set('Cookie', operatorRequestAuthorization())
+
+    expect(response.status).toBe(200)
+    expect(response.body.status).toBe('canceled')
+    expect(response.body.paymentMethod).toBe('cash')
+    expect(detail.body).toMatchObject({ status: 'canceled', paymentMethod: 'cash' })
+  })
+
   it('enforces manager access, reason bounds and one-way cancellation', async () => {
     const registered = await fixture.registerPortionOrder({
       authorization: managerRequestAuthorization(),
@@ -296,6 +318,7 @@ describe('Cancel Order Controller [PATCH /orders/:orderId/cancel]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000307',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
     expect(registration.status).toBe(201)

@@ -22,6 +22,44 @@ Accept: application/json
 #   "totalPages": 0
 # }
 
+### List orders by payment method (200)
+GET {{baseUrl}}/orders?paymentMethod=credit-card&page=1&pageSize=6
+Cookie: {{sessionCookie}}
+Accept: application/json
+
+# paymentMethod accepts pix, credit-card, debit-card or cash.
+# Response body:
+# {
+#   "items": [{"id": "{{orderId}}", "status": "registered", "paymentMethod": "credit-card"}],
+#   "page": 1,
+#   "pageSize": 6,
+#   "total": 1,
+#   "totalPages": 1
+# }
+
+### List orders with no recorded payment method (200)
+GET {{baseUrl}}/orders?paymentMethod=none&page=1&pageSize=6
+Cookie: {{sessionCookie}}
+Accept: application/json
+
+# none returns only orders registered before payment methods existed; their items omit paymentMethod.
+# Response body:
+# {
+#   "items": [{"id": "{{orderId}}", "status": "registered"}],
+#   "page": 1,
+#   "pageSize": 6,
+#   "total": 1,
+#   "totalPages": 1
+# }
+
+### List orders with an invalid payment method (422)
+GET {{baseUrl}}/orders?paymentMethod=voucher
+Cookie: {{sessionCookie}}
+Accept: application/json
+
+# Response body:
+# {"statusCode":422,"title":"Requisição inválida","message":"A requisição é inválida.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders?paymentMethod=voucher"}
+
 ### Get an order snapshot (200)
 GET {{baseUrl}}/orders/{{orderId}}
 Cookie: {{sessionCookie}}
@@ -33,6 +71,7 @@ Accept: application/json
 #   "sequenceNumber": 10,
 #   "createdByName": "Maria Manager",
 #   "status": "registered",
+#   "paymentMethod": "pix",
 #   "createdAt": "2026-01-01T12:00:00.000Z",
 #   "lines": [],
 #   "discounts": [],
@@ -58,6 +97,7 @@ Content-Type: application/json
 # {
 #   "id": "{{orderId}}",
 #   "status": "canceled",
+#   "paymentMethod": "pix",
 #   "cancellation": {
 #     "canceledByName": "Maria Manager",
 #     "reason": "Cliente solicitou o cancelamento",
@@ -250,6 +290,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "{{idempotencyKey}}",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{
     "productId": "{{productId}}",
     "kind": "portion",
@@ -270,6 +311,7 @@ Content-Type: application/json
 #     "sequenceNumber": 1,
 #     "createdBy": "00000000-0000-0000-0000-000000000012",
 #     "channel": null,
+#     "paymentMethod": "pix",
 #     "lines": [],
 #     "discounts": [],
 #     "subtotal": 10,
@@ -287,6 +329,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "{{idempotencyKey}}",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{
     "productId": "{{productId}}",
     "kind": "portion",
@@ -297,7 +340,7 @@ Content-Type: application/json
 }
 
 # Response body:
-# {"kind":"registered","replayed":true,"order":{"id":"00000000-0000-0000-0000-000000000010","sequenceNumber":1,"lines":[],"discounts":[],"subtotal":10,"totalDiscount":0,"total":10}}
+# {"kind":"registered","replayed":true,"order":{"id":"00000000-0000-0000-0000-000000000010","sequenceNumber":1,"paymentMethod":"pix","lines":[],"discounts":[],"subtotal":10,"totalDiscount":0,"total":10}}
 
 ### Reprice before confirmation (200 repriced)
 POST {{baseUrl}}/orders
@@ -307,6 +350,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000002",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{
     "productId": "{{productId}}",
     "kind": "portion",
@@ -327,6 +371,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000003",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{
     "productId": "{{productId}}",
     "kind": "portion",
@@ -347,6 +392,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000004",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{
     "productId": "{{productId}}",
     "kind": "portion",
@@ -367,6 +413,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "{{idempotencyKey}}",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{"productId":"{{productId}}","kind":"portion","quantity":2,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
 }
 
@@ -381,6 +428,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000005",
   "previewToken": "invalid-preview-token",
+  "paymentMethod": "pix",
   "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
 }
 
@@ -395,6 +443,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000006",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "channelId": "00000000-0000-4000-8000-000000000099",
   "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
 }
@@ -402,12 +451,58 @@ Content-Type: application/json
 # Response body:
 # {"statusCode":404,"title":"Erro de Não Encontrado","message":"Canal de venda não encontrado.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
 
+### Register without a payment method (422)
+POST {{baseUrl}}/orders
+Cookie: {{sessionCookie}}
+Content-Type: application/json
+
+{
+  "idempotencyKey": "00000000-0000-4000-8000-000000000009",
+  "previewToken": "{{previewToken}}",
+  "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
+}
+
+# No order, sequence number or stock movement is written.
+# Response body:
+# {"statusCode":422,"title":"Requisição inválida","message":"A requisição é inválida.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
+
+### Register with an invalid payment method (422)
+POST {{baseUrl}}/orders
+Cookie: {{sessionCookie}}
+Content-Type: application/json
+
+{
+  "idempotencyKey": "00000000-0000-4000-8000-00000000000a",
+  "previewToken": "{{previewToken}}",
+  "paymentMethod": "voucher",
+  "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
+}
+
+# Response body:
+# {"statusCode":422,"title":"Requisição inválida","message":"A requisição é inválida.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
+
+### Replay with a different payment method (409 standard error)
+POST {{baseUrl}}/orders
+Cookie: {{sessionCookie}}
+Content-Type: application/json
+
+{
+  "idempotencyKey": "{{idempotencyKey}}",
+  "previewToken": "{{previewToken}}",
+  "paymentMethod": "cash",
+  "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
+}
+
+# The key was first registered with another method, so no order is created.
+# Response body:
+# {"statusCode":409,"title":"Erro de Conflito","message":"A chave de idempotência já foi usada em outro pedido.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
+
 ### Malformed registration body (422)
 POST {{baseUrl}}/orders
 Cookie: {{sessionCookie}}
 Content-Type: application/json
 
-{"idempotencyKey":"not-a-uuid","previewToken":"{{previewToken}}","lines":[]}
+{"idempotencyKey":"not-a-uuid","previewToken":"{{previewToken}}","paymentMethod":"pix","lines":[]}
 
 # Response body:
 # {"statusCode":422,"title":"Invalid request","message":"Invalid request.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
@@ -416,7 +511,7 @@ Content-Type: application/json
 POST {{baseUrl}}/orders
 Content-Type: application/json
 
-{"idempotencyKey":"00000000-0000-4000-8000-000000000020","previewToken":"{{previewToken}}","lines":[]}
+{"idempotencyKey":"00000000-0000-4000-8000-000000000020","previewToken":"{{previewToken}}","paymentMethod":"pix","lines":[]}
 
 # Response body:
 # {"statusCode":401,"title":"Authentication required","message":"Authentication required.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
@@ -426,7 +521,7 @@ POST {{baseUrl}}/orders
 Cookie: replace-with-viewer-session-cookie
 Content-Type: application/json
 
-{"idempotencyKey":"00000000-0000-4000-8000-000000000021","previewToken":"{{previewToken}}","lines":[]}
+{"idempotencyKey":"00000000-0000-4000-8000-000000000021","previewToken":"{{previewToken}}","paymentMethod":"pix","lines":[]}
 
 # Response body:
 # {"statusCode":403,"title":"Access denied","message":"Access denied.","timestamp":"2026-01-01T00:00:00.000Z","path":"/orders"}
@@ -439,6 +534,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000007",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
 }
 
@@ -453,6 +549,7 @@ Content-Type: application/json
 {
   "idempotencyKey": "00000000-0000-4000-8000-000000000008",
   "previewToken": "{{previewToken}}",
+  "paymentMethod": "pix",
   "lines": [{"productId":"{{productId}}","kind":"portion","quantity":1,"sizeId":"{{sizeId}}","accompanimentIds":[]}]
 }
 

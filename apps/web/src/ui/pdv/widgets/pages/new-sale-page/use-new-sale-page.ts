@@ -5,6 +5,7 @@ import type {
   Cart,
   CartLineInput,
   OrderDetails,
+  OrderPaymentMethod,
   OrderPreviewInput,
   OrderRegistrationInput,
   OrderRegistrationResult,
@@ -31,6 +32,7 @@ export function useNewSalePage() {
   const [editingLine, setEditingLine] = useState<CartLineInput>()
   const [editingLineIndex, setEditingLineIndex] = useState<number>()
   const [channelId, setChannelId] = useState<string>()
+  const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>()
   const [previewCart, setPreviewCart] = useState<Cart>()
   const [previewToken, setPreviewToken] = useState<string>()
   const [idempotencyKey, setIdempotencyKey] = useState<string>()
@@ -70,12 +72,13 @@ export function useNewSalePage() {
     if (lineInputs.length === 0) return
 
     newSaleCartStorage.save(establishmentId, {
-      version: 1,
+      version: 2,
       lineInputs,
       products: Object.values(productsById),
       ...(channelId ? { channelId } : {}),
+      ...(paymentMethod ? { paymentMethod } : {}),
     })
-  }, [channelId, establishmentId, lineInputs, productsById])
+  }, [channelId, establishmentId, lineInputs, paymentMethod, productsById])
 
   useEffect(() => {
     if (!establishmentId) {
@@ -83,6 +86,7 @@ export function useNewSalePage() {
       setLineInputs([])
       setProductsById({})
       setChannelId(undefined)
+      setPaymentMethod(undefined)
       return
     }
 
@@ -95,6 +99,7 @@ export function useNewSalePage() {
       ),
     )
     setChannelId(storedCart?.channelId)
+    setPaymentMethod(storedCart?.paymentMethod)
   }, [establishmentId])
 
   useEffect(() => {
@@ -224,6 +229,7 @@ export function useNewSalePage() {
     registrationRequestRef.current = undefined
     setRegistrationResult(undefined)
     setPreviewError(undefined)
+    setPaymentMethod(undefined)
   }
 
   function handleChannelChange(nextChannelId: string | undefined) {
@@ -231,8 +237,13 @@ export function useNewSalePage() {
     startNewRegistrationRequest()
   }
 
+  function handlePaymentMethodChange(nextPaymentMethod: OrderPaymentMethod) {
+    setPaymentMethod(nextPaymentMethod)
+    startNewRegistrationRequest()
+  }
+
   function handleRegister() {
-    if (!previewCart || !previewToken || lineInputs.length === 0) return
+    if (!previewCart || !previewToken || !paymentMethod || lineInputs.length === 0) return
     setRegistrationError(undefined)
     setRegistrationFeedback(undefined)
     setIsRegistrationOpen(true)
@@ -324,14 +335,10 @@ export function useNewSalePage() {
 
     const result = response.body
     if (result.kind === 'registered') {
-      newSaleCartStorage.clear(establishmentId)
+      clearRegisteredCart()
       setRegisteredOrder(result.order)
       setRegistrationResult(undefined)
       setIsRegistrationOpen(false)
-      setLineInputs([])
-      setPreviewCart(undefined)
-      setPreviewToken(undefined)
-      setIdempotencyKey(undefined)
       setRegistrationFeedback(undefined)
       return
     }
@@ -344,14 +351,25 @@ export function useNewSalePage() {
     setRegistrationFeedback(undefined)
   }
 
+  function clearRegisteredCart() {
+    newSaleCartStorage.clear(establishmentId)
+    setLineInputs([])
+    setChannelId(undefined)
+    setPaymentMethod(undefined)
+    setPreviewCart(undefined)
+    setPreviewToken(undefined)
+    setIdempotencyKey(undefined)
+  }
+
   function createRegistrationRequest(): OrderRegistrationInput | undefined {
-    if (!previewToken || lineInputs.length === 0) return undefined
+    if (!previewToken || !paymentMethod || lineInputs.length === 0) return undefined
     const key = idempotencyKey ?? createIdempotencyKey()
     setIdempotencyKey(key)
     return {
       ...(channelId ? { channelId } : {}),
       idempotencyKey: key,
       lines: toPreviewLines(lineInputs),
+      paymentMethod,
       previewToken,
     }
   }
@@ -399,6 +417,11 @@ export function useNewSalePage() {
     setIdempotencyKey(createIdempotencyKey())
   }
 
+  const registrationChannelId = channelId ?? previewCart?.channelId
+  const registrationChannel = activeSalesChannels.find(
+    (channel) => channel.id === registrationChannelId,
+  )
+
   return {
     activeSalesChannels,
     catalogProducts,
@@ -411,6 +434,7 @@ export function useNewSalePage() {
     handleEditLine,
     handleFeedbackAction,
     handleNewSale,
+    handlePaymentMethodChange,
     handleRefreshPreview,
     handleRegister,
     handleRemoveLine,
@@ -423,14 +447,18 @@ export function useNewSalePage() {
     isLoadingActiveSalesChannels,
     isRefreshingActiveSalesChannels,
     isPreviewPending: previewAction.isPending,
+    isRegistrationChannelUnresolved:
+      registrationChannelId !== undefined && !registrationChannel,
     isRegistrationOpen,
     isRegistrationPending: registrationAction.isPending,
     isVerification: registrationFeedback === 'verification',
     lineInputs,
+    paymentMethod,
     previewCart,
     previewError,
     previewToken,
     registeredOrder,
+    registrationChannel,
     registrationError,
     registrationResult,
     registrationFeedback,

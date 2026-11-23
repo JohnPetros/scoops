@@ -236,6 +236,9 @@ export const PdvService = (restClient: RestClient): PdvRestService => ({
     if (input.createdFrom) params.set('createdFrom', input.createdFrom.toISOString())
     if (input.createdTo) params.set('createdTo', input.createdTo.toISOString())
     if (input.channelId !== undefined) params.set('channelId', input.channelId ?? 'none')
+    if (input.paymentMethod !== undefined) {
+      params.set('paymentMethod', input.paymentMethod ?? 'none')
+    }
     if (input.status) params.set('status', input.status)
 
     const response = await restClient.get<OrderPageJson>(`/orders?${params.toString()}`)
