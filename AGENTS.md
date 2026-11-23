@@ -198,8 +198,10 @@ deployed environment unless the task requests it.
 
 Route or transport mocks are acceptable for isolated tests, but they must not be
 presented as evidence that a real authenticated or server-backed integration
-works. Use `pnpm --filter web test:integration` for the repository's committed
-Playwright test suite.
+works. Run only the checks that cover the changed code (see the Local check scope in
+`documentation/tooling.md`), for example the committed Playwright files for the changed routes
+(`pnpm --filter web exec playwright test <file>`). Never run the complete suite
+(`pnpm --filter web test:integration`) locally; CI runs the complete checks.
 
 ## Skills
 
