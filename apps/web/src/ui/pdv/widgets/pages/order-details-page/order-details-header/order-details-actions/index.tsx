@@ -24,7 +24,7 @@ export const OrderDetailsActions = ({
     ) : (
       <p className='text-sm text-muted-foreground'>{timestamp}</p>
     )}
-    <div className='flex w-full flex-col gap-3 sm:w-auto sm:flex-row'>
+    <div className='flex w-full flex-col gap-3 sm:w-auto sm:flex-row [&>button]:h-10 [&>button]:rounded-lg [&>button]:px-3.5'>
       {printAction}
       {canCancel ? (
         <Button
