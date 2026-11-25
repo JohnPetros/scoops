@@ -282,8 +282,7 @@ port with `PLAYWRIGHT_PORT` when needed. The current mocked notification SSE res
 `http://localhost:4001`; use the default port for suites exercising those fixtures. An alternate
 port can therefore pass the login health check while failing notification/CORS assertions.
 Do not treat those failures as production-server authorization evidence or weaken the
-assertions to accommodate them. The real-service auth setup continues to use the
-developer server on port `4000`.
+assertions to accommodate them.
 
 Use the Playwright CLI for all repository browser interaction, inspection and
 validation, including manual or exploratory flows. Do not use `browser-use`, CDP
@@ -308,23 +307,9 @@ Run a real-service scenario explicitly only after starting the required Server,
 database, and Mailpit services; mocked route coverage is not persistence,
 authorization, or external-email evidence.
 
-To create reusable authenticated browser sessions for real-service scenarios,
-run the opt-in setup command after seeding the local development accounts:
-
-```bash
-pnpm --filter web test:auth:setup
-```
-
-The command logs in the local Manager and Operator seed accounts and writes
-generated Playwright storage states to `apps/web/playwright/.auth/`. Check their Git
-tracking status before setup; the current Manager and Operator state files are tracked.
-Never publish refreshed session credentials. Preserve existing tracked state files before
-validation and restore task-generated changes afterward; do not untrack files or alter ignore
-configuration as an incidental validation step. Override the
-credentials with `PLAYWRIGHT_MANAGER_EMAIL`, `PLAYWRIGHT_MANAGER_PASSWORD`,
-`PLAYWRIGHT_OPERATOR_EMAIL`, and `PLAYWRIGHT_OPERATOR_PASSWORD` when needed.
-Use a generated state in a test with `test.use({ storageState: ... })`; do not
-commit the generated files.
+For authenticated real-service scenarios, sign in through the Playwright CLI with
+the local Manager and Operator seed accounts. Do not commit saved browser session
+state or publish session credentials.
 
 Browser screenshots used for validation are ephemeral. Write them to Playwright's
 `test-results/` output or retain them as CI artifacts; do not write implementation

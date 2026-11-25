@@ -168,11 +168,10 @@ deployed environment unless the task requests it.
    `postgresql://postgres:postgres@localhost:54322/postgres`, the server at
    `http://localhost:3336`, the web app at `http://localhost:4000`, and Mailpit
    at `http://localhost:54324`.
-   For flows using persisted authentication, verify that the local Manager and
-   Operator seed accounts exist. If they do not, run
-   `pnpm --filter server db:seed` explicitly before
-   `pnpm --filter web test:auth:setup`; the seed resets local Auth users and
-   application seed data, so Playwright must not invoke it implicitly.
+   For authenticated flows, verify that the local Manager and Operator seed
+   accounts exist, then sign in through the Playwright CLI. If they do not exist,
+   run `pnpm --filter server db:seed` explicitly first; the seed resets local Auth
+   users and application seed data, so Playwright must not invoke it implicitly.
 2. Start `pnpm --filter server dev` and `pnpm --filter web dev` in persistent
    terminal sessions when the flow needs both applications. Wait for compilation
    and Nest bootstrap to finish before Playwright assertions.
