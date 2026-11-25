@@ -1,15 +1,26 @@
+import { OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { NewSalePage } from '..'
+import type { NewSaleCartProps } from '../new-sale-cart'
+import type { OrderRegistrationDialogProps } from '../order-registration-dialog'
 import { useNewSalePage } from '../use-new-sale-page'
+
+const { newSaleCartMock, orderRegistrationDialogMock } = vi.hoisted(() => ({
+  newSaleCartMock: vi.fn(),
+  orderRegistrationDialogMock: vi.fn(),
+}))
 
 vi.mock('../use-new-sale-page', () => ({ useNewSalePage: vi.fn() }))
 vi.mock('../new-sale-catalog', () => ({
   NewSaleCatalog: () => <div>Catálogo da venda</div>,
 }))
 vi.mock('../new-sale-cart', () => ({
-  NewSaleCart: () => <div>Carrinho da venda</div>,
+  NewSaleCart: (props: NewSaleCartProps) => {
+    newSaleCartMock(props)
+    return <div>Carrinho da venda</div>
+  },
 }))
 vi.mock('../portion-configuration-dialog', () => ({
   PortionConfigurationDialog: () => null,
@@ -18,7 +29,10 @@ vi.mock('../resale-configuration-dialog', () => ({
   ResaleConfigurationDialog: () => null,
 }))
 vi.mock('../order-registration-dialog', () => ({
-  OrderRegistrationDialog: () => null,
+  OrderRegistrationDialog: (props: OrderRegistrationDialogProps) => {
+    orderRegistrationDialogMock(props)
+    return null
+  },
 }))
 vi.mock('../order-confirmation', () => ({
   OrderConfirmation: () => <div>Confirmação da venda</div>,
@@ -48,6 +62,7 @@ function pageState() {
     handleEditLine: handler,
     handleFeedbackAction: handler,
     handleNewSale: handler,
+    handlePaymentMethodChange: handler,
     handleRefreshPreview: handler,
     handleRegister: handler,
     handleRemoveLine: handler,
@@ -64,6 +79,7 @@ function pageState() {
     isRegistrationPending: false,
     isVerification: false,
     lineInputs: [],
+    paymentMethod: undefined,
     previewCart: undefined,
     previewError: undefined,
     previewToken: undefined,
@@ -90,6 +106,66 @@ describe('NewSalePage', () => {
     expect(screen.getByText('Catálogo da venda')).toBeTruthy()
     expect(screen.getByText('Carrinho da venda')).toBeTruthy()
     expect(screen.queryByText(/Produtos com selo Adicionado/)).toBeNull()
+  })
+
+  it('wires the payment method and its handler into the cart and the confirmation dialog', () => {
+    const handlePaymentMethodChange = vi.fn()
+    const salesChannel = {
+      id: 'channel-1',
+      establishmentId: 'establishment-1',
+      name: 'Delivery próprio',
+      percentage: 12,
+    }
+    useNewSalePageMock.mockReturnValue({
+      ...pageState(),
+      activeSalesChannels: [salesChannel],
+      channelId: 'channel-1',
+      handlePaymentMethodChange,
+      isRegistrationOpen: true,
+      paymentMethod: OrderPaymentMethod.CreditCard,
+      registrationSummary: {
+        channel: salesChannel,
+        paymentMethod: OrderPaymentMethod.CreditCard,
+      },
+    } as never)
+
+    render(<NewSalePage />)
+
+    const cartProps: NewSaleCartProps = newSaleCartMock.mock.calls.at(-1)?.[0]
+    expect(cartProps.paymentMethod).toBe(OrderPaymentMethod.CreditCard)
+    expect(cartProps.onPaymentMethodChange).toBe(handlePaymentMethodChange)
+    const dialogProps: OrderRegistrationDialogProps =
+      orderRegistrationDialogMock.mock.calls.at(-1)?.[0]
+    expect(dialogProps.paymentMethod).toBe(OrderPaymentMethod.CreditCard)
+    expect(dialogProps.channel).toBe(salesChannel)
+    expect(dialogProps.isOpen).toBe(true)
+  })
+
+  it('tells the dialog when the selected channel cannot be resolved', () => {
+    useNewSalePageMock.mockReturnValue({
+      ...pageState(),
+      channelId: 'channel-1',
+      isRegistrationOpen: true,
+      registrationSummary: { channel: undefined, isChannelUnresolved: true },
+    } as never)
+
+    render(<NewSalePage />)
+
+    const dialogProps: OrderRegistrationDialogProps =
+      orderRegistrationDialogMock.mock.calls.at(-1)?.[0]
+    expect(dialogProps.channel).toBeUndefined()
+    expect(dialogProps.isChannelUnresolved).toBe(true)
+  })
+
+  it('passes no channel and no method to the dialog for a cart without them', () => {
+    useNewSalePageMock.mockReturnValue(pageState() as never)
+
+    render(<NewSalePage />)
+
+    const dialogProps: OrderRegistrationDialogProps =
+      orderRegistrationDialogMock.mock.calls.at(-1)?.[0]
+    expect(dialogProps.channel).toBeUndefined()
+    expect(dialogProps.paymentMethod).toBeUndefined()
   })
 
   it.each([

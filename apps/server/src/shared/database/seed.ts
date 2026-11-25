@@ -25,7 +25,11 @@ import type {
   ProductSizesRepository,
 } from '@scoops/core/mrp/interfaces'
 import type { OrderCreate } from '@scoops/core/pdv/domain/entities'
-import { SaleItemKind, type ComboCreate } from '@scoops/core/pdv/domain/structures'
+import {
+  OrderPaymentMethod,
+  SaleItemKind,
+  type ComboCreate,
+} from '@scoops/core/pdv/domain/structures'
 import type { SalesChannelsRepository } from '@scoops/core/pdv/interfaces'
 
 import { AppModule } from '@/app.module'
@@ -576,6 +580,12 @@ async function buildSeedCombos(app: INestApplicationContext): Promise<ComboCreat
   )
 }
 
+const SEED_PAYMENT_METHODS = Object.values(OrderPaymentMethod)
+
+function seedPaymentMethod(index: number) {
+  return SEED_PAYMENT_METHODS[index % SEED_PAYMENT_METHODS.length]
+}
+
 async function buildSeedOrders(
   app: INestApplicationContext,
   salesChannels: Awaited<ReturnType<SalesChannelsRepository['findMany']>>,
@@ -754,6 +764,7 @@ async function buildSeedOrders(
         createdBy: SEED_USERS.manager.id,
         createdByName: SEED_USERS.manager.name,
         channel: template.channel,
+        paymentMethod: seedPaymentMethod(dayIndex + orderIndex),
         lines: template.lines,
         discounts: [],
         subtotal,

@@ -33,4 +33,24 @@ function RadioGroupItem({ className, ...props }: RadioPrimitive.Root.Props) {
   )
 }
 
-export { RadioGroup, RadioGroupItem }
+function RadioGroupCardItem({
+  className,
+  children,
+  ...props
+}: RadioPrimitive.Root.Props) {
+  return (
+    <RadioPrimitive.Root
+      data-focus-ring='delegated'
+      data-slot='radio-group-card-item'
+      className={cn(
+        'flex h-11 min-h-11 min-w-11 flex-1 cursor-pointer items-center justify-center gap-1 overflow-hidden rounded-[10px] border border-border bg-card px-0.5 text-xs font-bold whitespace-nowrap text-foreground outline-none hover:border-text-tertiary focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 data-checked:border-primary data-checked:bg-accent data-checked:font-extrabold data-checked:text-primary data-checked:ring-[0.5px] data-checked:ring-primary',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </RadioPrimitive.Root>
+  )
+}
+
+export { RadioGroup, RadioGroupCardItem, RadioGroupItem }

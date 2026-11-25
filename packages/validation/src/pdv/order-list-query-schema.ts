@@ -1,6 +1,8 @@
 import { OrderStatus } from '@scoops/core/pdv/domain/structures'
 import { z } from 'zod'
 
+import { orderPaymentMethodSchema } from './order-payment-method-schema.ts'
+
 const optionalSearchSchema = z
   .string()
   .trim()
@@ -17,12 +19,19 @@ const channelIdSchema = z.union([z.uuid(), z.literal('none')]).transform((value)
   return value === 'none' ? null : value
 })
 
+const paymentMethodFilterSchema = z
+  .union([orderPaymentMethodSchema, z.literal('none')])
+  .transform((value) => {
+    return value === 'none' ? null : value
+  })
+
 export const orderListQuerySchema = z
   .strictObject({
     search: optionalSearchSchema,
     createdFrom: optionalInstantSchema,
     createdTo: optionalInstantSchema,
     channelId: channelIdSchema.optional(),
+    paymentMethod: paymentMethodFilterSchema.optional(),
     status: z.enum(OrderStatus).optional(),
     page: z.coerce.number().int().min(1).default(1),
     pageSize: z.coerce.number().int().min(1).max(100).default(6),

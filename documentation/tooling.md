@@ -289,12 +289,16 @@ Use the Playwright CLI for all repository browser interaction, inspection and
 validation, including manual or exploratory flows. Do not use `browser-use`, CDP
 workflows or Playwright MCP.
 
+Run locally only the Playwright files that cover the changed code, by naming them. Do not
+run the complete Web browser suite locally; it is slow and CI owns it.
+
 ```bash
-pnpm --filter web test:integration
+pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
 pnpm --filter web test:integration:ui
 ```
 
-The checked-in Web CI workflow runs only the mocked route suite:
+`pnpm --filter web test:integration` runs the complete suite and is reserved for CI. The
+checked-in Web CI workflow runs only the mocked route suite:
 
 ```bash
 pnpm --filter web exec playwright test tests --workers=1
@@ -733,40 +737,45 @@ variables.
 
 ## Recommended local validation
 
-Before handing off a change, run the checks for each affected workspace:
+Before handing off a change, run only the checks for the code you changed. This covers every
+check, not only tests: linting, types, architecture, complexity, coverage, mutation, builds and
+test suites. CI runs the complete checks on the pull request.
+
+Scope each check to the changed code where its tool allows it, and to the affected workspaces
+otherwise:
 
 ```bash
-pnpm --filter @scoops/core check:code
-pnpm --filter @scoops/core check:architecture
-pnpm --filter @scoops/core check:types
-pnpm --filter @scoops/core test:coverage
+pnpm --filter @scoops/core exec biome check src/pdv/use-cases/register-order-use-case.ts
+pnpm --filter @scoops/core exec vitest run src/pdv/use-cases/tests/register-order-use-case.test.ts
+pnpm --filter @scoops/core test:mutation --files src/pdv/use-cases/register-order-use-case.ts
 
-pnpm --filter @scoops/validation check:code
-pnpm --filter @scoops/validation check:architecture
-pnpm --filter @scoops/validation check:types
-
-pnpm --filter server check:code
-pnpm --filter server check:architecture
-pnpm --filter server check:types
-pnpm --filter server test:coverage
-pnpm --filter server build
-
-pnpm --filter web check:code
-pnpm --filter web check:architecture
 pnpm --filter web check:types
-pnpm --filter web test:coverage
-pnpm --filter web test:integration
-pnpm --filter web build
+pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
 ```
 
-Run only the workspaces affected by the change, adding Docker-backed integration
-checks when persistence or external service behavior changes.
+### Local check scope
+
+- **Scope to changed files.** Lint with `biome check <changed files>`, test with
+  `vitest run <path>` or `vitest related <changed files>`, run the Playwright files for the
+  changed web routes, and mutation-test only the changed eligible use cases with `--files`.
+- **Scope to affected workspaces.** Tools that analyze a whole project, such as `tsc`,
+  dependency-cruiser and the complexity check, run only in the workspaces whose code, or whose
+  dependencies' public contracts, changed. Do not run them in unrelated workspaces.
+- **Run the broad version only when shared code changed.** Run a workspace's full unit suite,
+  full coverage or build only when its shared code, such as fixtures, configuration, common
+  widgets or generated artifacts, changed, or when a coverage floor needs checking.
+- **Never run the complete Web Playwright suite locally.** CI runs it on the pull request.
+- **Do not use an unrelated check as evidence.** Report unrelated failures, such as missing
+  Docker or Mailpit services, separately and do not fix them as part of the change.
+- Add Docker-backed integration checks only when persistence or external service behavior
+  changes.
 
 ### SDD verification and evidence reuse
 
-During implementation, use focused unit/component and static checks. Run applicable
-broad integration suites after the candidate is integrated; fix failures and rerun
-failed and affected checks until passing. Review and conclusion reuse valid local
+During implementation, use focused unit/component and static checks. After the candidate is
+integrated, run only the checks for the changed code (see Local check scope), never the
+complete Web Playwright suite; leave the complete checks to PR CI. Fix failures and rerun failed and affected
+checks until passing. Review and conclusion reuse valid local
 evidence. Later changes reopen checks whose claims or dependencies they affect;
 role transitions, status updates and documentation-only handoffs do not require
 another behavioral run. Keep Evaluation `ready` as a local checkpoint rather than

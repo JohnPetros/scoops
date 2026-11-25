@@ -6,6 +6,8 @@ import { useSalesChannelsQuery } from '@/ui/pdv/hooks/use-sales-channels-query'
 import { useOrdersQuery } from '@/ui/pdv/hooks/use-orders-query'
 import type { OrdersSearch } from '@scoops/validation'
 
+import { hasActiveFilters } from './orders-filters/use-orders-filters'
+
 export type OrdersPageProps = {
   search: OrdersSearch
   onSearchChange: (search: OrdersSearch) => void
@@ -23,6 +25,7 @@ export function useOrdersPage({ onSearchChange, search }: OrdersPageProps) {
     search: search.search || undefined,
     status: search.status,
     channelId: search.channelId === 'none' ? null : search.channelId,
+    paymentMethod: search.paymentMethod === 'none' ? null : search.paymentMethod,
   })
   const channelsQuery = useSalesChannelsQuery()
 
@@ -37,6 +40,7 @@ export function useOrdersPage({ onSearchChange, search }: OrdersPageProps) {
   function handleClearFilters() {
     handleSearchChange({
       channelId: undefined,
+      paymentMethod: undefined,
       search: '',
       period: 'last-30-days',
       status: undefined,
@@ -56,14 +60,11 @@ export function useOrdersPage({ onSearchChange, search }: OrdersPageProps) {
     void navigateTo('newSale')
   }
 
-  const hasFilters = Boolean(
-    search.search || search.channelId || search.status || search.period === 'custom',
-  )
   const ordersPage = ordersQuery.ordersPage
 
   return {
     channels: channelsQuery.salesChannels,
-    hasFilters,
+    hasFilters: hasActiveFilters(search),
     isLoadingChannels: channelsQuery.isLoadingSalesChannels,
     isLoadingOrders: !isPeriodReady || ordersQuery.isLoadingOrders,
     isPageLoadingOrders: ordersQuery.isPageLoadingOrders,

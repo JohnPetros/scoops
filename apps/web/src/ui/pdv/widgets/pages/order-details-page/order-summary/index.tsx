@@ -13,6 +13,8 @@ import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 import { useFormatDate } from '@/ui/shared/hooks/use-format-date'
 import { Icon } from '@/ui/shared/widgets/components/icon'
 
+import { PaymentMethodRow } from './payment-method-row'
+
 export type OrderSummaryProps = { order: OrderDetails }
 
 export const OrderSummary = ({ order }: OrderSummaryProps) => {
@@ -68,6 +70,7 @@ export const OrderSummary = ({ order }: OrderSummaryProps) => {
                 <p className='text-xs text-muted-foreground'>Itens</p>
                 <p className='mt-1 font-semibold'>{totalItems} unidades</p>
               </div>
+              <PaymentMethodRow paymentMethod={order.paymentMethod} />
               <div>
                 <p className='text-xs text-muted-foreground'>Registrado por</p>
                 <p className='mt-1 font-semibold'>{order.createdByName}</p>

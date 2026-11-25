@@ -80,13 +80,12 @@ Run focused checks during development. Use the repository's commands and test-ow
 policy; do not add direct tests to indirect boundaries or weaken tests, coverage thresholds,
 complexity baselines or checkers to pass. Run applicable complexity checks at a coherent
 composition boundary before expensive checks that a structural correction would invalidate.
-Reserve the complete Web integration suite (`pnpm --filter web test:integration`) for final
-validation of the integrated candidate. Do not run it during implementation or intermediate
-corrections; use focused tests and targeted browser scenarios while making changes. At final
-validation, run the complete suite once, then repeat it only when a subsequent correction
-affects its claims or an unresolved risk justifies another full run. Keep repeated full builds
-and other complete integration suites for the integrated candidate unless an earlier failure,
-runtime dependency or Contract requirement justifies them.
+Run only the checks for the changed code, following the Local check scope in
+[`tooling.md`](../tooling.md): that covers linting, types, architecture, complexity, coverage,
+mutation, builds and tests, not only test suites. Never run the complete Web Playwright suite
+(`pnpm --filter web test:integration`) locally; PR CI owns it and the other complete checks.
+Run a broad check locally only when shared code changed, an earlier failure, runtime
+dependency or Contract requirement justifies it.
 
 For changed HTTP route groups, update the matching
 `apps/server/rest-client/<module>/<route-group>.rest` file in the same scope. Verify one
@@ -143,9 +142,10 @@ Once all source and shared/generated artifacts form one coherent candidate:
 
 1. compare the integrated diff with `FR-*`, `AC-*`, boundaries, exclusions and consequential
    technical decisions; inspect migrations, generated artifacts and REST-client parity;
-2. run each applicable complete integration suite once on the integrated candidate, together
-   with contracted code, architecture, type, coverage and build checks. Affected Core, Server
-   and Web workspaces must meet their configured coverage floors;
+2. run the checks for the changed code on the integrated candidate (tests, code, architecture,
+   type, complexity, coverage and build, scoped per the Local check scope in `tooling.md`, and
+   never the complete Web Playwright suite, which PR CI runs). Affected Core, Server and Web
+   workspaces must meet their configured coverage floors in CI;
 3. execute required `MV-*` scenarios with their actual environment and fixtures. Record
    expected and observed results; inspect console, network and persisted state where relevant;
 4. record current evidence and criterion coverage in Evaluation;

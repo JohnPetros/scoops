@@ -1,3 +1,4 @@
+import { OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
 import type {
   CartLineInput,
   SalesCatalogAccompaniment,
@@ -9,13 +10,19 @@ import type {
 import { showWarningToast } from '@/ui/shared/notifications'
 
 const STORAGE_KEY_PREFIX = 'scoops.pdv.new-sale-cart'
-const STORAGE_VERSION = 1
+const STORAGE_VERSION = 2
+const PREVIOUS_STORAGE_VERSION = 1
 
 export type StoredNewSaleCart = {
-  version: 1
+  version: typeof STORAGE_VERSION
   lineInputs: readonly CartLineInput[]
   products: readonly SalesCatalogProduct[]
   channelId?: string
+  paymentMethod?: OrderPaymentMethod
+}
+
+function isOrderPaymentMethod(value: unknown): value is OrderPaymentMethod {
+  return Object.values(OrderPaymentMethod).some((method) => method === value)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -118,26 +125,42 @@ function isSalesCatalogProduct(value: unknown): value is SalesCatalogProduct {
   )
 }
 
-function parseStoredCart(value: unknown): StoredNewSaleCart | undefined {
-  if (!isRecord(value)) return undefined
+function isSupportedVersion(version: unknown) {
+  return version === STORAGE_VERSION || version === PREVIOUS_STORAGE_VERSION
+}
 
-  if (
-    value.version !== STORAGE_VERSION ||
-    !Array.isArray(value.lineInputs) ||
-    value.lineInputs.length === 0 ||
-    !value.lineInputs.every(isCartLineInput) ||
-    !Array.isArray(value.products) ||
-    !value.products.every(isSalesCatalogProduct) ||
-    (value.channelId !== undefined && !isNonEmptyString(value.channelId))
-  ) {
+function isOptionalPaymentMethod(
+  value: unknown,
+): value is OrderPaymentMethod | undefined {
+  return value === undefined || isOrderPaymentMethod(value)
+}
+
+function hasValidCartContent(value: Record<string, unknown>) {
+  return (
+    Array.isArray(value.lineInputs) &&
+    value.lineInputs.length > 0 &&
+    value.lineInputs.every(isCartLineInput) &&
+    Array.isArray(value.products) &&
+    value.products.every(isSalesCatalogProduct) &&
+    (value.channelId === undefined || isNonEmptyString(value.channelId))
+  )
+}
+
+function parseStoredCart(value: unknown): StoredNewSaleCart | undefined {
+  if (!isRecord(value) || !isSupportedVersion(value.version)) return undefined
+
+  const paymentMethod =
+    value.version === PREVIOUS_STORAGE_VERSION ? undefined : value.paymentMethod
+  if (!hasValidCartContent(value) || !isOptionalPaymentMethod(paymentMethod)) {
     return undefined
   }
 
   return {
     version: STORAGE_VERSION,
-    lineInputs: value.lineInputs,
-    products: value.products,
-    ...(value.channelId ? { channelId: value.channelId } : {}),
+    lineInputs: value.lineInputs as readonly CartLineInput[],
+    products: value.products as readonly SalesCatalogProduct[],
+    ...(value.channelId ? { channelId: value.channelId as string } : {}),
+    ...(paymentMethod ? { paymentMethod } : {}),
   }
 }
 

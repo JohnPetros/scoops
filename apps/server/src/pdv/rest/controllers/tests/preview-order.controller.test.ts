@@ -65,6 +65,71 @@ describe('Preview Order Controller [POST /orders/preview]', () => {
     expect(response.body.cart).toMatchObject({ total: 10, subtotal: 10 })
   })
 
+  it('keeps the preview free of a payment method and valid for every method', async () => {
+    const product = await fixture.addProduct({
+      establishmentId: PdvModuleFixture.accounts.establishmentId,
+      name: 'Preview Method Portion',
+      unit: ProductUnit.Unit,
+      categories: [ProductCategory.Portion],
+      stockControl: ProductStockControl.Single,
+      status: ProductStatus.Active,
+      allowNegativeStock: false,
+      idealStock: 0,
+      currentUnitCost: 2,
+    })
+    const size = await fixture.addProductSize({
+      establishmentId: product.establishmentId,
+      productId: product.id,
+      name: 'Regular',
+      quantity: 1,
+      price: 10,
+      isActive: true,
+    })
+    await fixture.stockBalances.initialize(product.id)
+    await fixture.stockBalances.add({ productId: product.id }, 10)
+    const lines = [
+      {
+        productId: product.id,
+        kind: 'portion',
+        quantity: 1,
+        sizeId: size.id,
+        accompanimentIds: [],
+      },
+    ]
+
+    const preview = await request(fixture.app.getHttpServer())
+      .post('/orders/preview')
+      .set('Cookie', managerRequestAuthorization())
+      .send({ lines })
+    const withMethod = await request(fixture.app.getHttpServer())
+      .post('/orders/preview')
+      .set('Cookie', managerRequestAuthorization())
+      .send({ lines, paymentMethod: 'pix' })
+    const statuses: number[] = []
+    for (const [index, paymentMethod] of [
+      'pix',
+      'credit-card',
+      'debit-card',
+      'cash',
+    ].entries()) {
+      const registration = await request(fixture.app.getHttpServer())
+        .post('/orders')
+        .set('Cookie', managerRequestAuthorization())
+        .send({
+          idempotencyKey: `55000000-0000-4000-8000-00000000050${index}`,
+          previewToken: preview.body.previewToken,
+          paymentMethod,
+          lines,
+        })
+      statuses.push(registration.status)
+    }
+
+    expect(preview.status).toBe(200)
+    expect(JSON.stringify(preview.body)).not.toContain('paymentMethod')
+    expect(withMethod.status).toBe(422)
+    expect(statuses).toEqual([201, 201, 201, 201])
+  })
+
   it('rejects a selected accompaniment whose link has no configured price', async () => {
     const portion = await fixture.addProduct({
       establishmentId: PdvModuleFixture.accounts.establishmentId,
@@ -303,6 +368,7 @@ describe('Preview Order Controller [POST /orders/preview]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000001',
         previewToken: 'invalid-token',
+        paymentMethod: 'pix',
         lines: [
           {
             productId: '55000000-0000-4000-8000-000000000010',

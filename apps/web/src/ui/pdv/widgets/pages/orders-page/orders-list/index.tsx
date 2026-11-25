@@ -6,6 +6,7 @@ import { Button } from '@/ui/shadcn/button'
 import { Icon } from '@/ui/shared/widgets/components/icon'
 import { Pagination } from '@/ui/shared/widgets/components/pagination'
 
+import { PaymentMethodCell } from './payment-method-cell'
 import { useOrdersList } from './use-orders-list'
 
 export type OrdersListProps = {
@@ -63,6 +64,12 @@ export const OrdersList = ({
                 <dd className='font-semibold'>{order.channel?.name ?? 'Sem canal'}</dd>
               </div>
               <div>
+                <dt className='text-xs text-muted-foreground'>Pagamento</dt>
+                <dd className='font-semibold'>
+                  <PaymentMethodCell paymentMethod={order.paymentMethod} />
+                </dd>
+              </div>
+              <div>
                 <dt className='text-xs text-muted-foreground'>Itens</dt>
                 <dd className='font-semibold'>
                   {order.lines.reduce((total, line) => total + line.quantity, 0)} unidades
@@ -85,7 +92,7 @@ export const OrdersList = ({
         ))}
       </div>
       <div className='hidden overflow-x-auto lg:block'>
-        <table className='w-full min-w-[850px] text-left text-sm'>
+        <table className='w-full min-w-[980px] text-left text-sm'>
           <caption className='sr-only'>Pedidos mais recentes primeiro</caption>
           <thead className='bg-muted text-[11px] font-extrabold uppercase tracking-[0.08em] text-muted-foreground'>
             <tr>
@@ -93,6 +100,7 @@ export const OrdersList = ({
               <th className='px-4 py-3'>Data e hora</th>
               <th className='px-4 py-3'>Operador</th>
               <th className='px-4 py-3'>Canal</th>
+              <th className='px-4 py-3'>Pagamento</th>
               <th className='px-4 py-3'>Itens</th>
               <th className='px-4 py-3'>Total</th>
               <th className='px-4 py-3'>Status</th>
@@ -110,6 +118,9 @@ export const OrdersList = ({
                 </td>
                 <td className='px-4 py-4'>{order.createdByName}</td>
                 <td className='px-4 py-4'>{order.channel?.name ?? 'Sem canal'}</td>
+                <td className='px-4 py-4'>
+                  <PaymentMethodCell paymentMethod={order.paymentMethod} />
+                </td>
                 <td className='px-4 py-4 text-muted-foreground'>
                   {order.lines.reduce((total, line) => total + line.quantity, 0)} itens
                 </td>

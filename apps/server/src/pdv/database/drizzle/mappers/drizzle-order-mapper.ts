@@ -72,15 +72,7 @@ export class DrizzleOrderMapper {
       createdBy: record.createdBy,
       createdByName: record.createdByName,
       status: record.status,
-      ...(record.channelId
-        ? {
-            channel: {
-              channelId: record.channelId,
-              name: record.channelName as string,
-              percentage: Number(record.channelPercentage),
-            },
-          }
-        : {}),
+      ...DrizzleOrderMapper.toChannelAndPaymentMethod(record),
       lines: DrizzleOrderMapper.sortByPosition(lines).map((line) =>
         DrizzleOrderMapper.toOrderLine(
           line,
@@ -103,6 +95,21 @@ export class DrizzleOrderMapper {
       total: Number(record.total),
       ...(cancellation ? { cancellation } : {}),
       createdAt: record.createdAt,
+    }
+  }
+
+  private static toChannelAndPaymentMethod(record: DrizzleOrder) {
+    return {
+      ...(record.channelId
+        ? {
+            channel: {
+              channelId: record.channelId,
+              name: record.channelName as string,
+              percentage: Number(record.channelPercentage),
+            },
+          }
+        : {}),
+      ...(record.paymentMethod ? { paymentMethod: record.paymentMethod } : {}),
     }
   }
 

@@ -18,6 +18,7 @@ import type { BetterAuthFixture } from '@/identity/fixtures/better-auth-fixture'
 import {
   PdvModuleFixture,
   managerRequestAuthorization,
+  operatorRequestAuthorization,
   preparePdvFixture,
   resetPdvFixture,
 } from '@/pdv/fixtures/pdv-module-fixture'
@@ -85,6 +86,7 @@ describe('Register Order Controller [POST /orders]', () => {
     const body = {
       idempotencyKey: '55000000-0000-4000-8000-000000000002',
       previewToken: preview.body.previewToken,
+      paymentMethod: 'pix',
       lines,
     }
 
@@ -157,6 +159,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-00000000000e',
         previewToken: legacyToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -232,6 +235,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-00000000000f',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -259,6 +263,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000010',
         previewToken: repricingPreview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -372,6 +377,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-0000000000a1',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -418,6 +424,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000007',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines: firstLines,
       })
     const conflict = await request(fixture.app.getHttpServer())
@@ -426,6 +433,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000007',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines: conflictingLines,
       })
 
@@ -477,7 +485,12 @@ describe('Register Order Controller [POST /orders]', () => {
       const response = await request(fixture.app.getHttpServer())
         .post('/orders')
         .set('Cookie', managerRequestAuthorization())
-        .send({ idempotencyKey, previewToken: preview.body.previewToken, lines })
+        .send({
+          idempotencyKey,
+          previewToken: preview.body.previewToken,
+          paymentMethod: 'pix',
+          lines,
+        })
 
       expect(response.status).toBe(expectedStatus)
       const balance = await fixture.stockBalances.findByProductId(
@@ -529,6 +542,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-00000000000c',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -584,6 +598,7 @@ describe('Register Order Controller [POST /orders]', () => {
         .send({
           idempotencyKey: '55000000-0000-4000-8000-00000000000d',
           previewToken: preview.body.previewToken,
+          paymentMethod: 'pix',
           lines,
         })
       expect(response.status).toBe(500)
@@ -619,6 +634,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000003',
         previewToken: 'not-a-preview',
+        paymentMethod: 'pix',
         lines: [
           {
             productId: '55000000-0000-4000-8000-000000000010',
@@ -633,6 +649,122 @@ describe('Register Order Controller [POST /orders]', () => {
     expect(response.status).toBe(400)
     expect(response.body).not.toHaveProperty('cart')
     expect(response.body).not.toHaveProperty('recalculatedCart')
+  })
+
+  it('rejects a missing or invalid payment method without any write', async () => {
+    const { product, size } = await addRegisterablePortion(fixture, 'Method Rejection')
+    const lines = [portionLine(product.id, size.id)]
+    const preview = await previewLines(fixture, lines)
+    const body = {
+      idempotencyKey: '55000000-0000-4000-8000-0000000000b1',
+      previewToken: preview.body.previewToken,
+      lines,
+    }
+
+    const missing = await postOrder(fixture, body)
+    const invalid = await postOrder(fixture, { ...body, paymentMethod: 'voucher' })
+
+    expect(missing.status).toBe(422)
+    expect(invalid.status).toBe(422)
+    await expect(
+      fixture.orders.findMany({
+        establishmentId: PdvModuleFixture.accounts.establishmentId,
+        page: 1,
+        pageSize: 20,
+      }),
+    ).resolves.toMatchObject({ total: 0 })
+    await expect(
+      fixture.stockBalances.findByProductId(
+        PdvModuleFixture.accounts.establishmentId,
+        product.id,
+      ),
+    ).resolves.toMatchObject({ quantity: 2 })
+    const ledger = await fixture.stockTransactions.findPage(
+      PdvModuleFixture.accounts.establishmentId,
+      product.id,
+      { page: 1, limit: 20 },
+    )
+    expect(ledger.items).toEqual([])
+    const registered = await postOrder(fixture, { ...body, paymentMethod: 'pix' })
+    expect(registered.status).toBe(201)
+    expect(registered.body.order.sequenceNumber).toBe(1)
+  })
+
+  it.each(['pix', 'credit-card', 'debit-card', 'cash'] as const)(
+    'stores the %s payment method and returns it from the order detail',
+    async (paymentMethod) => {
+      const { product, size } = await addRegisterablePortion(
+        fixture,
+        `Method ${paymentMethod}`,
+      )
+      const lines = [portionLine(product.id, size.id)]
+      const preview = await previewLines(fixture, lines)
+
+      const response = await postOrder(fixture, {
+        idempotencyKey: '55000000-0000-4000-8000-0000000000b2',
+        previewToken: preview.body.previewToken,
+        paymentMethod,
+        lines,
+      })
+      const detail = await request(fixture.app.getHttpServer())
+        .get(`/orders/${response.body.order.id}`)
+        .set('Cookie', managerRequestAuthorization())
+
+      expect(response.status).toBe(201)
+      expect(response.body.order.paymentMethod).toBe(paymentMethod)
+      expect(detail.body.paymentMethod).toBe(paymentMethod)
+    },
+  )
+
+  it('replays the stored order and conflicts when the replay changes the method', async () => {
+    const { product, size } = await addRegisterablePortion(fixture, 'Method Replay')
+    const lines = [portionLine(product.id, size.id)]
+    const preview = await previewLines(fixture, lines)
+    const body = {
+      idempotencyKey: '55000000-0000-4000-8000-0000000000b3',
+      previewToken: preview.body.previewToken,
+      paymentMethod: 'cash',
+      lines,
+    }
+
+    const first = await postOrder(fixture, body)
+    const replay = await postOrder(fixture, body)
+    const changed = await postOrder(fixture, { ...body, paymentMethod: 'pix' })
+
+    expect(first.status).toBe(201)
+    expect(replay.status).toBe(200)
+    expect(replay.body.order).toEqual(first.body.order)
+    expect(replay.body.order.paymentMethod).toBe('cash')
+    expect(changed.status).toBe(409)
+    await expect(
+      fixture.orders.findMany({
+        establishmentId: PdvModuleFixture.accounts.establishmentId,
+        page: 1,
+        pageSize: 20,
+      }),
+    ).resolves.toMatchObject({ total: 1 })
+  })
+
+  it('lets an Operator register an order with a payment method', async () => {
+    const { product, size } = await addRegisterablePortion(fixture, 'Method Operator')
+    const lines = [portionLine(product.id, size.id)]
+    const preview = await request(fixture.app.getHttpServer())
+      .post('/orders/preview')
+      .set('Cookie', operatorRequestAuthorization())
+      .send({ lines })
+
+    const response = await request(fixture.app.getHttpServer())
+      .post('/orders')
+      .set('Cookie', operatorRequestAuthorization())
+      .send({
+        idempotencyKey: '55000000-0000-4000-8000-0000000000b4',
+        previewToken: preview.body.previewToken,
+        paymentMethod: 'debit-card',
+        lines,
+      })
+
+    expect(response.status).toBe(201)
+    expect(response.body.order.paymentMethod).toBe('debit-card')
   })
 
   it('requires an authenticated Manager or Operator', async () => {
@@ -674,6 +806,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000004',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         channelId: channel.id,
         lines,
       })
@@ -718,6 +851,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000005',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -762,6 +896,7 @@ describe('Register Order Controller [POST /orders]', () => {
       .send({
         idempotencyKey: '55000000-0000-4000-8000-000000000006',
         previewToken: preview.body.previewToken,
+        paymentMethod: 'pix',
         lines,
       })
 
@@ -809,6 +944,7 @@ describe('Register Order Controller [POST /orders]', () => {
           .send({
             idempotencyKey: `55000000-0000-4000-8000-${suffix}`,
             previewToken: preview.body.previewToken,
+            paymentMethod: 'pix',
             lines,
           }),
       ),
@@ -907,6 +1043,33 @@ function legacyFactsDigest(facts: OrderPreviewFacts): string {
     channel: facts.channel ?? null,
   })
   return createHash('sha256').update(canonicalFacts).digest('base64url')
+}
+
+function portionLine(productId: string, sizeId: string) {
+  return {
+    productId,
+    kind: 'portion' as const,
+    quantity: 1,
+    sizeId,
+    accompanimentIds: [],
+  }
+}
+
+async function previewLines(
+  fixture: PdvModuleFixture,
+  lines: ReturnType<typeof portionLine>[],
+) {
+  return request(fixture.app.getHttpServer())
+    .post('/orders/preview')
+    .set('Cookie', managerRequestAuthorization())
+    .send({ lines })
+}
+
+async function postOrder(fixture: PdvModuleFixture, body: Record<string, unknown>) {
+  return request(fixture.app.getHttpServer())
+    .post('/orders')
+    .set('Cookie', managerRequestAuthorization())
+    .send(body)
 }
 
 async function addRegisterablePortion(fixture: PdvModuleFixture, name: string) {

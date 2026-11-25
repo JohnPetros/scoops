@@ -218,6 +218,13 @@
       "when": 1792621931593,
       "tag": "0030_parallel_zarda",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1795372301005,
+      "tag": "0031_order_payment_method",
+      "breakpoints": true
     }
   ]
 }

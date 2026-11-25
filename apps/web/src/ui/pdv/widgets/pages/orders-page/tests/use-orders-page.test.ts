@@ -20,6 +20,7 @@ const useNavigationMock = vi.mocked(useNavigation)
 const search = {
   search: '',
   channelId: undefined,
+  paymentMethod: undefined,
   status: undefined,
   period: 'last-30-days' as const,
   page: 1,
@@ -73,12 +74,38 @@ describe('useOrdersPage', () => {
     expect(result.current.hasFilters).toBe(false)
   })
 
+  it('sends the payment method, mapping none to null, and counts it as a filter', () => {
+    const { result, rerender } = renderHook(
+      (props: { paymentMethod: 'pix' | 'none' | undefined }) =>
+        useOrdersPage({
+          onSearchChange: vi.fn(),
+          search: { ...search, paymentMethod: props.paymentMethod },
+        }),
+      { initialProps: { paymentMethod: 'pix' as 'pix' | 'none' | undefined } },
+    )
+    expect(useOrdersQueryMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ paymentMethod: 'pix' }),
+    )
+    expect(result.current.hasFilters).toBe(true)
+
+    rerender({ paymentMethod: 'none' })
+    expect(useOrdersQueryMock).toHaveBeenLastCalledWith(
+      expect.objectContaining({ paymentMethod: null }),
+    )
+    expect(result.current.hasFilters).toBe(true)
+
+    rerender({ paymentMethod: undefined })
+    expect(useOrdersQueryMock.mock.lastCall?.[0].paymentMethod).toBeUndefined()
+    expect(result.current.hasFilters).toBe(false)
+  })
+
   it('resets filters to the default period and routes an order to its canonical detail path', () => {
     const onSearchChange = vi.fn()
     const { result } = renderHook(() => useOrdersPage({ onSearchChange, search }))
     act(() => result.current.handleClearFilters())
     expect(onSearchChange).toHaveBeenCalledWith({
       channelId: undefined,
+      paymentMethod: undefined,
       search: '',
       period: 'last-30-days',
       status: undefined,

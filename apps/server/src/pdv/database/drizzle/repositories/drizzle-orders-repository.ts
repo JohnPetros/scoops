@@ -24,8 +24,10 @@ import {
   lte,
   lt,
   or,
+  type SQL,
   sql,
 } from 'drizzle-orm'
+import type { AnyPgColumn } from 'drizzle-orm/pg-core'
 import { Injectable } from '@nestjs/common'
 
 import { DrizzleRepository } from '@/shared/database/drizzle/drizzle-repository'
@@ -87,6 +89,7 @@ export class DrizzleOrdersRepository
             input.channel?.percentage === undefined
               ? null
               : String(input.channel.percentage),
+          paymentMethod: input.paymentMethod,
           subtotal: String(input.subtotal),
           totalDiscount: String(input.totalDiscount),
           total: String(input.total),
@@ -266,17 +269,23 @@ export class DrizzleOrdersRepository
     return this.toDomain(record)
   }
 
+  private nullableEquals(
+    column: AnyPgColumn,
+    value: string | null | undefined,
+  ): SQL | undefined {
+    if (value === undefined) return undefined
+    return value === null ? isNull(column) : eq(column, value)
+  }
+
   async findMany(input: OrderListParams): Promise<PaginationResponse<Order>> {
     const filters = [eq(orderModel.establishmentId, input.establishmentId)]
     if (input.createdFrom) filters.push(gte(orderModel.createdAt, input.createdFrom))
     if (input.createdTo) filters.push(lte(orderModel.createdAt, input.createdTo))
-    if (input.channelId !== undefined) {
-      filters.push(
-        input.channelId === null
-          ? isNull(orderModel.channelId)
-          : eq(orderModel.channelId, input.channelId),
-      )
-    }
+    const optionalFilters = [
+      this.nullableEquals(orderModel.channelId, input.channelId),
+      this.nullableEquals(orderModel.paymentMethod, input.paymentMethod),
+    ]
+    for (const filter of optionalFilters) if (filter) filters.push(filter)
     if (input.status) filters.push(eq(orderModel.status, input.status))
     if (input.search) filters.push(this.searchFilter(input.search))
     const where = and(...filters)

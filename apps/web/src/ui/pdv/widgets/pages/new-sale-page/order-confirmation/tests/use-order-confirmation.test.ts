@@ -1,4 +1,4 @@
-import type { OrderDetails } from '@scoops/core/pdv/domain/structures'
+import { OrderPaymentMethod, type OrderDetails } from '@scoops/core/pdv/domain/structures'
 import { cleanup, renderHook, act } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -15,6 +15,12 @@ describe('useOrderConfirmation', () => {
     expect(result.current.sequence).toBe('0042')
     expect(result.current.metadata).toContainEqual(['Canal de venda', 'Sem canal'])
     expect(result.current.metadata).toContainEqual(['Quantidade', '1 itens'])
+    expect(result.current.metadata.map(([label]) => label)).toEqual([
+      'Data e hora',
+      'Canal de venda',
+      'Forma de pagamento',
+      'Quantidade',
+    ])
     expect(result.current.metadata[0][1]).toContain('2026')
     expect(result.current.lines[0]).toMatchObject({
       details: 'Unidade · 1 un.',
@@ -46,6 +52,26 @@ describe('useOrderConfirmation', () => {
     expect(result.current.metadata).toContainEqual(['Canal de venda', 'Balcão · -5%'])
     expect(result.current.lines[0].details).toBe('Marca · 1 un.')
   })
+
+  it.each([
+    [OrderPaymentMethod.Pix, 'Pix', 'qr-code'],
+    [OrderPaymentMethod.CreditCard, 'Cartão de crédito', 'credit-card'],
+    [OrderPaymentMethod.DebitCard, 'Cartão de débito', 'wallet-cards'],
+    [OrderPaymentMethod.Cash, 'Dinheiro', 'banknote'],
+    [undefined, 'Não informado', 'circle-minus'],
+  ] as const)(
+    'maps the %s payment method to its long label and frame icon',
+    (paymentMethod, label, icon) => {
+      const { result } = renderHook(() =>
+        useOrderConfirmation({
+          order: makeOrder({ paymentMethod }),
+          onNewSale: vi.fn(),
+        }),
+      )
+
+      expect(result.current.metadata).toContainEqual(['Forma de pagamento', label, icon])
+    },
+  )
 })
 
 function makeOrder(overrides: Partial<OrderDetails> = {}): OrderDetails {

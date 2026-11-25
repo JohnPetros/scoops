@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker'
 
 import type { Order } from '#pdv/domain/entities/order.ts'
+import { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import { OrderStatus } from '#pdv/domain/structures/order-status.ts'
 
 export class OrderFaker {
@@ -33,6 +34,7 @@ export class OrderFaker {
       createdBy: faker.string.uuid(),
       createdByName: faker.person.fullName(),
       status: OrderStatus.Registered,
+      paymentMethod: OrderPaymentMethod.Pix,
       lines: [orderLine],
       discounts: [],
       subtotal: 10,

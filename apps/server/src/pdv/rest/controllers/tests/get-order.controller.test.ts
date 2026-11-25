@@ -54,6 +54,33 @@ describe('Get Order Controller [GET /orders/:orderId]', () => {
     expect(operator.body).toEqual(manager.body)
   })
 
+  it('returns the stored payment method and omits it for an older order', async () => {
+    const stored = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Stored Method Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000203',
+      paymentMethod: 'credit-card',
+    })
+    const legacy = await fixture.registerPortionOrder({
+      authorization: managerRequestAuthorization(),
+      productName: 'Legacy Method Snapshot',
+      idempotencyKey: '55000000-0000-4000-8000-000000000204',
+    })
+    await fixture.clearOrderPaymentMethod(legacy.order.id)
+
+    const storedResponse = await request(fixture.app.getHttpServer())
+      .get(`/orders/${stored.order.id}`)
+      .set('Cookie', managerRequestAuthorization())
+    const legacyResponse = await request(fixture.app.getHttpServer())
+      .get(`/orders/${legacy.order.id}`)
+      .set('Cookie', operatorRequestAuthorization())
+
+    expect(storedResponse.status).toBe(200)
+    expect(storedResponse.body.paymentMethod).toBe('credit-card')
+    expect(legacyResponse.status).toBe(200)
+    expect(legacyResponse.body).not.toHaveProperty('paymentMethod')
+  })
+
   it('hides unknown and cross-tenant orders and validates the UUID boundary', async () => {
     const foreign = await fixture.registerPortionOrder({
       authorization: foreignManagerRequestAuthorization(),

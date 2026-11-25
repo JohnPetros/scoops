@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react'
 
 import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
-import type { OrderStatus } from '@scoops/core/pdv/domain/structures'
+import type { OrderPaymentMethod, OrderStatus } from '@scoops/core/pdv/domain/structures'
 import type { OrdersSearch } from '@scoops/validation'
+
+import {
+  PAYMENT_METHOD_NOT_INFORMED_PRESENTATION,
+  PAYMENT_METHOD_PRESENTATION,
+} from '@/ui/pdv/constants/payment-method-presentation'
+import type { IconName } from '@/ui/shared/widgets/components/icon/types'
 
 export type OrdersFiltersProps = {
   channels: readonly SalesChannel[]
@@ -37,6 +43,15 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     })
   }
 
+  function handlePaymentMethodChange(value: string | null) {
+    if (value === null) return
+    onSearchChange({
+      ...search,
+      paymentMethod: value === 'all' ? undefined : (value as OrderPaymentMethod | 'none'),
+      page: 1,
+    })
+  }
+
   function handleStatusChange(value: string | null) {
     if (value === null) return
     onSearchChange({
@@ -52,6 +67,7 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
       onSearchChange({
         search: search.search,
         channelId: search.channelId,
+        paymentMethod: search.paymentMethod,
         status: search.status,
         period: 'last-30-days',
         page: 1,
@@ -64,6 +80,7 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     onSearchChange({
       search: search.search,
       channelId: search.channelId,
+      paymentMethod: search.paymentMethod,
       status: search.status,
       period: 'custom',
       from: customSearch?.from ?? today,
@@ -82,12 +99,18 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     onSearchChange({ ...search, from: search.from ?? value, to: value, page: 1 })
   }
 
+  const paymentMethodFilterLabel = getPaymentMethodFilterLabel(search.paymentMethod)
+  const paymentMethodFilterIcon = getPaymentMethodFilterIcon(search.paymentMethod)
+
   return {
     handleChannelChange,
     handleFromChange,
+    handlePaymentMethodChange,
     handlePeriodChange,
     handleStatusChange,
     handleToChange,
+    paymentMethodFilterIcon,
+    paymentMethodFilterLabel,
     searchValue,
     setSearchValue,
   }
@@ -98,4 +121,28 @@ function formatDateOnly(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
+}
+
+export function hasActiveFilters(search: OrdersSearch) {
+  return Boolean(
+    search.search ||
+      search.channelId ||
+      search.paymentMethod ||
+      search.status ||
+      search.period === 'custom',
+  )
+}
+
+function getPaymentMethodFilterLabel(paymentMethod: OrdersSearch['paymentMethod']) {
+  if (paymentMethod === undefined) return 'Todas as formas de pagamento'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].label
+}
+
+function getPaymentMethodFilterIcon(
+  paymentMethod: OrdersSearch['paymentMethod'],
+): IconName {
+  if (paymentMethod === undefined) return 'wallet'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.icon
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].icon
 }

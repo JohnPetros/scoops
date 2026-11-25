@@ -1,5 +1,7 @@
 import type { OrderDetails } from '@scoops/core/pdv/domain/structures'
 
+import { getPaymentMethodPresentation } from '@/ui/pdv/constants/payment-method-presentation'
+import type { IconName } from '@/ui/shared/widgets/components/icon/types'
 import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 import { useFormatDate } from '@/ui/shared/hooks/use-format-date'
 import { useFormatQuantity } from '@/ui/shared/hooks/use-format-quantity'
@@ -12,7 +14,12 @@ export type OrderConfirmationLineView = {
   accompaniments?: readonly string[]
   subtotal: string
 }
-export type OrderConfirmationMetadataItem = readonly [label: string, value: string]
+export type OrderConfirmationMetadataItem = readonly [
+  label: string,
+  value: string,
+  icon?: IconName,
+]
+export type OrderConfirmationBreakdownItem = readonly [label: string, value: string]
 type ConfirmationFormatters = {
   currency: ReturnType<typeof useFormatCurrency>
   date: ReturnType<typeof useFormatDate>
@@ -45,7 +52,7 @@ function getConfirmationDisplay(
     0,
   )
   const adjustment = (adjustedSubtotalCents - baseSubtotalCents) / 100
-  const breakdown: OrderConfirmationMetadataItem[] = [
+  const breakdown: OrderConfirmationBreakdownItem[] = [
     ['Subtotal', formatters.currency(baseSubtotalCents / 100)],
     ...(order.channel
       ? [
@@ -66,9 +73,11 @@ function getMetadata(
   order: OrderDetails,
   formatters: ConfirmationFormatters,
 ): readonly OrderConfirmationMetadataItem[] {
+  const paymentMethod = getPaymentMethodPresentation(order.paymentMethod)
   return [
     ['Data e hora', formatters.date(order.createdAt, DATE_OPTIONS)],
     ['Canal de venda', getChannelLabel(order)],
+    ['Forma de pagamento', paymentMethod.label, paymentMethod.icon],
     ['Quantidade', formatters.quantity(getUnitsCount(order), 'itens')],
   ]
 }

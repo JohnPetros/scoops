@@ -1,5 +1,5 @@
 import { UserProfile } from '#identity/domain/structures/user-profile.ts'
-import type { Order } from '#pdv/domain/entities/order.ts'
+import type { Order, OrderCreate } from '#pdv/domain/entities/order.ts'
 import { OrderRegisteredEvent } from '#pdv/domain/events/order-registered-event.ts'
 import type { AccompanimentSnapshot } from '#pdv/domain/structures/accompaniment-snapshot.ts'
 import type { BrandSnapshot } from '#pdv/domain/structures/brand-snapshot.ts'
@@ -11,6 +11,7 @@ import type {
   OrderPreviewFacts,
   OrderPreviewInput,
 } from '#pdv/domain/structures/order-preview.ts'
+import { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import type { OrderRegistrationChange } from '#pdv/domain/structures/order-registration-change.ts'
 import type { OrderLine } from '#pdv/domain/structures/order-line.ts'
 import type { OrderRegistrationInput } from '#pdv/domain/structures/order-registration-input.ts'
@@ -598,6 +599,7 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
 
   private matchesReplay(order: Order, request: Request): boolean {
     if ((order.channel?.channelId ?? undefined) !== request.channelId) return false
+    if (order.paymentMethod !== request.paymentMethod) return false
     const storedLines = order.lines
       .map((line) => ({
         productId: line.product.productId,
@@ -654,6 +656,13 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
     }
   }
 
+  private toChannelSnapshot(
+    channel: Awaited<ReturnType<RegisterOrderUseCase['findChannel']>>,
+  ): SalesChannelSnapshot | undefined {
+    if (!channel) return undefined
+    return { channelId: channel.id, name: channel.name, percentage: channel.percentage }
+  }
+
   private toOrderCreate(
     request: Request,
     cart: Cart,
@@ -663,20 +672,15 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
       readonly linePosition: number
       readonly components: readonly import('#pdv/domain/structures/order-cost-component-snapshot.ts').OrderCostComponentSnapshot[]
     }[],
-  ): Omit<Order, 'id' | 'sequenceNumber' | 'status' | 'cancellation' | 'createdAt'> {
+  ): OrderCreate {
     const productsById = new Map(products.map((product) => [product.productId, product]))
-    const channelSnapshot: SalesChannelSnapshot | undefined = channel
-      ? {
-          channelId: channel.id,
-          name: channel.name,
-          percentage: channel.percentage,
-        }
-      : undefined
+    const channelSnapshot = this.toChannelSnapshot(channel)
     return {
       establishmentId: request.actor.establishmentId,
       idempotencyKey: request.idempotencyKey,
       createdBy: request.actor.id,
       createdByName: request.actor.name,
+      paymentMethod: request.paymentMethod,
       ...(channelSnapshot ? { channel: channelSnapshot } : {}),
       lines: cart.lines.map((line, index) =>
         this.toOrderLine(
@@ -778,6 +782,8 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
       throw new BadRequestError('A chave de idempotência é obrigatória.')
     if (!input.previewToken || typeof input.previewToken !== 'string')
       throw new BadRequestError('O token da prévia é obrigatório.')
+    if (!Object.values(OrderPaymentMethod).includes(input.paymentMethod))
+      throw new BadRequestError('A forma de pagamento é obrigatória e deve ser válida.')
   }
 
   private validateActor(profile: UserProfile): void {

@@ -39,6 +39,12 @@ const makeLine = (productId: string, name: string) => ({
   consumptions: [],
 })
 
+function expectPaymentRow(label: string, iconName: string) {
+  const value = screen.getByText('Forma de pagamento').nextElementSibling
+  expect(value?.textContent).toBe(label)
+  expect(value?.querySelector(`svg.lucide-${iconName}`)).not.toBeNull()
+}
+
 describe('OrderDetailsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -86,6 +92,38 @@ describe('OrderDetailsPage', () => {
       HTMLElement,
     )
     expect(screen.getAllByText('Açaí tradicional')[0]).toBeInstanceOf(HTMLElement)
+  })
+
+  it('shows the stored payment method, kept after cancellation, and Não informado for older orders', () => {
+    const page = (order: OrderDetails) => ({
+      canCancel: false,
+      isCancelOpen: false,
+      isLoadingOrder: false,
+      isRefreshingOrder: false,
+      order,
+      orderError: null,
+      handleBack: vi.fn(),
+      handleCancelOpenChange: vi.fn(),
+      handleOpenCancel: vi.fn(),
+      handleRetry: vi.fn(),
+    })
+    useOrderDetailsPageMock.mockReturnValue(
+      page(makeOrder({ paymentMethod: 'credit-card' })),
+    )
+    const { rerender } = render(<OrderDetailsPage orderId='order-1' />)
+    expectPaymentRow('Cartão de crédito', 'credit-card')
+    expect(screen.queryByText('Crédito')).toBeNull()
+
+    useOrderDetailsPageMock.mockReturnValue(
+      page(makeCanceledOrder({ paymentMethod: 'credit-card' })),
+    )
+    rerender(<OrderDetailsPage orderId='order-1' />)
+    expectPaymentRow('Cartão de crédito', 'credit-card')
+
+    useOrderDetailsPageMock.mockReturnValue(page(makeOrder()))
+    rerender(<OrderDetailsPage orderId='order-1' />)
+    expectPaymentRow('Não informado', 'circle-minus')
+    expect(screen.queryByText('Cartão de crédito')).toBeNull()
   })
 
   it('offers printing to Operator for both statuses and guards refresh, loading and errors', () => {

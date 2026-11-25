@@ -4,6 +4,7 @@ import { mock, type MockProxy } from 'vitest-mock-extended'
 import { UserProfile } from '#identity/domain/structures/user-profile.ts'
 import { OrderFaker } from '#pdv/domain/entities/fakers/order-faker.ts'
 import type { OrderListParams } from '#pdv/domain/structures/order-list-params.ts'
+import { OrderPaymentMethod } from '#pdv/domain/structures/order-payment-method.ts'
 import { OrderStatus } from '#pdv/domain/structures/order-status.ts'
 import type { OrdersRepository } from '#pdv/interfaces/orders-repository.ts'
 import { AuthorizationError, BadRequestError } from '#shared/domain/errors/index.ts'
@@ -45,6 +46,27 @@ describe('List Order Use Case', () => {
       search: '#42',
       establishmentId: actor.establishmentId,
     })
+  })
+
+  it.each([...Object.values(OrderPaymentMethod), null])(
+    'forwards the %s payment method filter with the actor tenant',
+    async (paymentMethod) => {
+      await useCase.execute({ actor, paymentMethod, page: 1, pageSize: 6 })
+
+      expect(repository.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          establishmentId: actor.establishmentId,
+          paymentMethod,
+        }),
+      )
+    },
+  )
+
+  it('leaves the payment method undefined when no filter is requested', async () => {
+    await useCase.execute({ actor, page: 1, pageSize: 6 })
+
+    const [params] = repository.findMany.mock.calls[0]
+    expect(params.paymentMethod).toBeUndefined()
   })
 
   it.each([
