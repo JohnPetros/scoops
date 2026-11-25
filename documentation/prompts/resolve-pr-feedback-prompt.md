@@ -112,6 +112,19 @@ with only a resolved finding when the lesson requires authority updates.
 ## Reply and resolve every addressed thread
 
 Replying is not closing. Do not end a review cycle with an addressed conversation still open.
+Publishing the correction does not finish this workflow: the review cycle is complete only when
+every addressed thread has a reply and GitHub reports it resolved.
+
+- Pending CI is a reason to wait, not to stop. Stay in the task until the checks reach a terminal
+  result, then reply and resolve in the same task.
+- When the environment forbids waiting and watches CI for you, enable that watch if you are
+  authorized to, or ask for it. On the next wake-up or user message, check CI first and, when the
+  corrected head has passed, reply and resolve every addressed thread before any other work,
+  without waiting to be asked.
+- If the task must end while any thread is open, the first line of the final message states how
+  many threads remain open, why, and what will trigger their resolution. Never report the
+  feedback as resolved because the code was fixed or pushed.
+
 For every actionable thread:
 
 1. once the requested action is on the PR branch and, for an implementation or contract
