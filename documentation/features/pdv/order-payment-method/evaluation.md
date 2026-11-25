@@ -3,8 +3,8 @@ feature: "pdv/order-payment-method"
 spec: ./spec.md
 spec_revision: 1
 plan: ./plan.md
-status: ready
-updated_at: 2026-11-24
+status: completed
+updated_at: 2026-11-25
 ---
 
 # Evaluation
@@ -142,17 +142,19 @@ Visual evidence uses `EV-*` identifiers with `Type = visual`.
 
 | ID | Workflow | Head SHA | Result | Run |
 | --- | --- | --- | --- | --- |
+| CI-01 | Core CI (code, architecture, types, complexity, tests and coverage, mutation baseline and candidate 4/4, mutation score) | `d79aac7aac8b0ae55f8210beb489258b26eb5f10` | success. Coverage floors passed (lines 84.97%); mutation module scores Analytics 91.83%, Communication 73.76%, Identity 70.00%, MRP 87.73%, PDV 78.29% (Billing excluded) | https://github.com/JohnPetros/scoops/actions/runs/45536077665 |
+| CI-02 | Server CI (code, architecture, types, complexity, unit tests and coverage, Inngest integration, build) | `d79aac7aac8b0ae55f8210beb489258b26eb5f10` | success. Coverage floors passed (lines 78.76%); the email-job tests of FND-01 passed in CI | https://github.com/JohnPetros/scoops/actions/runs/45536077814 |
+| CI-03 | Web CI (code, architecture, types, complexity, unit tests and coverage, browser integration 4/4, build) | `d79aac7aac8b0ae55f8210beb489258b26eb5f10` | success. Coverage floors passed (lines 59.75%) | https://github.com/JohnPetros/scoops/actions/runs/45536077639 |
+| CI-04 | Validation CI (code, architecture, types, complexity) | `d79aac7aac8b0ae55f8210beb489258b26eb5f10` | success | https://github.com/JohnPetros/scoops/actions/runs/45536077646 |
 
 ## Continuation handoff
 
-- **Branch/candidate:** `feat/payment-method`, working tree
-- **Progress (review cycle 1):** FND-16 to FND-23 resolved, review passed, Evaluation ready; next conclude-spec publishes and runs CI
-- **Progress:** Spec in_progress, all Plan tasks completed; MV and both reviews done, fixes applied
-- **Interrupted/uncommitted paths:** none
+- **Branch/candidate:** `feat/payment-method`, PR [#74](https://github.com/JohnPetros/scoops/pull/74); implementation candidate `d79aac7a` passed PR CI (CI-01 to CI-04)
+- **Progress:** delivery completed; review cycle 1 resolved and its eight threads answered and resolved
+- **Interrupted/uncommitted paths:** none (two unrelated untracked PDFs in the repository root are excluded)
 - **Unfinished criteria:** none (AC-10 Combo case accepted with a waiver, FND-04)
-- **Blockers and stale evidence:** none. Waivers and accepted findings: FND-01, 04, 13, 14. Complete Web Playwright suite and workspace coverage are left to PR CI (EV-10)
-- **Latest checkers:** EV-01 passed
-- **Next useful action:** run conclude-spec when publication is authorized; commit all changes (including the policy docs), open the PR, and wait for PR CI on the head SHA
+- **Blockers and stale evidence:** none. Accepted findings: FND-01, 04, 13, 14, 24
+- **Next useful action:** none in this Spec; later review comments go through `resolve-pr-feedback`
 
 ## History
 
@@ -161,3 +163,4 @@ Visual evidence uses `EV-*` identifiers with `Type = visual`.
 | 2026-11-22 | Implementation started |
 | 2026-11-22 | MV-01..03 run on the real stack; Implementation and Visual reviews done; fixes applied; FND-04 waived by the user; Evaluation set ready locally |
 | 2026-11-24 | Review cycle 1: eight Rule-violation comments on PR #74 recorded as FND-16 to FND-23 (in-contract, Spec revision unchanged). Evaluation and Plan reopened; implement-spec then conclude-spec. FND-17 supersedes the FND-15 baseline resolution |
+| 2026-11-25 | PR CI passed on `d79aac7a`; review threads answered and resolved; Spec, Plan and Evaluation completed |

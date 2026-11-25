@@ -3,8 +3,8 @@ title: Order payment method recording — plan
 spec: ./spec.md
 spec_revision: 1
 evaluation: ./evaluation.md
-status: in_progress
-updated_at: 2026-11-22
+status: completed
+updated_at: 2026-11-25
 ---
 
 # Plan — Order payment method recording

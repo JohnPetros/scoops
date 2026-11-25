@@ -1,6 +1,6 @@
 ---
 title: Order payment method recording
-status: in_progress
+status: completed
 revision: 1
 source:
   type: issue
@@ -10,10 +10,12 @@ scope:
   - packages/validation (PDV order schemas and orders route search)
   - apps/server (PDV orders REST and persistence)
   - apps/web (PDV New sale, Orders, Order detail and order print)
-last_updated_at: 2026-11-22
+last_updated_at: 2026-11-25
 ---
 
 # Order payment method recording
+
+**Outcome:** delivered in [PR #74](https://github.com/JohnPetros/scoops/pull/74); every acceptance criterion passed, AC-10's Combo case under an explicit waiver. Evidence: [Evaluation](./evaluation.md).
 
 ## 1. Context and scope
 
