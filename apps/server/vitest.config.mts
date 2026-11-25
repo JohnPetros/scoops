@@ -2,6 +2,8 @@ import { fileURLToPath } from 'node:url'
 
 import { defineConfig } from 'vitest/config'
 
+const JOB_TESTS = 'src/**/messaging/**/jobs/tests/**/*.test.ts'
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -36,12 +38,33 @@ export default defineConfig({
       },
     },
     environment: 'node',
-    exclude: ['src/shared/messaging/inngest/jobs/tests/**/*.test.ts'],
     fileParallelism: false,
     isolate: false,
-    include: ['src/**/*.test.ts'],
     maxWorkers: 1,
-    testTimeout: 60_000,
-    hookTimeout: 60_000,
+    // Distinct group orders keep the two Docker-backed suites from running at once.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'controllers',
+          // Everything outside the job suite, so a new test file is never skipped.
+          include: ['src/**/*.test.ts'],
+          exclude: [JOB_TESTS],
+          testTimeout: 60_000,
+          hookTimeout: 60_000,
+          sequence: { groupOrder: 0 },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jobs',
+          include: [JOB_TESTS],
+          testTimeout: 120_000,
+          hookTimeout: 120_000,
+          sequence: { groupOrder: 1 },
+        },
+      },
+    ],
   },
 })

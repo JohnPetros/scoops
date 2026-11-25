@@ -158,5 +158,13 @@ Server build configuration must exclude `**/tests/**` and `**/*.test.ts`.
 Integration tests rely on the Vitest alias configuration so internal imports keep
 the same `@/` paths used by production server code.
 
-Running controller integration tests requires a working Docker-compatible
-container runtime.
+## Run the controller suite
+
+Controller tests form the `controllers` suite:
+
+```bash
+pnpm --filter server test:controllers
+```
+
+Server CI runs it as the `Server controller tests` check. Running controller
+integration tests requires a working Docker-compatible container runtime.

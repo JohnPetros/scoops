@@ -324,12 +324,9 @@ pnpm --filter web exec playwright install chromium
 
 ### Server tests
 
-The server uses Vitest with a Node environment. Tests are discovered from
-`apps/server/src/**/*.test.ts`; Testcontainers PostgreSQL is available for
-database-backed fixtures, and `shared/messaging/inngest/inngest-fixture.ts`
-provides a Docker-backed Inngest development server for job integration tests.
-Better Auth controller fixtures use the same standard PostgreSQL contract and do
-not require an external authentication gateway.
+The server uses Vitest with a Node environment and requires Docker. Its tests are
+split into two suites, declared as Vitest projects in
+`apps/server/vitest.config.mts`. Test files run one at a time.
 
 ```bash
 pnpm --filter server test
@@ -337,9 +334,36 @@ pnpm --filter server test:watch
 pnpm --filter server test:coverage
 ```
 
-The server configuration gives tests and lifecycle hooks a 60-second timeout to
-allow container startup. The test command currently passes when no test files are
-present.
+These commands run both suites. The `test` command currently passes when no test
+files are present.
+
+#### Controller tests
+
+HTTP integration tests under `src/<module>/rest/controllers/tests/`, backed by
+Testcontainers PostgreSQL. Better Auth controller fixtures use the same standard
+PostgreSQL contract and do not require an external authentication gateway. Tests
+and lifecycle hooks have a 60-second timeout to allow container startup. See the
+[controller testing rules](./rules/controllers-testing-rules.md).
+
+```bash
+pnpm --filter server test:controllers
+```
+
+The `controllers` project selects every server test outside the job suite, so a
+test file in another location still runs.
+
+#### Job tests
+
+Inngest and Nest scheduled-job tests under
+`src/<module>/messaging/**/jobs/tests/`.
+`shared/messaging/inngest/inngest-fixture.ts` provides a Docker-backed Inngest
+development server, and email jobs require the Mailpit service. Tests and
+lifecycle hooks have a 120-second timeout. See the
+[job testing rules](./rules/jobs-testing-rules.md).
+
+```bash
+pnpm --filter server test:jobs
+```
 
 The Core package uses Vitest for use-case unit tests:
 
@@ -491,6 +515,10 @@ prints a text summary. CI runs these commands and enforces the measured no-regre
 configured in each Vitest file. Falling below any statements, branches, functions or lines floor
 makes Vitest exit non-zero and fails the CI job. Automatic threshold updates are disabled. These
 floors are not the quality target and must never be lowered to make a change pass.
+
+Server CI runs the controller and job suites as separate jobs through `test:blob`, which records
+coverage without enforcing floors on a partial run. The `Server coverage` job then runs
+`test:coverage:merge` to combine both reports and enforce the Server floors.
 
 After a workspace coverage gate passes, its CI workflow writes the metrics to the GitHub Actions
 job summary and creates or updates that workspace's coverage comment on internal pull requests.
