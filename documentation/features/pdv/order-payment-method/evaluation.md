@@ -4,7 +4,7 @@ spec: ./spec.md
 spec_revision: 1
 plan: ./plan.md
 status: ready
-updated_at: 2026-11-22
+updated_at: 2026-11-24
 ---
 
 # Evaluation
@@ -54,6 +54,8 @@ Current result: `All 76 Plan rows completed, --require-plan passes. MV-01 to MV-
 | EV-18 | Web fidelity fixes | `vitest run src/ui/pdv` 57 files, 202 tests; `tsc --noEmit`; Playwright `new-sale-page`, `orders-page`, `order-page` 62 passed (default port 4001, targeted files only); biome no errors | passed |
 | EV-19 | Core/Server proof fixes | Core register test 60 passed; server `list-orders` and `register-order` controller tests 26 passed; mutation 70.78% / 80.00%, 0 survivors on changed lines | passed |
 | EV-09 | Web Playwright (mocked transport) | `new-sale-page.test.ts` 28 passed; `orders-page.test.tsx` + `order-page.test.tsx` 34 passed (builder runs) | Covers AC-02, 03, 05, 07, 08, 09, 17, 18, 19 web contract | passed |
+| EV-20 | Review cycle 1 checks | `vitest run src/ui/pdv src/ui/shared src/rest` 67 files, 235 tests; Core register test 60; Server list, register and get controller tests 29; Playwright `new-sale-page`, `orders-page`, `order-page` 62 passed; `check:code`, `check:types`, `check:architecture`, `check:test-integrity`, `check:complexity` passed; mutation on `register-order-use-case.ts` 71.00% | Covers FND-16 to FND-23 | passed |
+| EV-21 | Review cycle 1 independent review | Implementation Reviewer over the correction diff and the baseline compared with `main`'s | No blocking findings; behavior preserved; no existing function rises in severity (only new small warn-level MI functions); FND-24 low | passed |
 
 ## Manual evidence
 
@@ -116,7 +118,16 @@ Visual evidence uses `EV-*` identifiers with `Type = visual`.
 | FND-12 | Proof gap, fixed | Server list test could not show tenant scoping of `paymentMethod=none`; stock movement not asserted | AC-16, AC-11 | resolved | Foreign legacy order, channel and period combinations, and an empty stock ledger assertion added |
 | FND-13 | Ambiguity, accepted | A method chosen while the cart has no items is not saved, so a reload after removing the last line loses it. FR-04 mentions removals and reload, D-04 and AC-07 cover only a saved cart with items | AC-06, AC-07 | accepted_non_blocking | Matches D-04 and the tested behavior; confirm if the Spec should say so |
 | FND-14 | Visual, low, accepted | Missing channel and payment dividers in the cart; no `circle-minus` before `Sem canal`; mobile order card keeps its 2x2 grid; frames outline every active filter | EV-11, EV-15 | accepted_non_blocking | Not in the Spec's inventory as required; confirm if wanted |
-| FND-15 | CI failure, baseline drift | PR CI `Complexity` jobs (Core, Validation, Server, Web) failed on head 9cbc41e8: the delivery shifted line numbers and grew functions already in `.code-multivitals-baseline.json`, so the gate saw new violations. `pnpm check:complexity` was not run before publication | PR CI gate | resolved | Regenerated with `pnpm update:complexity-baseline` and reviewed the diff: mostly line shifts and value growth inside existing violations; severity rose only for `drizzle-order-mapper.toDomain` (Halstead, warn to error), `drizzle-orders-repository.findMany` (cyclomatic, new warn) and one `seed.ts` anonymous function (Halstead, new warn). `pnpm check:complexity` passes in all four workspaces |
+| FND-15 | CI failure, baseline drift (superseded by FND-17) | PR CI `Complexity` jobs (Core, Validation, Server, Web) failed on head 9cbc41e8: the delivery shifted line numbers and grew functions already in `.code-multivitals-baseline.json`, so the gate saw new violations. `pnpm check:complexity` was not run before publication | PR CI gate | resolved | Regenerated with `pnpm update:complexity-baseline` and reviewed the diff: mostly line shifts and value growth inside existing violations; severity rose only for `drizzle-order-mapper.toDomain` (Halstead, warn to error), `drizzle-orders-repository.findMany` (cyclomatic, new warn) and one `seed.ts` anonymous function (Halstead, new warn). `pnpm check:complexity` passes in all four workspaces |
+| FND-16 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192631) | AC-10 | resolved | Added `use-order-registration-summary.ts` (channel label, item and unit labels, payment presentation) and a hook test; `index.tsx` only renders |
+| FND-17 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192632) | PR CI gate | resolved | Reduced complexity instead of accepting rises: mapper `toChannelAndPaymentMethod`, repository `nullableEquals`, seed `seedPaymentMethod`, `setNullableParam` in `pdv-service.ts`, `PaymentMethodRow` widget, core `toChannelSnapshot`, grouped `registrationSummary`. Baseline regenerated from `main`'s and compared per function: no existing function rises in severity; only new small functions at warn-level MI are recorded. Supersedes the FND-15 resolution |
+| FND-18 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192643) | AC-17 | resolved | `paymentMethodFilterLabel` and `paymentMethodFilterIcon` derived in `use-orders-filters.ts`; hook test added; widget test mocks the hook values |
+| FND-19 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192644) | AC-18 | resolved | `PaymentMethodCell` moved to `orders-list/payment-method-cell/` with its hook and exported props type |
+| FND-20 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192751) | AC-10 | resolved | Shared `ui/shared/hooks/use-format-percentage.ts` used by the cart and the summary |
+| FND-21 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192759) | AC-18 | resolved | Detail panel located with `getByRole('region', { name: 'Informações do pedido' })` in the two new cases |
+| FND-22 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192762) | AC-01 to AC-03, AC-10, AC-17 | resolved | Existence checks replaced by text content, disabled state, aria-describedby and DOM order assertions in the five widget test files (new cases) |
+| FND-23 | Rule violation, review comment | PR #74 review (https://github.com/JohnPetros/scoops/pull/74#discussion_r4689192777) | AC-05 | resolved | `page.clock.install()` and `page.clock.fastForward(1000)` replace the 500 ms sleep |
+| FND-24 | Review cycle 1, Implementation Reviewer, low | Replacement assertions `getByText(X).textContent` equal X are still presence checks; one older `waitForTimeout(500)` at `new-sale-page.test.ts:1518` predates the feature | EV-20 | accepted_non_blocking | Stronger replacements (aria-describedby, DOM order, disabled state) applied where a property exists; text-only cases kept because no jest-dom matcher is installed. The older sleep is outside the commented lines |
 | FND-03 | Test gap | Mutation survivor on the guard error message (`register-order-use-case.ts:785`) | EV-07 | resolved | Test now asserts the message; rerun shows 0 survivors on changed lines |
 
 ## Lessons learned
@@ -135,6 +146,7 @@ Visual evidence uses `EV-*` identifiers with `Type = visual`.
 ## Continuation handoff
 
 - **Branch/candidate:** `feat/payment-method`, working tree
+- **Progress (review cycle 1):** FND-16 to FND-23 resolved, review passed, Evaluation ready; next conclude-spec publishes and runs CI
 - **Progress:** Spec in_progress, all Plan tasks completed; MV and both reviews done, fixes applied
 - **Interrupted/uncommitted paths:** none
 - **Unfinished criteria:** none (AC-10 Combo case accepted with a waiver, FND-04)
@@ -148,3 +160,4 @@ Visual evidence uses `EV-*` identifiers with `Type = visual`.
 | --- | --- |
 | 2026-11-22 | Implementation started |
 | 2026-11-22 | MV-01..03 run on the real stack; Implementation and Visual reviews done; fixes applied; FND-04 waived by the user; Evaluation set ready locally |
+| 2026-11-24 | Review cycle 1: eight Rule-violation comments on PR #74 recorded as FND-16 to FND-23 (in-contract, Spec revision unchanged). Evaluation and Plan reopened; implement-spec then conclude-spec. FND-17 supersedes the FND-15 baseline resolution |

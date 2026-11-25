@@ -91,6 +91,7 @@ unassigned or a kebab-case <responsibility>-builder name. -->
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/use-new-sale-page.ts` | Modify | T4 | FR-03, FR-04, FR-07, AC-05, AC-06, AC-07, AC-08, AC-09 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart-storage.ts` | Modify | T4 | FR-04, AC-07 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/index.tsx` | Modify | T4 | FR-01, FR-02, AC-01, AC-03, AC-04 | completed | none |
+| `apps/web/src/ui/shared/hooks/use-format-percentage.ts` | Create | T4 | FR-05, AC-10 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/use-new-sale-cart.ts` | Modify | T4 | FR-02, AC-03, AC-04 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/payment-method-selector/index.tsx` | Create | T4 | FR-01, AC-01, AC-02 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/payment-method-selector/tests/payment-method-selector.test.tsx` | Create | T4 | FR-01, AC-01, AC-02 | completed | none |
@@ -100,6 +101,8 @@ unassigned or a kebab-case <responsibility>-builder name. -->
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/tests/use-new-sale-page.test.ts` | Modify | T4 | FR-03, FR-04, FR-07, AC-05, AC-06, AC-07, AC-08, AC-09 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/index.tsx` | Modify | T4 | FR-05, AC-10 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/index.tsx` | Create | T4 | FR-05, AC-10 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/use-order-registration-summary.ts` | Create | T4 | FR-05, AC-10 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/tests/use-order-registration-summary.test.ts` | Create | T4 | FR-05, AC-10 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/tests/order-registration-dialog.test.tsx` | Modify | T4 | FR-05, AC-10 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-confirmation/use-order-confirmation.ts` | Modify | T4 | FR-11, AC-18 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-confirmation/order-confirmation-metadata/index.tsx` | Modify | T4 | FR-11, AC-18 | completed | none |
@@ -109,6 +112,8 @@ unassigned or a kebab-case <responsibility>-builder name. -->
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/index.tsx` | Modify | T5 | FR-10, AC-17 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/use-orders-filters.ts` | Modify | T5 | FR-10, AC-17 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/index.tsx` | Modify | T5 | FR-09, FR-11, AC-15, AC-18 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/index.tsx` | Create | T5 | FR-09, FR-11, AC-15, AC-18 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/use-payment-method-cell.ts` | Create | T5 | FR-09, FR-11, AC-15, AC-18 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filtered-empty-state/index.tsx` | Modify | T5 | FR-10, AC-17 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/tests/orders-page.test.tsx` | Modify | T5 | FR-10, AC-17 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/tests/use-orders-page.test.ts` | Modify | T5 | FR-10, AC-17 | completed | none |
@@ -116,6 +121,8 @@ unassigned or a kebab-case <responsibility>-builder name. -->
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/tests/use-orders-filters.test.ts` | Modify | T5 | FR-10, AC-17 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/tests/orders-list.test.tsx` | Modify | T5 | FR-09, FR-11, AC-15, AC-18 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/index.tsx` | Modify | T5 | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/index.tsx` | Create | T5 | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | completed | none |
+| `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/use-payment-method-row.ts` | Create | T5 | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | completed | none |
 | `apps/web/src/ui/pdv/widgets/pages/order-details-page/tests/order-details-page.test.tsx` | Modify | T5 | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | completed | none |
 | `apps/web/src/ui/pdv/widgets/components/order-print/order-print-document/use-order-print-document.ts` | Modify | T5 | FR-09, FR-12, AC-15, AC-19 | completed | none |
 | `apps/web/src/ui/pdv/widgets/components/order-print/order-print-document/tests/order-print-document.test.tsx` | Modify | T5 | FR-12, AC-19 | completed | none |

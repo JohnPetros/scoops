@@ -466,6 +466,7 @@ passes the field through.
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/use-new-sale-page.ts` | Modify | FR-03, FR-04, FR-07, AC-05, AC-06, AC-07, AC-08, AC-09 | State, lifecycle, request and key |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart-storage.ts` | Modify | FR-04, AC-07 | Storage version 2 with the method |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/index.tsx` | Modify | FR-01, FR-02, AC-01, AC-03, AC-04 | Selector placement, hint and linked reason |
+| `apps/web/src/ui/shared/hooks/use-format-percentage.ts` | Create | FR-05, AC-10 | Shared percentage formatter used by the cart and the summary (FND-20) |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/use-new-sale-cart.ts` | Modify | FR-02, AC-03, AC-04 | Reason and enablement derivation |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/payment-method-selector/index.tsx` | Create | FR-01, AC-01, AC-02 | Labelled single-choice selector |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/new-sale-cart/payment-method-selector/tests/payment-method-selector.test.tsx` | Create | FR-01, AC-01, AC-02 | Options, checked state and keyboard |
@@ -475,6 +476,8 @@ passes the field through.
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/tests/use-new-sale-page.test.ts` | Modify | FR-03, FR-04, FR-07, AC-05, AC-06, AC-07, AC-08, AC-09 | Lifecycle, preview exclusion, key rotation and storage |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/index.tsx` | Modify | FR-05, AC-10 | Frame summary |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/index.tsx` | Create | FR-05, AC-10 | Confirmation summary rows, split from the dialog |
+| `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/use-order-registration-summary.ts` | Create | FR-05, AC-10 | Colocated hook for the summary derivations (FND-16, FND-20) |
+| `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/tests/use-order-registration-summary.test.ts` | Create | FR-05, AC-10 | Hook test for labels and counts (FND-16) |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/tests/order-registration-dialog.test.tsx` | Modify | FR-05, AC-10 | Rows, no-channel, no-Combo and actions |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-confirmation/use-order-confirmation.ts` | Modify | FR-11, AC-18 | Method metadata item |
 | `apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-confirmation/order-confirmation-metadata/index.tsx` | Modify | FR-11, AC-18 | Grid for four items |
@@ -484,6 +487,8 @@ passes the field through.
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/index.tsx` | Modify | FR-10, AC-17 | Payment-method `Select` |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/use-orders-filters.ts` | Modify | FR-10, AC-17 | Change handler and period change |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/index.tsx` | Modify | FR-09, FR-11, AC-15, AC-18 | Table column and mobile card cell |
+| `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/index.tsx` | Create | FR-09, FR-11, AC-15, AC-18 | Payment method cell moved out of the list file (FND-19) |
+| `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/use-payment-method-cell.ts` | Create | FR-09, FR-11, AC-15, AC-18 | Cell hook (FND-19) |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filtered-empty-state/index.tsx` | Modify | FR-10, AC-17 | Copy naming the payment method |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/tests/orders-page.test.tsx` | Modify | FR-10, AC-17 | Filter states on the page |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/tests/use-orders-page.test.ts` | Modify | FR-10, AC-17 | Mapping, clear and has-filters |
@@ -491,6 +496,8 @@ passes the field through.
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/tests/use-orders-filters.test.ts` | Modify | FR-10, AC-17 | Handler and period change |
 | `apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/tests/orders-list.test.tsx` | Modify | FR-09, FR-11, AC-15, AC-18 | Method and `Não informado` |
 | `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/index.tsx` | Modify | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | `Forma de pagamento` row |
+| `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/index.tsx` | Create | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | Payment row as a nested widget (FND-17) |
+| `apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/use-payment-method-row.ts` | Create | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | Row hook (FND-17) |
 | `apps/web/src/ui/pdv/widgets/pages/order-details-page/tests/order-details-page.test.tsx` | Modify | FR-08, FR-09, FR-11, AC-14, AC-15, AC-18 | Registered, canceled and older orders |
 | `apps/web/src/ui/pdv/widgets/components/order-print/order-print-document/use-order-print-document.ts` | Modify | FR-09, FR-12, AC-15, AC-19 | `Pagamento` print row |
 | `apps/web/src/ui/pdv/widgets/components/order-print/order-print-document/tests/order-print-document.test.tsx` | Modify | FR-12, AC-19 | Rendered print row |
@@ -698,4 +705,4 @@ started for the run.
 
 | Revision | Date | Material change and reason |
 | --- | --- | --- |
-| 1 | 2026-11-22 | Initial contract from issue #73 with decisions D-01 to D-11. Independent Spec review findings resolved before opening: both deployment-order windows accepted (Q6a), unchanged controller row removed, page reset on filter change, typed legacy-staging fixture helper, recorded `order.ts` gap and conditional print stylesheet correction. Recorded during implementation, without a revision change: D-12 allows text-only selector options below `sm`, as a clarification of an allowed deviation already built. |
+| 1 | 2026-11-22 | Initial contract from issue #73 with decisions D-01 to D-11. Independent Spec review findings resolved before opening: both deployment-order windows accepted (Q6a), unchanged controller row removed, page reset on filter change, typed legacy-staging fixture helper, recorded `order.ts` gap and conditional print stylesheet correction. Recorded during implementation, without a revision change: D-12 allows text-only selector options below `sm`, as a clarification of an allowed deviation already built. Review cycle 1 (PR #74, 2026-11-24): non-material Path map additions only (hooks and nested widgets extracted to satisfy the UI Rules); revision unchanged. |
