@@ -2,6 +2,11 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { OrdersFilters } from '..'
+import {
+  PAYMENT_METHOD_NOT_INFORMED_PRESENTATION,
+  PAYMENT_METHOD_PRESENTATION,
+} from '@/ui/pdv/constants/payment-method-presentation'
+
 import { useOrdersFilters } from '../use-orders-filters'
 
 vi.mock('../use-orders-filters', async (importOriginal) => ({
@@ -19,6 +24,20 @@ const baseSearch = {
   page: 1,
 }
 
+type FilterPaymentMethod = Parameters<typeof OrdersFilters>[0]['search']['paymentMethod']
+
+function filterLabel(paymentMethod: FilterPaymentMethod) {
+  if (paymentMethod === undefined) return 'Todas as formas de pagamento'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].label
+}
+
+function filterIcon(paymentMethod: FilterPaymentMethod) {
+  if (paymentMethod === undefined) return 'wallet' as const
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.icon
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].icon
+}
+
 function renderFilters(search: Parameters<typeof OrdersFilters>[0]['search']) {
   useOrdersFiltersMock.mockReturnValue({
     handleChannelChange: vi.fn(),
@@ -27,6 +46,8 @@ function renderFilters(search: Parameters<typeof OrdersFilters>[0]['search']) {
     handlePeriodChange: vi.fn(),
     handleStatusChange: vi.fn(),
     handleToChange: vi.fn(),
+    paymentMethodFilterIcon: filterIcon(search.paymentMethod),
+    paymentMethodFilterLabel: filterLabel(search.paymentMethod),
     searchValue: '',
     setSearchValue: vi.fn(),
   })
@@ -51,6 +72,8 @@ describe('OrdersFilters', () => {
       handlePeriodChange: vi.fn(),
       handleStatusChange: vi.fn(),
       handleToChange: vi.fn(),
+      paymentMethodFilterIcon: 'wallet',
+      paymentMethodFilterLabel: 'Todas as formas de pagamento',
       searchValue: '',
       setSearchValue: vi.fn(),
     })
@@ -70,7 +93,10 @@ describe('OrdersFilters', () => {
         }}
       />,
     )
-    expect(screen.getByRole('textbox', { name: 'Buscar pedidos' })).toBeTruthy()
+    expect(
+      (screen.getByRole('textbox', { name: 'Buscar pedidos' }) as HTMLInputElement)
+        .readOnly,
+    ).toBe(false)
     expect(
       screen.getByRole('combobox', { name: 'Filtrar por canal' }).textContent,
     ).toContain('Todos os canais')
@@ -161,6 +187,9 @@ describe('OrdersFilters', () => {
       screen.getByRole('combobox', { name: 'Filtrar por forma de pagamento' })
         .textContent,
     ).toContain('Não informado')
-    expect(screen.getByRole('button', { name: 'Limpar filtros' })).toBeTruthy()
+    expect(
+      (screen.getByRole('button', { name: 'Limpar filtros' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false)
   })
 })

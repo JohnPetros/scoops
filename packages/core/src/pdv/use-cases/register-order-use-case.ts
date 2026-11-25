@@ -656,6 +656,13 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
     }
   }
 
+  private toChannelSnapshot(
+    channel: Awaited<ReturnType<RegisterOrderUseCase['findChannel']>>,
+  ): SalesChannelSnapshot | undefined {
+    if (!channel) return undefined
+    return { channelId: channel.id, name: channel.name, percentage: channel.percentage }
+  }
+
   private toOrderCreate(
     request: Request,
     cart: Cart,
@@ -667,13 +674,7 @@ export class RegisterOrderUseCase implements UseCase<Request, OrderRegistrationR
     }[],
   ): OrderCreate {
     const productsById = new Map(products.map((product) => [product.productId, product]))
-    const channelSnapshot: SalesChannelSnapshot | undefined = channel
-      ? {
-          channelId: channel.id,
-          name: channel.name,
-          percentage: channel.percentage,
-        }
-      : undefined
+    const channelSnapshot = this.toChannelSnapshot(channel)
     return {
       establishmentId: request.actor.establishmentId,
       idempotencyKey: request.idempotencyKey,

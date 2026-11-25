@@ -217,8 +217,8 @@ describe('NewSaleCart', () => {
     )
 
     expect(screen.queryAllByText('Atualizando valor…')).toHaveLength(0)
-    expect(screen.getByText('R$ 20,00 cada')).toBeTruthy()
-    expect(screen.getByText('R$ 22,00 cada')).toBeTruthy()
+    expect(screen.getAllByText('R$ 20,00 cada')).toHaveLength(1)
+    expect(screen.getAllByText('R$ 22,00 cada')).toHaveLength(1)
   })
 
   it('places the empty payment method selector below the channel field', () => {
@@ -232,8 +232,8 @@ describe('NewSaleCart', () => {
     const group = screen.getByRole('radiogroup', { name: 'Forma de pagamento' })
     expect(
       channel.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy()
-    expect(screen.getByText('Obrigatório')).toBeTruthy()
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(screen.getByText('Obrigatório').textContent).toBe('Obrigatório')
     expect(screen.getAllByRole('radio').map((radio) => radio.textContent)).toEqual([
       'Pix',
       'Crédito',
@@ -254,7 +254,7 @@ describe('NewSaleCart', () => {
 
     const registerButton = screen.getByRole('button', { name: 'Registrar pedido' })
     expect((registerButton as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getByText(HINT)).toBeTruthy()
+    expect(screen.getByText(HINT).textContent).toBe(HINT)
     const reason = screen.getByText(REASON)
     expect(registerButton.getAttribute('aria-describedby')).toBe(reason.id)
   })
@@ -287,7 +287,7 @@ describe('NewSaleCart', () => {
 
     render(<NewSaleCart {...cartProps({ isPreviewPending: true, lineInputs: [] })} />)
 
-    expect(screen.getByText(REASON)).toBeTruthy()
+    expect(screen.getByText(REASON).textContent).toBe(REASON)
     expect(
       (screen.getByRole('button', { name: 'Registrar pedido' }) as HTMLButtonElement)
         .disabled,

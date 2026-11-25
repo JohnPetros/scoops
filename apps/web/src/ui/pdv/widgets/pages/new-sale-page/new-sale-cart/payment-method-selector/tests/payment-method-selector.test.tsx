@@ -34,8 +34,8 @@ describe('PaymentMethodSelector', () => {
     render(<PaymentMethodSelector onPaymentMethodChange={vi.fn()} />)
 
     const group = screen.getByRole('radiogroup', { name: 'Forma de pagamento' })
-    expect(group.getAttribute('aria-describedby')).toBeTruthy()
-    expect(screen.getByText('Obrigatório')).toBeTruthy()
+    expect(group.getAttribute('aria-describedby')).toContain(screen.getByText(HINT).id)
+    expect(screen.getByText('Obrigatório').textContent).toBe('Obrigatório')
     const radios = screen.getAllByRole('radio')
     expect(radios.map((radio) => radio.textContent)).toEqual([
       'Pix',
@@ -44,7 +44,7 @@ describe('PaymentMethodSelector', () => {
       'Dinheiro',
     ])
     for (const radio of radios) expect(radio.getAttribute('aria-checked')).toBe('false')
-    expect(screen.getByText(HINT)).toBeTruthy()
+    expect(screen.getByText(HINT).textContent).toBe(HINT)
     expect(group.getAttribute('aria-describedby')).toBe(
       screen.getByText(HINT).getAttribute('id'),
     )

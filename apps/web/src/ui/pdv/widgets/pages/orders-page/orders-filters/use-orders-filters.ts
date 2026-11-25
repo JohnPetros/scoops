@@ -4,6 +4,12 @@ import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
 import type { OrderPaymentMethod, OrderStatus } from '@scoops/core/pdv/domain/structures'
 import type { OrdersSearch } from '@scoops/validation'
 
+import {
+  PAYMENT_METHOD_NOT_INFORMED_PRESENTATION,
+  PAYMENT_METHOD_PRESENTATION,
+} from '@/ui/pdv/constants/payment-method-presentation'
+import type { IconName } from '@/ui/shared/widgets/components/icon/types'
+
 export type OrdersFiltersProps = {
   channels: readonly SalesChannel[]
   isLoadingChannels: boolean
@@ -93,6 +99,9 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     onSearchChange({ ...search, from: search.from ?? value, to: value, page: 1 })
   }
 
+  const paymentMethodFilterLabel = getPaymentMethodFilterLabel(search.paymentMethod)
+  const paymentMethodFilterIcon = getPaymentMethodFilterIcon(search.paymentMethod)
+
   return {
     handleChannelChange,
     handleFromChange,
@@ -100,6 +109,8 @@ export function useOrdersFilters({ onSearchChange, search }: OrdersFiltersProps)
     handlePeriodChange,
     handleStatusChange,
     handleToChange,
+    paymentMethodFilterIcon,
+    paymentMethodFilterLabel,
     searchValue,
     setSearchValue,
   }
@@ -120,4 +131,18 @@ export function hasActiveFilters(search: OrdersSearch) {
       search.status ||
       search.period === 'custom',
   )
+}
+
+function getPaymentMethodFilterLabel(paymentMethod: OrdersSearch['paymentMethod']) {
+  if (paymentMethod === undefined) return 'Todas as formas de pagamento'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].label
+}
+
+function getPaymentMethodFilterIcon(
+  paymentMethod: OrdersSearch['paymentMethod'],
+): IconName {
+  if (paymentMethod === undefined) return 'wallet'
+  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.icon
+  return PAYMENT_METHOD_PRESENTATION[paymentMethod].icon
 }

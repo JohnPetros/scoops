@@ -474,6 +474,7 @@ test.describe('NewSalePage', () => {
   }) => {
     const previewBodies: unknown[] = []
     const registrationBodies: unknown[] = []
+    await page.clock.install()
     page.on('request', (request) => {
       const { pathname } = new URL(request.url())
       if (request.method() !== 'POST') return
@@ -511,7 +512,7 @@ test.describe('NewSalePage', () => {
     await expect(
       page.getByText('Escolha como o cliente vai pagar para registrar o pedido.'),
     ).toHaveCount(0)
-    await page.waitForTimeout(500)
+    await page.clock.fastForward(1000)
     expect(previewBodies).toHaveLength(previewCount)
     for (const body of previewBodies) expect(body).not.toHaveProperty('paymentMethod')
     await expect(page.getByRole('main').getByText('R$ 20,00').last()).toBeVisible()

@@ -226,6 +226,14 @@ function mapOrderRegistrationResponse(
   })
 }
 
+function setNullableParam(
+  params: URLSearchParams,
+  key: string,
+  value: string | null | undefined,
+) {
+  if (value !== undefined) params.set(key, value ?? 'none')
+}
+
 export const PdvService = (restClient: RestClient): PdvRestService => ({
   async listOrders(input: Omit<OrderListParams, 'establishmentId'>) {
     const params = new URLSearchParams({
@@ -235,10 +243,8 @@ export const PdvService = (restClient: RestClient): PdvRestService => ({
     if (input.search) params.set('search', input.search)
     if (input.createdFrom) params.set('createdFrom', input.createdFrom.toISOString())
     if (input.createdTo) params.set('createdTo', input.createdTo.toISOString())
-    if (input.channelId !== undefined) params.set('channelId', input.channelId ?? 'none')
-    if (input.paymentMethod !== undefined) {
-      params.set('paymentMethod', input.paymentMethod ?? 'none')
-    }
+    setNullableParam(params, 'channelId', input.channelId)
+    setNullableParam(params, 'paymentMethod', input.paymentMethod)
     if (input.status) params.set('status', input.status)
 
     const response = await restClient.get<OrderPageJson>(`/orders?${params.toString()}`)

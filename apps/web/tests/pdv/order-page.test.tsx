@@ -202,7 +202,7 @@ test.describe('OrderPage', () => {
 
         await page.setViewportSize({ width: 1481, height: 1050 })
         await page.goto(`/orders/${ORDER_ID}`)
-        const panel = page.locator('[data-slot="accordion-panel"]').first()
+        const panel = page.getByRole('region', { name: 'Informações do pedido' })
         const paymentRow = panel
           .locator('div')
           .filter({ has: page.getByText('Forma de pagamento', { exact: true }) })
@@ -242,7 +242,7 @@ test.describe('OrderPage', () => {
 
     await page.setViewportSize({ width: 1481, height: 1050 })
     await page.goto(`/orders/${ORDER_ID}`)
-    const panel = page.locator('[data-slot="accordion-panel"]').first()
+    const panel = page.getByRole('region', { name: 'Informações do pedido' })
     await expect(panel).toContainText('Forma de pagamento')
     await expect(panel.getByText('Não informado')).toBeVisible()
   })

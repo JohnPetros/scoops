@@ -51,9 +51,11 @@ describe('OrdersPage', () => {
 
   it('renders the heading and delegates the filters and empty state', () => {
     render(<OrdersPage onSearchChange={vi.fn()} search={search} />)
-    expect(screen.getByRole('heading', { name: /Pedidos/ })).toBeTruthy()
-    expect(screen.getByText('filters')).toBeTruthy()
-    expect(screen.getByText('empty')).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /Pedidos/ }).textContent).toMatch(
+      /Pedidos/,
+    )
+    expect(screen.getByText('filters').textContent).toBe('filters')
+    expect(screen.getByText('empty').textContent).toBe('empty')
   })
 
   it('names the payment method in the filtered empty state and clears from it', () => {
@@ -68,8 +70,10 @@ describe('OrdersPage', () => {
     expect(
       screen.getByText(
         'Não encontramos pedidos com a busca, o canal, a forma de pagamento, o status e o período selecionados.',
-      ),
-    ).toBeTruthy()
+      ).textContent,
+    ).toBe(
+      'Não encontramos pedidos com a busca, o canal, a forma de pagamento, o status e o período selecionados.',
+    )
     fireEvent.click(screen.getByRole('button', { name: 'Limpar filtros' }))
     expect(handleClearFilters).toHaveBeenCalledTimes(1)
   })

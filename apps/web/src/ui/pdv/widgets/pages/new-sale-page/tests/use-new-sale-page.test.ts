@@ -990,11 +990,11 @@ describe('useNewSalePage payment method', () => {
 
   it('resolves the registration channel only from the active channels', async () => {
     const { result, rerender } = setupPaymentMethodHook()
-    expect(result.current.isRegistrationChannelUnresolved).toBe(false)
+    expect(result.current.registrationSummary.isChannelUnresolved).toBe(false)
 
     act(() => result.current.handleChannelChange('channel-1'))
-    expect(result.current.registrationChannel).toBeUndefined()
-    expect(result.current.isRegistrationChannelUnresolved).toBe(true)
+    expect(result.current.registrationSummary.channel).toBeUndefined()
+    expect(result.current.registrationSummary.isChannelUnresolved).toBe(true)
 
     const channel = { id: 'channel-1', name: 'Balcão', percentage: 0 }
     useActiveSalesChannelsQueryMock.mockReturnValue({
@@ -1005,7 +1005,7 @@ describe('useNewSalePage payment method', () => {
     } as never)
     rerender()
 
-    expect(result.current.registrationChannel).toEqual(channel)
-    expect(result.current.isRegistrationChannelUnresolved).toBe(false)
+    expect(result.current.registrationSummary.channel).toEqual(channel)
+    expect(result.current.registrationSummary.isChannelUnresolved).toBe(false)
   })
 })

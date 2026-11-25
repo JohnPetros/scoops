@@ -123,7 +123,10 @@ describe('NewSalePage', () => {
       handlePaymentMethodChange,
       isRegistrationOpen: true,
       paymentMethod: OrderPaymentMethod.CreditCard,
-      registrationChannel: salesChannel,
+      registrationSummary: {
+        channel: salesChannel,
+        paymentMethod: OrderPaymentMethod.CreditCard,
+      },
     } as never)
 
     render(<NewSalePage />)
@@ -142,9 +145,8 @@ describe('NewSalePage', () => {
     useNewSalePageMock.mockReturnValue({
       ...pageState(),
       channelId: 'channel-1',
-      isRegistrationChannelUnresolved: true,
       isRegistrationOpen: true,
-      registrationChannel: undefined,
+      registrationSummary: { channel: undefined, isChannelUnresolved: true },
     } as never)
 
     render(<NewSalePage />)

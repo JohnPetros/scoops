@@ -447,8 +447,6 @@ export function useNewSalePage() {
     isLoadingActiveSalesChannels,
     isRefreshingActiveSalesChannels,
     isPreviewPending: previewAction.isPending,
-    isRegistrationChannelUnresolved:
-      registrationChannelId !== undefined && !registrationChannel,
     isRegistrationOpen,
     isRegistrationPending: registrationAction.isPending,
     isVerification: registrationFeedback === 'verification',
@@ -458,10 +456,14 @@ export function useNewSalePage() {
     previewError,
     previewToken,
     registeredOrder,
-    registrationChannel,
     registrationError,
     registrationResult,
     registrationFeedback,
+    registrationSummary: {
+      channel: registrationChannel,
+      isChannelUnresolved: registrationChannelId !== undefined && !registrationChannel,
+      paymentMethod,
+    },
     selectedProduct,
   }
 }

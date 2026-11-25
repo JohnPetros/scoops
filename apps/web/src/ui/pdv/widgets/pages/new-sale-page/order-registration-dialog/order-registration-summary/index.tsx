@@ -1,32 +1,25 @@
-import type { SalesChannel } from '@scoops/core/pdv/domain/entities'
-import type { Cart, OrderPaymentMethod } from '@scoops/core/pdv/domain/structures'
-
-import { getPaymentMethodPresentation } from '@/ui/pdv/constants/payment-method-presentation'
-import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
 import { Icon } from '@/ui/shared/widgets/components/icon'
 
-export type OrderRegistrationSummaryProps = {
-  cart: Cart
-  channel?: SalesChannel
-  isChannelUnresolved?: boolean
-  paymentMethod?: OrderPaymentMethod
-}
+import {
+  type OrderRegistrationSummaryProps,
+  useOrderRegistrationSummary,
+} from './use-order-registration-summary'
 
-const PERCENTAGE_FORMATTER = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 })
+export type { OrderRegistrationSummaryProps }
+
 const ROW_CLASS_NAME =
   'flex items-center justify-between gap-4 border-b border-border-soft py-2'
 const LABEL_CLASS_NAME = 'text-xs whitespace-nowrap font-semibold text-muted-foreground'
 
-export const OrderRegistrationSummary = ({
-  cart,
-  channel,
-  isChannelUnresolved = false,
-  paymentMethod,
-}: OrderRegistrationSummaryProps) => {
-  const formatCurrency = useFormatCurrency()
-  const paymentMethodPresentation = getPaymentMethodPresentation(paymentMethod)
-  const itemsCount = cart.lines.length
-  const unitsCount = cart.lines.reduce((total, line) => total + line.quantity, 0)
+export const OrderRegistrationSummary = (props: OrderRegistrationSummaryProps) => {
+  const { cart, channel } = props
+  const {
+    channelLabel,
+    formatCurrency,
+    itemsLabel,
+    paymentMethodPresentation,
+    unitsLabel,
+  } = useOrderRegistrationSummary(props)
 
   return (
     <dl className='rounded-xl border border-border-soft bg-muted px-4 py-0.5'>
@@ -34,15 +27,9 @@ export const OrderRegistrationSummary = ({
         <dt className={LABEL_CLASS_NAME}>Canal de venda</dt>
         <dd className='flex items-center gap-1.5 text-sm font-bold'>
           {channel ? (
-            <>
-              <Icon className='size-3.5 text-primary sm:hidden' name='store' />
-              {`${channel.name} · ${channel.percentage > 0 ? '+' : ''}${PERCENTAGE_FORMATTER.format(channel.percentage)}%`}
-            </>
-          ) : isChannelUnresolved ? (
-            'Canal indisponível'
-          ) : (
-            'Sem canal'
-          )}
+            <Icon className='size-3.5 text-primary sm:hidden' name='store' />
+          ) : null}
+          {channelLabel}
         </dd>
       </div>
       <div className={ROW_CLASS_NAME}>
@@ -55,8 +42,7 @@ export const OrderRegistrationSummary = ({
       <div className={ROW_CLASS_NAME}>
         <dt className={LABEL_CLASS_NAME}>Itens</dt>
         <dd className='text-sm font-bold'>
-          {itemsCount} {itemsCount === 1 ? 'item' : 'itens'} · {unitsCount}{' '}
-          {unitsCount === 1 ? 'unidade' : 'unidades'}
+          {itemsLabel} · {unitsLabel}
         </dd>
       </div>
       {cart.discounts.map((discount) => (

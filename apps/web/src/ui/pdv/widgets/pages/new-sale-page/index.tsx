@@ -45,7 +45,6 @@ export const NewSalePage = () => {
     isLoadingActiveSalesChannels,
     isRefreshingActiveSalesChannels,
     isPreviewPending,
-    isRegistrationChannelUnresolved,
     isRegistrationOpen,
     isRegistrationPending,
     isVerification,
@@ -55,7 +54,7 @@ export const NewSalePage = () => {
     previewError,
     previewToken,
     registeredOrder,
-    registrationChannel,
+    registrationSummary,
     registrationError,
     registrationFeedback,
     registrationResult,
@@ -137,15 +136,13 @@ export const NewSalePage = () => {
       {!isVerification ? (
         <OrderRegistrationDialog
           cart={previewCart}
-          channel={registrationChannel}
-          isChannelUnresolved={isRegistrationChannelUnresolved}
           isOpen={isRegistrationOpen}
           isPending={isRegistrationPending}
           onConfirm={handleConfirmRegistration}
           onOpenChange={(open) => {
             if (!open) handleFeedbackAction()
           }}
-          paymentMethod={paymentMethod}
+          {...registrationSummary}
         />
       ) : null}
 

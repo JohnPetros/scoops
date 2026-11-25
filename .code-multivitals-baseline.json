@@ -1,9 +1,9 @@
 {
-  "analysedAt": "2026-11-23T01:41:21.533Z",
-  "totalFiles": 2096,
-  "totalFunctions": 7182,
-  "warnCount": 1669,
-  "errorCount": 171,
+  "analysedAt": "2026-11-25T02:37:53.499Z",
+  "totalFiles": 2102,
+  "totalFunctions": 7194,
+  "warnCount": 1674,
+  "errorCount": 170,
   "averageMI": 57.6,
   "averageHealthScore": 72.4,
   "clones": [
@@ -15557,8 +15557,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       }
     },
@@ -15574,8 +15574,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       }
     },
@@ -15591,8 +15591,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       }
     },
@@ -20232,8 +20232,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       }
     },
@@ -20249,8 +20249,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       }
     },
@@ -20266,8 +20266,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       }
     },
@@ -20385,8 +20385,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       }
     },
@@ -20402,8 +20402,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -20487,8 +20487,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       }
     },
@@ -20504,8 +20504,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -23428,8 +23428,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       }
     },
@@ -23778,15 +23778,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAmounts",
-        "startLine": 155,
-        "endLine": 170,
+        "startLine": 161,
+        "endLine": 176,
         "lines": 16
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostComponent",
-        "startLine": 468,
-        "endLine": 475,
+        "startLine": 474,
+        "endLine": 481,
         "lines": 8
       }
     },
@@ -23795,15 +23795,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAmounts",
-        "startLine": 155,
-        "endLine": 170,
+        "startLine": 161,
+        "endLine": 176,
         "lines": 16
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationMetadata",
-        "startLine": 558,
-        "endLine": 568,
+        "startLine": 564,
+        "endLine": 574,
         "lines": 11
       }
     },
@@ -23812,15 +23812,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -23829,8 +23829,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
@@ -23846,8 +23846,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
@@ -23863,8 +23863,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
@@ -23880,15 +23880,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       }
     },
@@ -23897,15 +23897,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       }
     },
@@ -23914,8 +23914,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -23931,8 +23931,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -23948,8 +23948,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -23965,8 +23965,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -23982,8 +23982,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -23999,15 +23999,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       }
     },
@@ -24016,8 +24016,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -24033,8 +24033,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -24050,8 +24050,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -24067,8 +24067,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -24084,8 +24084,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -24101,15 +24101,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAccompaniments",
-        "startLine": 385,
-        "endLine": 391,
+        "startLine": 391,
+        "endLine": 397,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineConsumptions",
-        "startLine": 399,
-        "endLine": 405,
+        "startLine": 405,
+        "endLine": 411,
         "lines": 7
       }
     },
@@ -24118,15 +24118,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAccompaniments",
-        "startLine": 385,
-        "endLine": 391,
+        "startLine": 391,
+        "endLine": 397,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationOutcomes",
-        "startLine": 539,
-        "endLine": 545,
+        "startLine": 545,
+        "endLine": 551,
         "lines": 7
       }
     },
@@ -24135,15 +24135,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineConsumptions",
-        "startLine": 399,
-        "endLine": 405,
+        "startLine": 405,
+        "endLine": 411,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationOutcomes",
-        "startLine": 539,
-        "endLine": 545,
+        "startLine": 545,
+        "endLine": 551,
         "lines": 7
       }
     },
@@ -24152,15 +24152,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostComponent",
-        "startLine": 468,
-        "endLine": 475,
+        "startLine": 474,
+        "endLine": 481,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationMetadata",
-        "startLine": 558,
-        "endLine": 568,
+        "startLine": 564,
+        "endLine": 574,
         "lines": 11
       }
     },
@@ -24169,8 +24169,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       },
       "blockB": {
@@ -24186,8 +24186,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       },
       "blockB": {
@@ -24203,8 +24203,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       },
       "blockB": {
@@ -24220,8 +24220,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -24237,8 +24237,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -24254,8 +24254,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -24271,8 +24271,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -24288,8 +24288,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -24509,15 +24509,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findById",
-        "startLine": 224,
-        "endLine": 234,
+        "startLine": 226,
+        "endLine": 236,
         "lines": 11
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findByIdempotencyKey",
-        "startLine": 252,
-        "endLine": 268,
+        "startLine": 254,
+        "endLine": 270,
         "lines": 17
       }
     },
@@ -24526,15 +24526,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findLineAggregateRows",
-        "startLine": 607,
-        "endLine": 618,
+        "startLine": 608,
+        "endLine": 619,
         "lines": 12
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findDiscountAggregateRows",
-        "startLine": 725,
-        "endLine": 736,
+        "startLine": 726,
+        "endLine": 737,
         "lines": 12
       }
     },
@@ -24543,15 +24543,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineChildren",
-        "startLine": 629,
-        "endLine": 639,
+        "startLine": 630,
+        "endLine": 640,
         "lines": 11
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountChildren",
-        "startLine": 686,
-        "endLine": 692,
+        "startLine": 687,
+        "endLine": 693,
         "lines": 7
       }
     },
@@ -24560,15 +24560,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineAccompaniments",
-        "startLine": 641,
-        "endLine": 649,
+        "startLine": 642,
+        "endLine": 650,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineConsumptions",
-        "startLine": 651,
-        "endLine": 659,
+        "startLine": 652,
+        "endLine": 660,
         "lines": 9
       }
     },
@@ -24577,15 +24577,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineAccompaniments",
-        "startLine": 641,
-        "endLine": 649,
+        "startLine": 642,
+        "endLine": 650,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineCostComponents",
-        "startLine": 661,
-        "endLine": 669,
+        "startLine": 662,
+        "endLine": 670,
         "lines": 9
       }
     },
@@ -24594,15 +24594,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineAccompaniments",
-        "startLine": 641,
-        "endLine": 649,
+        "startLine": 642,
+        "endLine": 650,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponentAccompaniments",
-        "startLine": 765,
-        "endLine": 775,
+        "startLine": 766,
+        "endLine": 776,
         "lines": 11
       }
     },
@@ -24611,15 +24611,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineConsumptions",
-        "startLine": 651,
-        "endLine": 659,
+        "startLine": 652,
+        "endLine": 660,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineCostComponents",
-        "startLine": 661,
-        "endLine": 669,
+        "startLine": 662,
+        "endLine": 670,
         "lines": 9
       }
     },
@@ -24628,15 +24628,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineConsumptions",
-        "startLine": 651,
-        "endLine": 659,
+        "startLine": 652,
+        "endLine": 660,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponentAccompaniments",
-        "startLine": 765,
-        "endLine": 775,
+        "startLine": 766,
+        "endLine": 776,
         "lines": 11
       }
     },
@@ -24645,15 +24645,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineCostComponents",
-        "startLine": 661,
-        "endLine": 669,
+        "startLine": 662,
+        "endLine": 670,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponentAccompaniments",
-        "startLine": 765,
-        "endLine": 775,
+        "startLine": 766,
+        "endLine": 776,
         "lines": 11
       }
     },
@@ -24662,15 +24662,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLines",
-        "startLine": 671,
-        "endLine": 677,
+        "startLine": 672,
+        "endLine": 678,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscounts",
-        "startLine": 777,
-        "endLine": 785,
+        "startLine": 778,
+        "endLine": 786,
         "lines": 9
       }
     },
@@ -24679,15 +24679,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findLineRowsForOrder",
-        "startLine": 815,
-        "endLine": 821,
+        "startLine": 816,
+        "endLine": 822,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findDiscountRowsForOrder",
-        "startLine": 851,
-        "endLine": 863,
+        "startLine": 852,
+        "endLine": 864,
         "lines": 13
       }
     },
@@ -24859,193 +24859,6 @@
         "startLine": 4,
         "endLine": 9,
         "lines": 6
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapProduct",
-        "startLine": 141,
-        "endLine": 147,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapBrand",
-        "startLine": 162,
-        "endLine": 168,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapProduct",
-        "startLine": 141,
-        "endLine": 147,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapAccompanimentType",
-        "startLine": 233,
-        "endLine": 239,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapProduct",
-        "startLine": 141,
-        "endLine": 147,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapSalesChannel",
-        "startLine": 68,
-        "endLine": 74,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapProduct",
-        "startLine": 141,
-        "endLine": 147,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapCombo",
-        "startLine": 102,
-        "endLine": 108,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapBrand",
-        "startLine": 162,
-        "endLine": 168,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapAccompanimentType",
-        "startLine": 233,
-        "endLine": 239,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapBrand",
-        "startLine": 162,
-        "endLine": 168,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapSalesChannel",
-        "startLine": 68,
-        "endLine": 74,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapBrand",
-        "startLine": 162,
-        "endLine": 168,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapCombo",
-        "startLine": 102,
-        "endLine": 108,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapAccompanimentType",
-        "startLine": 233,
-        "endLine": 239,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapSalesChannel",
-        "startLine": 68,
-        "endLine": 74,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/mrp-service.ts",
-        "functionName": "mapAccompanimentType",
-        "startLine": 233,
-        "endLine": 239,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapCombo",
-        "startLine": 102,
-        "endLine": 108,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapSalesChannel",
-        "startLine": 68,
-        "endLine": 74,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapCombo",
-        "startLine": 102,
-        "endLine": 108,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapComboPage",
-        "startLine": 114,
-        "endLine": 122,
-        "lines": 9
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/services/pdv-service.ts",
-        "functionName": "mapOrderPage",
-        "startLine": 146,
-        "endLine": 154,
-        "lines": 9
       }
     },
     {
@@ -25590,6 +25403,193 @@
         "startLine": 94,
         "endLine": 107,
         "lines": 14
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapProduct",
+        "startLine": 141,
+        "endLine": 147,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapBrand",
+        "startLine": 162,
+        "endLine": 168,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapProduct",
+        "startLine": 141,
+        "endLine": 147,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapAccompanimentType",
+        "startLine": 233,
+        "endLine": 239,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapProduct",
+        "startLine": 141,
+        "endLine": 147,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapSalesChannel",
+        "startLine": 68,
+        "endLine": 74,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapProduct",
+        "startLine": 141,
+        "endLine": 147,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapCombo",
+        "startLine": 102,
+        "endLine": 108,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapBrand",
+        "startLine": 162,
+        "endLine": 168,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapAccompanimentType",
+        "startLine": 233,
+        "endLine": 239,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapBrand",
+        "startLine": 162,
+        "endLine": 168,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapSalesChannel",
+        "startLine": 68,
+        "endLine": 74,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapBrand",
+        "startLine": 162,
+        "endLine": 168,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapCombo",
+        "startLine": 102,
+        "endLine": 108,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapAccompanimentType",
+        "startLine": 233,
+        "endLine": 239,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapSalesChannel",
+        "startLine": 68,
+        "endLine": 74,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/mrp-service.ts",
+        "functionName": "mapAccompanimentType",
+        "startLine": 233,
+        "endLine": 239,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapCombo",
+        "startLine": 102,
+        "endLine": 108,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapSalesChannel",
+        "startLine": 68,
+        "endLine": 74,
+        "lines": 7
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapCombo",
+        "startLine": 102,
+        "endLine": 108,
+        "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapComboPage",
+        "startLine": 114,
+        "endLine": 122,
+        "lines": 9
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/services/pdv-service.ts",
+        "functionName": "mapOrderPage",
+        "startLine": 146,
+        "endLine": 154,
+        "lines": 9
       }
     },
     {
@@ -32225,57 +32225,6 @@
     {
       "similarity": 1,
       "blockA": {
-        "filePath": "apps/web/src/rest/mappers/communication/notification-page-mapper.ts",
-        "functionName": "mapDate",
-        "startLine": 26,
-        "endLine": 33,
-        "lines": 8
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/mappers/identity/date-mapper.ts",
-        "functionName": "IdentityDateMapper",
-        "startLine": 3,
-        "endLine": 10,
-        "lines": 8
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/mappers/identity/response-mapper.ts",
-        "functionName": "PendingOnboardingResponseMapper",
-        "startLine": 11,
-        "endLine": 23,
-        "lines": 13
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/mappers/identity/response-mapper.ts",
-        "functionName": "UserDetailsResponseMapper",
-        "startLine": 25,
-        "endLine": 37,
-        "lines": 13
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/rest/mappers/identity/user-mapper.ts",
-        "functionName": "UserMapper",
-        "startLine": 11,
-        "endLine": 21,
-        "lines": 11
-      },
-      "blockB": {
-        "filePath": "apps/web/src/rest/mappers/identity/user-summary-mapper.ts",
-        "functionName": "UserSummaryMapper",
-        "startLine": 15,
-        "endLine": 24,
-        "lines": 10
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
         "filePath": "apps/web/src/provision/auth/better-auth/better-auth-provider.ts",
         "functionName": "BetterAuthProvider",
         "startLine": 117,
@@ -32373,6 +32322,57 @@
         "startLine": 67,
         "endLine": 84,
         "lines": 18
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/mappers/communication/notification-page-mapper.ts",
+        "functionName": "mapDate",
+        "startLine": 26,
+        "endLine": 33,
+        "lines": 8
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/mappers/identity/date-mapper.ts",
+        "functionName": "IdentityDateMapper",
+        "startLine": 3,
+        "endLine": 10,
+        "lines": 8
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/mappers/identity/response-mapper.ts",
+        "functionName": "PendingOnboardingResponseMapper",
+        "startLine": 11,
+        "endLine": 23,
+        "lines": 13
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/mappers/identity/response-mapper.ts",
+        "functionName": "UserDetailsResponseMapper",
+        "startLine": 25,
+        "endLine": 37,
+        "lines": 13
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/rest/mappers/identity/user-mapper.ts",
+        "functionName": "UserMapper",
+        "startLine": 11,
+        "endLine": 21,
+        "lines": 11
+      },
+      "blockB": {
+        "filePath": "apps/web/src/rest/mappers/identity/user-summary-mapper.ts",
+        "functionName": "UserSummaryMapper",
+        "startLine": 15,
+        "endLine": 24,
+        "lines": 10
       }
     },
     {
@@ -33908,6 +33908,23 @@
     {
       "similarity": 1,
       "blockA": {
+        "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-error/index.tsx",
+        "functionName": "AccompanimentTypesError",
+        "startLine": 7,
+        "endLine": 20,
+        "lines": 14
+      },
+      "blockB": {
+        "filePath": "apps/web/src/ui/pdv/widgets/pages/discounts-page/discounts-error/index.tsx",
+        "functionName": "DiscountsError",
+        "startLine": 7,
+        "endLine": 21,
+        "lines": 15
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
         "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-empty-state/index.tsx",
         "functionName": "AccompanimentTypesEmptyState",
         "startLine": 8,
@@ -34073,23 +34090,6 @@
         "startLine": 8,
         "endLine": 23,
         "lines": 16
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
-        "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-error/index.tsx",
-        "functionName": "AccompanimentTypesError",
-        "startLine": 7,
-        "endLine": 20,
-        "lines": 14
-      },
-      "blockB": {
-        "filePath": "apps/web/src/ui/pdv/widgets/pages/discounts-page/discounts-error/index.tsx",
-        "functionName": "DiscountsError",
-        "startLine": 7,
-        "endLine": 21,
-        "lines": 15
       }
     },
     {
@@ -35438,23 +35438,6 @@
     {
       "similarity": 1,
       "blockA": {
-        "filePath": "apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/index.tsx",
-        "functionName": "getPaymentMethodFilterLabel",
-        "startLine": 184,
-        "endLine": 190,
-        "lines": 7
-      },
-      "blockB": {
-        "filePath": "apps/web/src/ui/pdv/widgets/pages/orders-page/orders-filters/index.tsx",
-        "functionName": "getPaymentMethodFilterIcon",
-        "startLine": 192,
-        "endLine": 198,
-        "lines": 7
-      }
-    },
-    {
-      "similarity": 1,
-      "blockA": {
         "filePath": "apps/web/src/ui/pdv/widgets/pages/sales-channels-page/change-sales-channel-status-dialog/use-change-sales-channel-status-dialog.ts",
         "functionName": "useChangeSalesChannelStatusDialog",
         "startLine": 12,
@@ -35552,6 +35535,23 @@
         "startLine": 7,
         "endLine": 13,
         "lines": 7
+      }
+    },
+    {
+      "similarity": 1,
+      "blockA": {
+        "filePath": "apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/use-payment-method-row.ts",
+        "functionName": "usePaymentMethodRow",
+        "startLine": 7,
+        "endLine": 21,
+        "lines": 15
+      },
+      "blockB": {
+        "filePath": "apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/use-payment-method-cell.ts",
+        "functionName": "usePaymentMethodCell",
+        "startLine": 7,
+        "endLine": 21,
+        "lines": 15
       }
     },
     {
@@ -41346,8 +41346,8 @@
       "blockB": {
         "filePath": "packages/core/src/pdv/use-cases/register-order-use-case.ts",
         "functionName": "validateActor",
-        "startLine": 788,
-        "endLine": 793,
+        "startLine": 789,
+        "endLine": 794,
         "lines": 6
       }
     },
@@ -42393,15 +42393,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findById",
-        "startLine": 224,
-        "endLine": 234,
+        "startLine": 226,
+        "endLine": 236,
         "lines": 11
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findByIdForUpdate",
-        "startLine": 236,
-        "endLine": 250,
+        "startLine": 238,
+        "endLine": 252,
         "lines": 15
       }
     },
@@ -42410,15 +42410,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findByIdForUpdate",
-        "startLine": 236,
-        "endLine": 250,
+        "startLine": 238,
+        "endLine": 252,
         "lines": 15
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findByIdempotencyKey",
-        "startLine": 252,
-        "endLine": 268,
+        "startLine": 254,
+        "endLine": 270,
         "lines": 17
       }
     },
@@ -43233,8 +43233,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -44467,15 +44467,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineAccompaniments",
-        "startLine": 641,
-        "endLine": 649,
+        "startLine": 642,
+        "endLine": 650,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountLines",
-        "startLine": 693,
-        "endLine": 700,
+        "startLine": 694,
+        "endLine": 701,
         "lines": 8
       }
     },
@@ -44484,15 +44484,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineConsumptions",
-        "startLine": 651,
-        "endLine": 659,
+        "startLine": 652,
+        "endLine": 660,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountLines",
-        "startLine": 693,
-        "endLine": 700,
+        "startLine": 694,
+        "endLine": 701,
         "lines": 8
       }
     },
@@ -44501,15 +44501,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineCostComponents",
-        "startLine": 661,
-        "endLine": 669,
+        "startLine": 662,
+        "endLine": 670,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountLines",
-        "startLine": 693,
-        "endLine": 700,
+        "startLine": 694,
+        "endLine": 701,
         "lines": 8
       }
     },
@@ -44518,15 +44518,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountLines",
-        "startLine": 693,
-        "endLine": 700,
+        "startLine": 694,
+        "endLine": 701,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponentAccompaniments",
-        "startLine": 765,
-        "endLine": 775,
+        "startLine": 766,
+        "endLine": 776,
         "lines": 11
       }
     },
@@ -46293,8 +46293,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46361,8 +46361,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       }
     },
@@ -46378,8 +46378,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       }
     },
@@ -46395,8 +46395,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46412,8 +46412,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46429,8 +46429,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46446,8 +46446,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46463,8 +46463,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -46473,15 +46473,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       }
     },
@@ -46490,15 +46490,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -46507,8 +46507,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
@@ -46524,8 +46524,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
@@ -46541,8 +46541,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
@@ -46558,8 +46558,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
@@ -46582,8 +46582,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -47782,15 +47782,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineAccompaniments",
-        "startLine": 641,
-        "endLine": 649,
+        "startLine": 642,
+        "endLine": 650,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponents",
-        "startLine": 752,
-        "endLine": 763,
+        "startLine": 753,
+        "endLine": 764,
         "lines": 12
       }
     },
@@ -47799,15 +47799,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineConsumptions",
-        "startLine": 651,
-        "endLine": 659,
+        "startLine": 652,
+        "endLine": 660,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponents",
-        "startLine": 752,
-        "endLine": 763,
+        "startLine": 753,
+        "endLine": 764,
         "lines": 12
       }
     },
@@ -47816,15 +47816,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLineCostComponents",
-        "startLine": 661,
-        "endLine": 669,
+        "startLine": 662,
+        "endLine": 670,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponents",
-        "startLine": 752,
-        "endLine": 763,
+        "startLine": 753,
+        "endLine": 764,
         "lines": 12
       }
     },
@@ -47833,15 +47833,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderLines",
-        "startLine": 671,
-        "endLine": 677,
+        "startLine": 672,
+        "endLine": 678,
         "lines": 7
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findAggregateRestorations",
-        "startLine": 787,
-        "endLine": 795,
+        "startLine": 788,
+        "endLine": 796,
         "lines": 9
       }
     },
@@ -47850,15 +47850,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponents",
-        "startLine": 752,
-        "endLine": 763,
+        "startLine": 753,
+        "endLine": 764,
         "lines": 12
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponentAccompaniments",
-        "startLine": 765,
-        "endLine": 775,
+        "startLine": 766,
+        "endLine": 776,
         "lines": 11
       }
     },
@@ -47867,15 +47867,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscounts",
-        "startLine": 777,
-        "endLine": 785,
+        "startLine": 778,
+        "endLine": 786,
         "lines": 9
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findAggregateRestorations",
-        "startLine": 787,
-        "endLine": 795,
+        "startLine": 788,
+        "endLine": 796,
         "lines": 9
       }
     },
@@ -52251,35 +52251,18 @@
     {
       "similarity": 0.9,
       "blockA": {
-        "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-empty-state/index.tsx",
-        "functionName": "AccompanimentTypesEmptyState",
-        "startLine": 8,
-        "endLine": 21,
-        "lines": 14
-      },
-      "blockB": {
         "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-error/index.tsx",
         "functionName": "AccompanimentTypesError",
         "startLine": 7,
         "endLine": 20,
         "lines": 14
-      }
-    },
-    {
-      "similarity": 0.9,
-      "blockA": {
+      },
+      "blockB": {
         "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-empty-state/index.tsx",
         "functionName": "AccompanimentTypesEmptyState",
         "startLine": 8,
         "endLine": 21,
         "lines": 14
-      },
-      "blockB": {
-        "filePath": "apps/web/src/ui/pdv/widgets/pages/discounts-page/discounts-error/index.tsx",
-        "functionName": "DiscountsError",
-        "startLine": 7,
-        "endLine": 21,
-        "lines": 15
       }
     },
     {
@@ -52450,6 +52433,23 @@
         "startLine": 8,
         "endLine": 23,
         "lines": 16
+      }
+    },
+    {
+      "similarity": 0.9,
+      "blockA": {
+        "filePath": "apps/web/src/ui/mrp/widgets/pages/accompaniment-types-page/accompaniment-types-empty-state/index.tsx",
+        "functionName": "AccompanimentTypesEmptyState",
+        "startLine": 8,
+        "endLine": 21,
+        "lines": 14
+      },
+      "blockB": {
+        "filePath": "apps/web/src/ui/pdv/widgets/pages/discounts-page/discounts-error/index.tsx",
+        "functionName": "DiscountsError",
+        "startLine": 7,
+        "endLine": 21,
+        "lines": 15
       }
     },
     {
@@ -58832,8 +58832,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -58849,8 +58849,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -58866,8 +58866,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -58883,8 +58883,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -58900,8 +58900,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -58917,8 +58917,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -58934,8 +58934,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -58951,8 +58951,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -58968,8 +58968,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -58985,8 +58985,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -59002,8 +59002,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -59019,8 +59019,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -59036,8 +59036,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -59053,8 +59053,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -59070,8 +59070,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -59859,8 +59859,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       }
     },
@@ -60107,8 +60107,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "isIntegrityConstraintError",
-        "startLine": 709,
-        "endLine": 723,
+        "startLine": 710,
+        "endLine": 724,
         "lines": 15
       },
       "blockB": {
@@ -60148,8 +60148,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toCancellationSnapshot",
-        "startLine": 319,
-        "endLine": 328,
+        "startLine": 325,
+        "endLine": 334,
         "lines": 10
       }
     },
@@ -60158,8 +60158,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAccompaniment",
-        "startLine": 447,
-        "endLine": 457,
+        "startLine": 453,
+        "endLine": 463,
         "lines": 11
       },
       "blockB": {
@@ -61892,15 +61892,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountLines",
-        "startLine": 693,
-        "endLine": 700,
+        "startLine": 694,
+        "endLine": 701,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/repositories/drizzle-orders-repository.ts",
         "functionName": "findOrderDiscountComponents",
-        "startLine": 752,
-        "endLine": 763,
+        "startLine": 753,
+        "endLine": 764,
         "lines": 12
       }
     },
@@ -65751,8 +65751,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
@@ -65768,8 +65768,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       },
       "blockB": {
@@ -68121,8 +68121,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostComponentAmounts",
-        "startLine": 501,
-        "endLine": 512,
+        "startLine": 507,
+        "endLine": 518,
         "lines": 12
       }
     },
@@ -68155,8 +68155,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       }
     },
@@ -68189,8 +68189,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       }
     },
@@ -68410,8 +68410,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       }
     },
@@ -68427,8 +68427,8 @@
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -68488,15 +68488,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       }
     },
@@ -68505,15 +68505,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       }
     },
@@ -68522,8 +68522,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       },
       "blockB": {
@@ -68539,8 +68539,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       },
       "blockB": {
@@ -68556,8 +68556,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toAccompanimentPrices",
-        "startLine": 459,
-        "endLine": 466,
+        "startLine": 465,
+        "endLine": 472,
         "lines": 8
       },
       "blockB": {
@@ -73282,8 +73282,8 @@
       "blockA": {
         "filePath": "apps/web/src/ui/pdv/widgets/pages/new-sale-page/use-new-sale-page.ts",
         "functionName": "toCartLineInput",
-        "startLine": 473,
-        "endLine": 482,
+        "startLine": 475,
+        "endLine": 484,
         "lines": 10
       },
       "blockB": {
@@ -74387,15 +74387,15 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toOrderLine",
-        "startLine": 132,
-        "endLine": 146,
+        "startLine": 138,
+        "endLine": 152,
         "lines": 15
       },
       "blockB": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineProductDetails",
-        "startLine": 148,
-        "endLine": 153,
+        "startLine": 154,
+        "endLine": 159,
         "lines": 6
       }
     },
@@ -74404,8 +74404,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineAmounts",
-        "startLine": 155,
-        "endLine": 170,
+        "startLine": 161,
+        "endLine": 176,
         "lines": 16
       },
       "blockB": {
@@ -74421,8 +74421,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostComponent",
-        "startLine": 468,
-        "endLine": 475,
+        "startLine": 474,
+        "endLine": 481,
         "lines": 8
       },
       "blockB": {
@@ -74438,8 +74438,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationMetadata",
-        "startLine": 558,
-        "endLine": 568,
+        "startLine": 564,
+        "endLine": 574,
         "lines": 11
       },
       "blockB": {
@@ -76308,8 +76308,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountSnapshot",
-        "startLine": 306,
-        "endLine": 317,
+        "startLine": 312,
+        "endLine": 323,
         "lines": 12
       },
       "blockB": {
@@ -79334,8 +79334,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLinePriceAmounts",
-        "startLine": 172,
-        "endLine": 181,
+        "startLine": 178,
+        "endLine": 187,
         "lines": 10
       },
       "blockB": {
@@ -79351,8 +79351,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toLineCostAmounts",
-        "startLine": 183,
-        "endLine": 190,
+        "startLine": 189,
+        "endLine": 196,
         "lines": 8
       },
       "blockB": {
@@ -79368,8 +79368,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toDiscountComponentBase",
-        "startLine": 231,
-        "endLine": 239,
+        "startLine": 237,
+        "endLine": 245,
         "lines": 9
       },
       "blockB": {
@@ -79385,8 +79385,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationStatus",
-        "startLine": 570,
-        "endLine": 580,
+        "startLine": 576,
+        "endLine": 586,
         "lines": 11
       },
       "blockB": {
@@ -79402,8 +79402,8 @@
       "blockA": {
         "filePath": "apps/server/src/pdv/database/drizzle/mappers/drizzle-order-mapper.ts",
         "functionName": "toRestorationProduct",
-        "startLine": 582,
-        "endLine": 592,
+        "startLine": 588,
+        "endLine": 598,
         "lines": 11
       },
       "blockB": {
@@ -84100,8 +84100,8 @@
         },
         {
           "name": "buildSeedOrders",
-          "startLine": 583,
-          "endLine": 773,
+          "startLine": 589,
+          "endLine": 777,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84117,7 +84117,7 @@
             },
             {
               "name": "functionLength",
-              "value": 188,
+              "value": 186,
               "threshold": 70,
               "severity": "error"
             },
@@ -84129,26 +84129,26 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1107.98,
+              "value": 1056.77,
               "threshold": 800,
               "severity": "error"
             }
           ],
-          "maintainabilityIndex": 28.1,
+          "maintainabilityIndex": 28.4,
           "maintainabilityRating": "warn",
           "healthScore": 54,
           "smells": [
             {
               "id": "bloated",
               "label": "Bloated",
-              "reason": "Large function (188 lines) with high vocabulary (Halstead volume 1107.98) but low branching — consider extracting helpers."
+              "reason": "Large function (186 lines) with high vocabulary (Halstead volume 1056.77) but low branching — consider extracting helpers."
             }
           ]
         },
         {
           "name": "findSize",
-          "startLine": 603,
-          "endLine": 614,
+          "startLine": 609,
+          "endLine": 620,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84188,8 +84188,8 @@
         },
         {
           "name": "portionLine",
-          "startLine": 616,
-          "endLine": 649,
+          "startLine": 622,
+          "endLine": 655,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84229,8 +84229,8 @@
         },
         {
           "name": "resaleLine",
-          "startLine": 651,
-          "endLine": 681,
+          "startLine": 657,
+          "endLine": 687,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84270,8 +84270,8 @@
         },
         {
           "name": "channel",
-          "startLine": 684,
-          "endLine": 692,
+          "startLine": 690,
+          "endLine": 698,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84311,8 +84311,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 744,
-          "endLine": 772,
+          "startLine": 748,
+          "endLine": 776,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84352,8 +84352,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 752,
-          "endLine": 771,
+          "startLine": 756,
+          "endLine": 775,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84381,20 +84381,20 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 401.13,
+              "value": 380.29,
               "threshold": 800,
-              "severity": "warn"
+              "severity": "ok"
             }
           ],
-          "maintainabilityIndex": 53.3,
+          "maintainabilityIndex": 53.4,
           "maintainabilityRating": "warn",
           "healthScore": 82,
           "smells": []
         },
         {
           "name": "seedDatabase",
-          "startLine": 775,
-          "endLine": 948,
+          "startLine": 779,
+          "endLine": 952,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84440,8 +84440,8 @@
         },
         {
           "name": "verifySeedUsers",
-          "startLine": 950,
-          "endLine": 963,
+          "startLine": 954,
+          "endLine": 967,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84481,8 +84481,8 @@
         },
         {
           "name": "resetSeedUsers",
-          "startLine": 965,
-          "endLine": 987,
+          "startLine": 969,
+          "endLine": 991,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -84522,9 +84522,9 @@
         }
       ],
       "summary": {
-        "totalLines": 993,
-        "weightedMI": 42.8,
-        "weightedHealthScore": 68.1,
+        "totalLines": 997,
+        "weightedMI": 43.1,
+        "weightedHealthScore": 68.2,
         "worstSeverity": "error",
         "smellIds": [
           "bloated"
@@ -100471,11 +100471,11 @@
         {
           "name": "toDomain",
           "startLine": 28,
-          "endLine": 108,
+          "endLine": 99,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 8,
+              "value": 6,
               "threshold": 15,
               "severity": "ok"
             },
@@ -100487,7 +100487,7 @@
             },
             {
               "name": "functionLength",
-              "value": 70,
+              "value": 61,
               "threshold": 70,
               "severity": "warn"
             },
@@ -100499,20 +100499,67 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 848.91,
+              "value": 695.61,
               "threshold": 800,
-              "severity": "error"
+              "severity": "warn"
             }
           ],
-          "maintainabilityIndex": 38.2,
+          "maintainabilityIndex": 40.3,
           "maintainabilityRating": "warn",
-          "healthScore": 54,
+          "healthScore": 61,
+          "smells": [
+            {
+              "id": "bloated",
+              "label": "Bloated",
+              "reason": "Large function (61 lines) with high vocabulary (Halstead volume 695.61) but low branching — consider extracting helpers."
+            }
+          ]
+        },
+        {
+          "name": "toChannelAndPaymentMethod",
+          "startLine": 101,
+          "endLine": 114,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 14,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 114.22,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 60.2,
+          "maintainabilityRating": "warn",
+          "healthScore": 83,
           "smells": []
         },
         {
           "name": "toCancellation",
-          "startLine": 110,
-          "endLine": 130,
+          "startLine": 116,
+          "endLine": 136,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -100558,11 +100605,12 @@
         }
       ],
       "summary": {
-        "totalLines": 636,
-        "weightedMI": 66.5,
-        "weightedHealthScore": 83.2,
-        "worstSeverity": "error",
+        "totalLines": 642,
+        "weightedMI": 67,
+        "weightedHealthScore": 84.6,
+        "worstSeverity": "warn",
         "smellIds": [
+          "bloated",
           "fragile"
         ]
       }
@@ -101479,8 +101527,8 @@
       "functions": [
         {
           "name": "addWithCreatedAt",
-          "startLine": 70,
-          "endLine": 222,
+          "startLine": 72,
+          "endLine": 224,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101520,8 +101568,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 107,
-          "endLine": 122,
+          "startLine": 109,
+          "endLine": 124,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101561,8 +101609,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 135,
-          "endLine": 148,
+          "startLine": 137,
+          "endLine": 150,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101602,8 +101650,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 156,
-          "endLine": 166,
+          "startLine": 158,
+          "endLine": 168,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101643,8 +101691,8 @@
         },
         {
           "name": "findById",
-          "startLine": 224,
-          "endLine": 234,
+          "startLine": 226,
+          "endLine": 236,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101684,8 +101732,8 @@
         },
         {
           "name": "findByIdForUpdate",
-          "startLine": 236,
-          "endLine": 250,
+          "startLine": 238,
+          "endLine": 252,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101725,8 +101773,8 @@
         },
         {
           "name": "findByIdempotencyKey",
-          "startLine": 252,
-          "endLine": 268,
+          "startLine": 254,
+          "endLine": 270,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101766,49 +101814,49 @@
         },
         {
           "name": "findMany",
-          "startLine": 270,
-          "endLine": 313,
+          "startLine": 280,
+          "endLine": 314,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 10,
+              "value": 8,
               "threshold": 15,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "cognitiveComplexity",
-              "value": 7,
+              "value": 8,
               "threshold": 25,
               "severity": "ok"
             },
             {
               "name": "functionLength",
-              "value": 44,
+              "value": 35,
               "threshold": 70,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "nestingDepth",
-              "value": 1,
+              "value": 2,
               "threshold": 4,
               "severity": "ok"
             },
             {
               "name": "halsteadVolume",
-              "value": 1482.68,
+              "value": 1300.06,
               "threshold": 800,
               "severity": "error"
             }
           ],
-          "maintainabilityIndex": 40.6,
+          "maintainabilityIndex": 43.4,
           "maintainabilityRating": "warn",
-          "healthScore": 48,
+          "healthScore": 50,
           "smells": []
         },
         {
           "name": "findActivityBatch",
-          "startLine": 315,
-          "endLine": 370,
+          "startLine": 316,
+          "endLine": 371,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101854,8 +101902,8 @@
         },
         {
           "name": "cancel",
-          "startLine": 372,
-          "endLine": 412,
+          "startLine": 373,
+          "endLine": 413,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101901,8 +101949,8 @@
         },
         {
           "name": "removeAll",
-          "startLine": 414,
-          "endLine": 424,
+          "startLine": 415,
+          "endLine": 425,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101942,8 +101990,8 @@
         },
         {
           "name": "findReservedSequenceNumber",
-          "startLine": 426,
-          "endLine": 435,
+          "startLine": 427,
+          "endLine": 436,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -101983,8 +102031,8 @@
         },
         {
           "name": "toLineRow",
-          "startLine": 437,
-          "endLine": 457,
+          "startLine": 438,
+          "endLine": 458,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102024,8 +102072,8 @@
         },
         {
           "name": "toDiscountRows",
-          "startLine": 459,
-          "endLine": 537,
+          "startLine": 460,
+          "endLine": 538,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102065,8 +102113,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 472,
-          "endLine": 502,
+          "startLine": 473,
+          "endLine": 503,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102117,8 +102165,8 @@
         },
         {
           "name": "matchesComponent",
-          "startLine": 539,
-          "endLine": 551,
+          "startLine": 540,
+          "endLine": 552,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102158,8 +102206,8 @@
         },
         {
           "name": "toDomain",
-          "startLine": 553,
-          "endLine": 573,
+          "startLine": 554,
+          "endLine": 574,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102199,8 +102247,8 @@
         },
         {
           "name": "searchFilter",
-          "startLine": 575,
-          "endLine": 590,
+          "startLine": 576,
+          "endLine": 591,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102240,8 +102288,8 @@
         },
         {
           "name": "isIntegrityConstraintError",
-          "startLine": 709,
-          "endLine": 723,
+          "startLine": 710,
+          "endLine": 724,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -102287,9 +102335,9 @@
         }
       ],
       "summary": {
-        "totalLines": 941,
-        "weightedMI": 56.9,
-        "weightedHealthScore": 69.7,
+        "totalLines": 942,
+        "weightedMI": 57.2,
+        "weightedHealthScore": 70,
         "worstSeverity": "error",
         "smellIds": [
           "bloated",
@@ -103555,6 +103603,592 @@
         "weightedHealthScore": 59.8,
         "worstSeverity": "warn",
         "smellIds": [
+          "fragile"
+        ]
+      }
+    },
+    {
+      "filePath": "apps/web/src/provision/telemetry/sentry-telemetry-provider.ts",
+      "functions": [
+        {
+          "name": "SentryTelemetryProvider",
+          "startLine": 57,
+          "endLine": 93,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 1,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 34,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 31.7,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 55.9,
+          "maintainabilityRating": "warn",
+          "healthScore": 82,
+          "smells": []
+        },
+        {
+          "name": "createWebTelemetryConfiguration",
+          "startLine": 106,
+          "endLine": 126,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 8,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 4,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 19,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 239.72,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 54.4,
+          "maintainabilityRating": "warn",
+          "healthScore": 66,
+          "smells": [
+            {
+              "id": "fragile",
+              "label": "Fragile",
+              "reason": "High cyclomatic complexity (8) with low MI (54.4) — many branches and hard to maintain safely."
+            }
+          ]
+        },
+        {
+          "name": "getSafeWebErrorClass",
+          "startLine": 128,
+          "endLine": 145,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 9,
+              "threshold": 15,
+              "severity": "warn"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 8,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 18,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 179.31,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 55.6,
+          "maintainabilityRating": "warn",
+          "healthScore": 61,
+          "smells": [
+            {
+              "id": "fragile",
+              "label": "Fragile",
+              "reason": "High cyclomatic complexity (9) with low MI (55.6) — many branches and hard to maintain safely."
+            }
+          ]
+        },
+        {
+          "name": "captureSafeLog",
+          "startLine": 147,
+          "endLine": 168,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 15,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 2,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 31.7,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 63.4,
+          "maintainabilityRating": "warn",
+          "healthScore": 77,
+          "smells": []
+        },
+        {
+          "name": "captureWebRequestDuration",
+          "startLine": 170,
+          "endLine": 193,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 17,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 2,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 131.18,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 57.9,
+          "maintainabilityRating": "warn",
+          "healthScore": 75,
+          "smells": []
+        },
+        {
+          "name": "captureWebNavigationDuration",
+          "startLine": 195,
+          "endLine": 215,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 4,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 15,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 2,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 128.38,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 59,
+          "maintainabilityRating": "warn",
+          "healthScore": 74,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 235,
+        "weightedMI": 63.8,
+        "weightedHealthScore": 78.6,
+        "worstSeverity": "warn",
+        "smellIds": [
+          "fragile"
+        ]
+      }
+    },
+    {
+      "filePath": "apps/web/src/provision/telemetry/sentry.config.ts",
+      "functions": [
+        {
+          "name": "SentryBrowser",
+          "startLine": 20,
+          "endLine": 66,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 4,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 42,
+              "threshold": 70,
+              "severity": "warn"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 2,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 61.9,
+          "maintainabilityRating": "warn",
+          "healthScore": 77,
+          "smells": []
+        },
+        {
+          "name": "initializeBrowserSentry",
+          "startLine": 27,
+          "endLine": 64,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 4,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 38,
+              "threshold": 70,
+              "severity": "warn"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 310.2,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 47.6,
+          "maintainabilityRating": "warn",
+          "healthScore": 68,
+          "smells": []
+        },
+        {
+          "name": "scrubBrowserEvent",
+          "startLine": 72,
+          "endLine": 115,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 5,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 44,
+              "threshold": 70,
+              "severity": "warn"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 656.39,
+              "threshold": 800,
+              "severity": "warn"
+            }
+          ],
+          "maintainabilityIndex": 43.8,
+          "maintainabilityRating": "warn",
+          "healthScore": 62,
+          "smells": [
+            {
+              "id": "bloated",
+              "label": "Bloated",
+              "reason": "Large function (44 lines) with high vocabulary (Halstead volume 656.39) but low branching — consider extracting helpers."
+            }
+          ]
+        },
+        {
+          "name": "scrubBrowserSpan",
+          "startLine": 117,
+          "endLine": 140,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 4,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 22,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 340.86,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 52.4,
+          "maintainabilityRating": "warn",
+          "healthScore": 72,
+          "smells": []
+        },
+        {
+          "name": "getSafeRouteTemplate",
+          "startLine": 142,
+          "endLine": 153,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 5,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 4,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 12,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 167.37,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 60.2,
+          "maintainabilityRating": "warn",
+          "healthScore": 74,
+          "smells": []
+        },
+        {
+          "name": "getSafeErrorClass",
+          "startLine": 165,
+          "endLine": 181,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 10,
+              "threshold": 15,
+              "severity": "warn"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 9,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 17,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 152.29,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 56.5,
+          "maintainabilityRating": "warn",
+          "healthScore": 59,
+          "smells": [
+            {
+              "id": "fragile",
+              "label": "Fragile",
+              "reason": "High cyclomatic complexity (10) with low MI (56.5) — many branches and hard to maintain safely."
+            }
+          ]
+        },
+        {
+          "name": "getSafeTraceContext",
+          "startLine": 192,
+          "endLine": 205,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 2,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 14,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 138.97,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 59.6,
+          "maintainabilityRating": "warn",
+          "healthScore": 79,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 220,
+        "weightedMI": 59.9,
+        "weightedHealthScore": 75,
+        "worstSeverity": "warn",
+        "smellIds": [
+          "bloated",
           "fragile"
         ]
       }
@@ -105723,12 +106357,12 @@
         },
         {
           "name": "PdvService",
-          "startLine": 229,
-          "endLine": 451,
+          "startLine": 237,
+          "endLine": 457,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 25,
+              "value": 21,
               "threshold": 15,
               "severity": "error"
             },
@@ -105757,31 +106391,31 @@
               "severity": "ok"
             }
           ],
-          "maintainabilityIndex": 82.9,
+          "maintainabilityIndex": 83.4,
           "maintainabilityRating": "ok",
           "healthScore": 71,
           "smells": []
         },
         {
           "name": "listOrders",
-          "startLine": 230,
-          "endLine": 252,
+          "startLine": 238,
+          "endLine": 258,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 10,
+              "value": 6,
               "threshold": 15,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "cognitiveComplexity",
-              "value": 9,
+              "value": 5,
               "threshold": 25,
               "severity": "ok"
             },
             {
               "name": "functionLength",
-              "value": 23,
+              "value": 21,
               "threshold": 70,
               "severity": "ok"
             },
@@ -105793,26 +106427,20 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 768.86,
+              "value": 657.86,
               "threshold": 800,
               "severity": "warn"
             }
           ],
-          "maintainabilityIndex": 48.7,
+          "maintainabilityIndex": 50.6,
           "maintainabilityRating": "warn",
-          "healthScore": 52,
-          "smells": [
-            {
-              "id": "fragile",
-              "label": "Fragile",
-              "reason": "High cyclomatic complexity (10) with low MI (48.7) — many branches and hard to maintain safely."
-            }
-          ]
+          "healthScore": 64,
+          "smells": []
         },
         {
           "name": "listOrderCatalog",
-          "startLine": 264,
-          "endLine": 284,
+          "startLine": 270,
+          "endLine": 290,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -105852,8 +106480,8 @@
         },
         {
           "name": "listCombos",
-          "startLine": 296,
-          "endLine": 315,
+          "startLine": 302,
+          "endLine": 321,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -105893,8 +106521,8 @@
         },
         {
           "name": "getCombo",
-          "startLine": 317,
-          "endLine": 326,
+          "startLine": 323,
+          "endLine": 332,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -105934,8 +106562,8 @@
         },
         {
           "name": "listComboProducts",
-          "startLine": 328,
-          "endLine": 350,
+          "startLine": 334,
+          "endLine": 356,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -105975,8 +106603,8 @@
         },
         {
           "name": "createCombo",
-          "startLine": 352,
-          "endLine": 361,
+          "startLine": 358,
+          "endLine": 367,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -106016,8 +106644,8 @@
         },
         {
           "name": "updateCombo",
-          "startLine": 363,
-          "endLine": 375,
+          "startLine": 369,
+          "endLine": 381,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -106057,8 +106685,8 @@
         },
         {
           "name": "inactivateCombo",
-          "startLine": 377,
-          "endLine": 389,
+          "startLine": 383,
+          "endLine": 395,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -106098,8 +106726,8 @@
         },
         {
           "name": "reactivateCombo",
-          "startLine": 391,
-          "endLine": 403,
+          "startLine": 397,
+          "endLine": 409,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -106139,599 +106767,11 @@
         }
       ],
       "summary": {
-        "totalLines": 452,
-        "weightedMI": 70.2,
-        "weightedHealthScore": 76.3,
+        "totalLines": 458,
+        "weightedMI": 70.5,
+        "weightedHealthScore": 76.9,
         "worstSeverity": "error",
-        "smellIds": [
-          "fragile"
-        ]
-      }
-    },
-    {
-      "filePath": "apps/web/src/provision/telemetry/sentry-telemetry-provider.ts",
-      "functions": [
-        {
-          "name": "SentryTelemetryProvider",
-          "startLine": 57,
-          "endLine": 93,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 1,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 0,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 34,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 0,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 31.7,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 55.9,
-          "maintainabilityRating": "warn",
-          "healthScore": 82,
-          "smells": []
-        },
-        {
-          "name": "createWebTelemetryConfiguration",
-          "startLine": 106,
-          "endLine": 126,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 8,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 4,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 19,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 239.72,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 54.4,
-          "maintainabilityRating": "warn",
-          "healthScore": 66,
-          "smells": [
-            {
-              "id": "fragile",
-              "label": "Fragile",
-              "reason": "High cyclomatic complexity (8) with low MI (54.4) — many branches and hard to maintain safely."
-            }
-          ]
-        },
-        {
-          "name": "getSafeWebErrorClass",
-          "startLine": 128,
-          "endLine": 145,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 9,
-              "threshold": 15,
-              "severity": "warn"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 8,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 18,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 179.31,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 55.6,
-          "maintainabilityRating": "warn",
-          "healthScore": 61,
-          "smells": [
-            {
-              "id": "fragile",
-              "label": "Fragile",
-              "reason": "High cyclomatic complexity (9) with low MI (55.6) — many branches and hard to maintain safely."
-            }
-          ]
-        },
-        {
-          "name": "captureSafeLog",
-          "startLine": 147,
-          "endLine": 168,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 3,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 15,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 2,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 31.7,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 63.4,
-          "maintainabilityRating": "warn",
-          "healthScore": 77,
-          "smells": []
-        },
-        {
-          "name": "captureWebRequestDuration",
-          "startLine": 170,
-          "endLine": 193,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 3,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 17,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 2,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 131.18,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 57.9,
-          "maintainabilityRating": "warn",
-          "healthScore": 75,
-          "smells": []
-        },
-        {
-          "name": "captureWebNavigationDuration",
-          "startLine": 195,
-          "endLine": 215,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 4,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 15,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 2,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 128.38,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 59,
-          "maintainabilityRating": "warn",
-          "healthScore": 74,
-          "smells": []
-        }
-      ],
-      "summary": {
-        "totalLines": 235,
-        "weightedMI": 63.8,
-        "weightedHealthScore": 78.6,
-        "worstSeverity": "warn",
-        "smellIds": [
-          "fragile"
-        ]
-      }
-    },
-    {
-      "filePath": "apps/web/src/provision/telemetry/sentry.config.ts",
-      "functions": [
-        {
-          "name": "SentryBrowser",
-          "startLine": 20,
-          "endLine": 66,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 4,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 0,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 42,
-              "threshold": 70,
-              "severity": "warn"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 0,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 2,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 61.9,
-          "maintainabilityRating": "warn",
-          "healthScore": 77,
-          "smells": []
-        },
-        {
-          "name": "initializeBrowserSentry",
-          "startLine": 27,
-          "endLine": 64,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 4,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 38,
-              "threshold": 70,
-              "severity": "warn"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 310.2,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 47.6,
-          "maintainabilityRating": "warn",
-          "healthScore": 68,
-          "smells": []
-        },
-        {
-          "name": "scrubBrowserEvent",
-          "startLine": 72,
-          "endLine": 115,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 5,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 44,
-              "threshold": 70,
-              "severity": "warn"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 656.39,
-              "threshold": 800,
-              "severity": "warn"
-            }
-          ],
-          "maintainabilityIndex": 43.8,
-          "maintainabilityRating": "warn",
-          "healthScore": 62,
-          "smells": [
-            {
-              "id": "bloated",
-              "label": "Bloated",
-              "reason": "Large function (44 lines) with high vocabulary (Halstead volume 656.39) but low branching — consider extracting helpers."
-            }
-          ]
-        },
-        {
-          "name": "scrubBrowserSpan",
-          "startLine": 117,
-          "endLine": 140,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 4,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 22,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 340.86,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 52.4,
-          "maintainabilityRating": "warn",
-          "healthScore": 72,
-          "smells": []
-        },
-        {
-          "name": "getSafeRouteTemplate",
-          "startLine": 142,
-          "endLine": 153,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 5,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 4,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 12,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 167.37,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 60.2,
-          "maintainabilityRating": "warn",
-          "healthScore": 74,
-          "smells": []
-        },
-        {
-          "name": "getSafeErrorClass",
-          "startLine": 165,
-          "endLine": 181,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 10,
-              "threshold": 15,
-              "severity": "warn"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 9,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 17,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 152.29,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 56.5,
-          "maintainabilityRating": "warn",
-          "healthScore": 59,
-          "smells": [
-            {
-              "id": "fragile",
-              "label": "Fragile",
-              "reason": "High cyclomatic complexity (10) with low MI (56.5) — many branches and hard to maintain safely."
-            }
-          ]
-        },
-        {
-          "name": "getSafeTraceContext",
-          "startLine": 192,
-          "endLine": 205,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 3,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 2,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 14,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 138.97,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 59.6,
-          "maintainabilityRating": "warn",
-          "healthScore": 79,
-          "smells": []
-        }
-      ],
-      "summary": {
-        "totalLines": 220,
-        "weightedMI": 59.9,
-        "weightedHealthScore": 75,
-        "worstSeverity": "warn",
-        "smellIds": [
-          "bloated",
-          "fragile"
-        ]
+        "smellIds": []
       }
     },
     {
@@ -123879,7 +123919,7 @@
         {
           "name": "NewSalePage",
           "startLine": 23,
-          "endLine": 338,
+          "endLine": 335,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -123895,7 +123935,7 @@
             },
             {
               "name": "functionLength",
-              "value": 316,
+              "value": 313,
               "threshold": 70,
               "severity": "error"
             },
@@ -123907,21 +123947,21 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1854.58,
+              "value": 1824.03,
               "threshold": 800,
               "severity": "error"
             }
           ],
-          "maintainabilityIndex": 19.9,
-          "maintainabilityRating": "error",
+          "maintainabilityIndex": 20,
+          "maintainabilityRating": "warn",
           "healthScore": 34,
           "smells": []
         }
       ],
       "summary": {
-        "totalLines": 339,
-        "weightedMI": 30.6,
-        "weightedHealthScore": 43.4,
+        "totalLines": 336,
+        "weightedMI": 30.8,
+        "weightedHealthScore": 43.5,
         "worstSeverity": "error",
         "smellIds": []
       }
@@ -124367,7 +124407,7 @@
         {
           "name": "useNewSalePage",
           "startLine": 24,
-          "endLine": 467,
+          "endLine": 469,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -124383,7 +124423,7 @@
             },
             {
               "name": "functionLength",
-              "value": 444,
+              "value": 446,
               "threshold": 70,
               "severity": "error"
             },
@@ -124395,7 +124435,7 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1657.89,
+              "value": 1685,
               "threshold": 800,
               "severity": "error"
             }
@@ -124828,8 +124868,8 @@
         },
         {
           "name": "toCartLineInput",
-          "startLine": 473,
-          "endLine": 482,
+          "startLine": 475,
+          "endLine": 484,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -124869,8 +124909,8 @@
         },
         {
           "name": "toPreviewLines",
-          "startLine": 484,
-          "endLine": 501,
+          "startLine": 486,
+          "endLine": 503,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -124910,9 +124950,9 @@
         }
       ],
       "summary": {
-        "totalLines": 526,
+        "totalLines": 528,
         "weightedMI": 36.8,
-        "weightedHealthScore": 53.2,
+        "weightedHealthScore": 53.1,
         "worstSeverity": "error",
         "smellIds": [
           "god-function",
@@ -136391,7 +136431,7 @@
         {
           "name": "NewSaleCart",
           "startLine": 34,
-          "endLine": 364,
+          "endLine": 365,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -136407,7 +136447,7 @@
             },
             {
               "name": "functionLength",
-              "value": 331,
+              "value": 332,
               "threshold": 70,
               "severity": "error"
             },
@@ -136419,7 +136459,7 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1824.19,
+              "value": 1817.4,
               "threshold": 800,
               "severity": "error"
             }
@@ -136431,8 +136471,8 @@
         },
         {
           "name": "<anonymous>",
-          "startLine": 131,
-          "endLine": 253,
+          "startLine": 132,
+          "endLine": 254,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -136478,9 +136518,9 @@
         }
       ],
       "summary": {
-        "totalLines": 365,
+        "totalLines": 366,
         "weightedMI": 24.8,
-        "weightedHealthScore": 36.3,
+        "weightedHealthScore": 36.2,
         "worstSeverity": "error",
         "smellIds": [
           "incomprehensible"
@@ -137882,14 +137922,14 @@
       "functions": [
         {
           "name": "OrderSummary",
-          "startLine": 19,
-          "endLine": 164,
+          "startLine": 20,
+          "endLine": 145,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 10,
+              "value": 8,
               "threshold": 15,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "cognitiveComplexity",
@@ -137899,7 +137939,7 @@
             },
             {
               "name": "functionLength",
-              "value": 146,
+              "value": 126,
               "threshold": 70,
               "severity": "error"
             },
@@ -137911,21 +137951,21 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1124.26,
+              "value": 960.71,
               "threshold": 800,
               "severity": "error"
             }
           ],
-          "maintainabilityIndex": 30.1,
+          "maintainabilityIndex": 32.2,
           "maintainabilityRating": "warn",
-          "healthScore": 49,
+          "healthScore": 53,
           "smells": []
         }
       ],
       "summary": {
-        "totalLines": 165,
-        "weightedMI": 30.5,
-        "weightedHealthScore": 49.3,
+        "totalLines": 146,
+        "weightedMI": 32.7,
+        "weightedHealthScore": 53.3,
         "worstSeverity": "error",
         "smellIds": []
       }
@@ -137996,8 +138036,8 @@
       "functions": [
         {
           "name": "OrdersFilters",
-          "startLine": 29,
-          "endLine": 182,
+          "startLine": 28,
+          "endLine": 183,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -138013,7 +138053,7 @@
             },
             {
               "name": "functionLength",
-              "value": 154,
+              "value": 156,
               "threshold": 70,
               "severity": "error"
             },
@@ -138025,7 +138065,7 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 1270.71,
+              "value": 1245.42,
               "threshold": 800,
               "severity": "error"
             }
@@ -138037,9 +138077,9 @@
         }
       ],
       "summary": {
-        "totalLines": 199,
-        "weightedMI": 36.6,
-        "weightedHealthScore": 44.2,
+        "totalLines": 184,
+        "weightedMI": 33.7,
+        "weightedHealthScore": 40.9,
         "worstSeverity": "error",
         "smellIds": []
       }
@@ -138049,8 +138089,8 @@
       "functions": [
         {
           "name": "useOrdersFilters",
-          "startLine": 15,
-          "endLine": 106,
+          "startLine": 21,
+          "endLine": 117,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -138066,7 +138106,7 @@
             },
             {
               "name": "functionLength",
-              "value": 92,
+              "value": 97,
               "threshold": 70,
               "severity": "error"
             },
@@ -138078,20 +138118,20 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 132.83,
+              "value": 216.1,
               "threshold": 800,
               "severity": "ok"
             }
           ],
-          "maintainabilityIndex": 39.9,
+          "maintainabilityIndex": 37.9,
           "maintainabilityRating": "warn",
-          "healthScore": 47,
+          "healthScore": 46,
           "smells": []
         },
         {
           "name": "handlePeriodChange",
-          "startLine": 58,
-          "endLine": 84,
+          "startLine": 64,
+          "endLine": 90,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -138131,9 +138171,9 @@
         }
       ],
       "summary": {
-        "totalLines": 124,
-        "weightedMI": 51.7,
-        "weightedHealthScore": 62.8,
+        "totalLines": 149,
+        "weightedMI": 51.6,
+        "weightedHealthScore": 63.1,
         "worstSeverity": "error",
         "smellIds": []
       }
@@ -138263,53 +138303,12 @@
           "maintainabilityRating": "ok",
           "healthScore": 86,
           "smells": []
-        },
-        {
-          "name": "PaymentMethodCell",
-          "startLine": 169,
-          "endLine": 189,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 3,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 0,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 21,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 0,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 62.27,
-              "threshold": 800,
-              "severity": "ok"
-            }
-          ],
-          "maintainabilityIndex": 58.2,
-          "maintainabilityRating": "warn",
-          "healthScore": 82,
-          "smells": []
         }
       ],
       "summary": {
-        "totalLines": 190,
-        "weightedMI": 55.1,
-        "weightedHealthScore": 71.3,
+        "totalLines": 166,
+        "weightedMI": 54.9,
+        "weightedHealthScore": 70.3,
         "worstSeverity": "error",
         "smellIds": []
       }
@@ -141681,8 +141680,61 @@
       "functions": [
         {
           "name": "OrderRegistrationSummary",
-          "startLine": 20,
-          "endLine": 76,
+          "startLine": 14,
+          "endLine": 62,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 2,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 49,
+              "threshold": 70,
+              "severity": "warn"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 284.6,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 45.7,
+          "maintainabilityRating": "warn",
+          "healthScore": 74,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 63,
+        "weightedMI": 51.7,
+        "weightedHealthScore": 76.9,
+        "worstSeverity": "warn",
+        "smellIds": []
+      }
+    },
+    {
+      "filePath": "apps/web/src/ui/pdv/widgets/pages/new-sale-page/order-registration-dialog/order-registration-summary/use-order-registration-summary.ts",
+      "functions": [
+        {
+          "name": "useOrderRegistrationSummary",
+          "startLine": 15,
+          "endLine": 42,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -141698,9 +141750,9 @@
             },
             {
               "name": "functionLength",
-              "value": 52,
+              "value": 23,
               "threshold": 70,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "nestingDepth",
@@ -141710,31 +141762,182 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 530.52,
+              "value": 230.75,
               "threshold": 800,
-              "severity": "warn"
+              "severity": "ok"
             }
           ],
-          "maintainabilityIndex": 42.7,
+          "maintainabilityIndex": 52.9,
           "maintainabilityRating": "warn",
-          "healthScore": 64,
-          "smells": [
-            {
-              "id": "bloated",
-              "label": "Bloated",
-              "reason": "Large function (52 lines) with high vocabulary (Halstead volume 530.52) but low branching — consider extracting helpers."
-            }
-          ]
+          "healthScore": 74,
+          "smells": []
         }
       ],
       "summary": {
-        "totalLines": 77,
-        "weightedMI": 49,
-        "weightedHealthScore": 68.2,
+        "totalLines": 43,
+        "weightedMI": 56.7,
+        "weightedHealthScore": 76,
         "worstSeverity": "warn",
-        "smellIds": [
-          "bloated"
-        ]
+        "smellIds": []
+      }
+    },
+    {
+      "filePath": "apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/index.tsx",
+      "functions": [
+        {
+          "name": "PaymentMethodRow",
+          "startLine": 7,
+          "endLine": 19,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 1,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 13,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 53.89,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 63.4,
+          "maintainabilityRating": "warn",
+          "healthScore": 88,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 20,
+        "weightedMI": 63.4,
+        "weightedHealthScore": 88,
+        "worstSeverity": "warn",
+        "smellIds": []
+      }
+    },
+    {
+      "filePath": "apps/web/src/ui/pdv/widgets/pages/order-details-page/order-summary/payment-method-row/use-payment-method-row.ts",
+      "functions": [
+        {
+          "name": "usePaymentMethodRow",
+          "startLine": 7,
+          "endLine": 21,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 15,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 101.58,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 59.9,
+          "maintainabilityRating": "warn",
+          "healthScore": 83,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 22,
+        "weightedMI": 59.9,
+        "weightedHealthScore": 83,
+        "worstSeverity": "warn",
+        "smellIds": []
+      }
+    },
+    {
+      "filePath": "apps/web/src/ui/pdv/widgets/pages/orders-page/orders-list/payment-method-cell/use-payment-method-cell.ts",
+      "functions": [
+        {
+          "name": "usePaymentMethodCell",
+          "startLine": 7,
+          "endLine": 21,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 3,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 0,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 15,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 0,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 101.58,
+              "threshold": 800,
+              "severity": "ok"
+            }
+          ],
+          "maintainabilityIndex": 59.9,
+          "maintainabilityRating": "warn",
+          "healthScore": 83,
+          "smells": []
+        }
+      ],
+      "summary": {
+        "totalLines": 22,
+        "weightedMI": 59.9,
+        "weightedHealthScore": 83,
+        "worstSeverity": "warn",
+        "smellIds": []
       }
     },
     {
@@ -161825,12 +162028,12 @@
         },
         {
           "name": "toOrderCreate",
-          "startLine": 659,
-          "endLine": 708,
+          "startLine": 666,
+          "endLine": 709,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
-              "value": 5,
+              "value": 4,
               "threshold": 15,
               "severity": "ok"
             },
@@ -161842,9 +162045,9 @@
             },
             {
               "name": "functionLength",
-              "value": 41,
+              "value": 35,
               "threshold": 70,
-              "severity": "warn"
+              "severity": "ok"
             },
             {
               "name": "nestingDepth",
@@ -161854,26 +162057,20 @@
             },
             {
               "name": "halsteadVolume",
-              "value": 406.24,
+              "value": 336.51,
               "threshold": 800,
-              "severity": "warn"
+              "severity": "ok"
             }
           ],
-          "maintainabilityIndex": 45.9,
+          "maintainabilityIndex": 48.1,
           "maintainabilityRating": "warn",
-          "healthScore": 70,
-          "smells": [
-            {
-              "id": "bloated",
-              "label": "Bloated",
-              "reason": "Large function (41 lines) with high vocabulary (Halstead volume 406.24) but low branching — consider extracting helpers."
-            }
-          ]
+          "healthScore": 73,
+          "smells": []
         },
         {
           "name": "toOrderLine",
-          "startLine": 710,
-          "endLine": 772,
+          "startLine": 711,
+          "endLine": 773,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -161913,8 +162110,8 @@
         },
         {
           "name": "validateRegistrationInput",
-          "startLine": 778,
-          "endLine": 786,
+          "startLine": 779,
+          "endLine": 787,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -161954,8 +162151,8 @@
         },
         {
           "name": "allocateNetSalesCents",
-          "startLine": 796,
-          "endLine": 814,
+          "startLine": 797,
+          "endLine": 815,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -161995,8 +162192,8 @@
         },
         {
           "name": "consolidateConsumptions",
-          "startLine": 816,
-          "endLine": 826,
+          "startLine": 817,
+          "endLine": 827,
           "metrics": [
             {
               "name": "cyclomaticComplexity",
@@ -162036,9 +162233,9 @@
         }
       ],
       "summary": {
-        "totalLines": 827,
-        "weightedMI": 59.4,
-        "weightedHealthScore": 74.8,
+        "totalLines": 828,
+        "weightedMI": 59.7,
+        "weightedHealthScore": 75.1,
         "worstSeverity": "warn",
         "smellIds": [
           "fragile",
@@ -165567,6 +165764,67 @@
       }
     },
     {
+      "filePath": "packages/validation/src/communication/notification-list-query-schema.ts",
+      "functions": [
+        {
+          "name": "<anonymous>",
+          "startLine": 16,
+          "endLine": 41,
+          "metrics": [
+            {
+              "name": "cyclomaticComplexity",
+              "value": 8,
+              "threshold": 15,
+              "severity": "ok"
+            },
+            {
+              "name": "cognitiveComplexity",
+              "value": 5,
+              "threshold": 25,
+              "severity": "ok"
+            },
+            {
+              "name": "functionLength",
+              "value": 26,
+              "threshold": 70,
+              "severity": "ok"
+            },
+            {
+              "name": "nestingDepth",
+              "value": 1,
+              "threshold": 4,
+              "severity": "ok"
+            },
+            {
+              "name": "halsteadVolume",
+              "value": 418.43,
+              "threshold": 800,
+              "severity": "warn"
+            }
+          ],
+          "maintainabilityIndex": 49.7,
+          "maintainabilityRating": "warn",
+          "healthScore": 61,
+          "smells": [
+            {
+              "id": "fragile",
+              "label": "Fragile",
+              "reason": "High cyclomatic complexity (8) with low MI (49.7) — many branches and hard to maintain safely."
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "totalLines": 44,
+        "weightedMI": 51.4,
+        "weightedHealthScore": 62.3,
+        "worstSeverity": "warn",
+        "smellIds": [
+          "fragile"
+        ]
+      }
+    },
+    {
       "filePath": "packages/validation/src/environment/browser-env-schema.ts",
       "functions": [
         {
@@ -165711,67 +165969,6 @@
         "weightedHealthScore": 83.4,
         "worstSeverity": "warn",
         "smellIds": []
-      }
-    },
-    {
-      "filePath": "packages/validation/src/communication/notification-list-query-schema.ts",
-      "functions": [
-        {
-          "name": "<anonymous>",
-          "startLine": 16,
-          "endLine": 41,
-          "metrics": [
-            {
-              "name": "cyclomaticComplexity",
-              "value": 8,
-              "threshold": 15,
-              "severity": "ok"
-            },
-            {
-              "name": "cognitiveComplexity",
-              "value": 5,
-              "threshold": 25,
-              "severity": "ok"
-            },
-            {
-              "name": "functionLength",
-              "value": 26,
-              "threshold": 70,
-              "severity": "ok"
-            },
-            {
-              "name": "nestingDepth",
-              "value": 1,
-              "threshold": 4,
-              "severity": "ok"
-            },
-            {
-              "name": "halsteadVolume",
-              "value": 418.43,
-              "threshold": 800,
-              "severity": "warn"
-            }
-          ],
-          "maintainabilityIndex": 49.7,
-          "maintainabilityRating": "warn",
-          "healthScore": 61,
-          "smells": [
-            {
-              "id": "fragile",
-              "label": "Fragile",
-              "reason": "High cyclomatic complexity (8) with low MI (49.7) — many branches and hard to maintain safely."
-            }
-          ]
-        }
-      ],
-      "summary": {
-        "totalLines": 44,
-        "weightedMI": 51.4,
-        "weightedHealthScore": 62.3,
-        "worstSeverity": "warn",
-        "smellIds": [
-          "fragile"
-        ]
       }
     },
     {

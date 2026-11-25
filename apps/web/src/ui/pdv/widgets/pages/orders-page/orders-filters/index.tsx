@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from '@/ui/shadcn/select'
 import { Icon } from '@/ui/shared/widgets/components/icon'
-import type { IconName } from '@/ui/shared/widgets/components/icon/types'
 
 import {
   type OrdersFiltersProps,
@@ -34,6 +33,8 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
     handlePeriodChange,
     handleStatusChange,
     handleToChange,
+    paymentMethodFilterIcon,
+    paymentMethodFilterLabel,
     searchValue,
     setSearchValue,
   } = useOrdersFilters(props)
@@ -92,9 +93,9 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
         >
           <Icon
             className='size-4 shrink-0 text-muted-foreground'
-            name={getPaymentMethodFilterIcon(search.paymentMethod)}
+            name={paymentMethodFilterIcon}
           />
-          <SelectValue>{getPaymentMethodFilterLabel(search.paymentMethod)}</SelectValue>
+          <SelectValue>{paymentMethodFilterLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='all'>Todas as formas de pagamento</SelectItem>
@@ -179,20 +180,4 @@ export const OrdersFilters = (props: OrdersFiltersProps) => {
       ) : null}
     </div>
   )
-}
-
-function getPaymentMethodFilterLabel(
-  paymentMethod: OrdersFiltersProps['search']['paymentMethod'],
-) {
-  if (paymentMethod === undefined) return 'Todas as formas de pagamento'
-  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.label
-  return PAYMENT_METHOD_PRESENTATION[paymentMethod].label
-}
-
-function getPaymentMethodFilterIcon(
-  paymentMethod: OrdersFiltersProps['search']['paymentMethod'],
-): IconName {
-  if (paymentMethod === undefined) return 'wallet'
-  if (paymentMethod === 'none') return PAYMENT_METHOD_NOT_INFORMED_PRESENTATION.icon
-  return PAYMENT_METHOD_PRESENTATION[paymentMethod].icon
 }

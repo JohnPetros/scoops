@@ -90,8 +90,10 @@ describe('OrderRegistrationDialog', () => {
     expect(
       within(dialog).getByText(
         'A venda é registrada e o estoque é baixado. Não há reembolso nem estorno; só um gerente pode cancelar depois.',
-      ),
-    ).toBeTruthy()
+      ).textContent,
+    ).toBe(
+      'A venda é registrada e o estoque é baixado. Não há reembolso nem estorno; só um gerente pode cancelar depois.',
+    )
     expect(rowLabels()).toEqual([
       'Canal de venda',
       'Forma de pagamento',
@@ -99,10 +101,16 @@ describe('OrderRegistrationDialog', () => {
       'Combo Açaí + Picolé',
       'Total',
     ])
-    expect(within(dialog).getByText('Delivery próprio · +12%')).toBeTruthy()
-    expect(within(dialog).getByText('Cartão de crédito')).toBeTruthy()
+    expect(within(dialog).getByText('Delivery próprio · +12%').textContent).toBe(
+      'Delivery próprio · +12%',
+    )
+    expect(within(dialog).getByText('Cartão de crédito').textContent).toBe(
+      'Cartão de crédito',
+    )
     expect(within(dialog).queryByText('Crédito')).toBeNull()
-    expect(within(dialog).getByText('2 itens · 3 unidades')).toBeTruthy()
+    expect(within(dialog).getByText('2 itens · 3 unidades').textContent).toBe(
+      '2 itens · 3 unidades',
+    )
     expect(
       within(dialog).getByText('Economia de R$ 4,64').textContent?.replaceAll(' ', ' '),
     ).toBe('Economia de R$ 4,64')
@@ -110,9 +118,19 @@ describe('OrderRegistrationDialog', () => {
       'R$ 23,36',
     )
     expect(
-      within(dialog).getByRole('button', { name: 'Voltar ao carrinho' }),
-    ).toBeTruthy()
-    expect(within(dialog).getByRole('button', { name: 'Registrar pedido' })).toBeTruthy()
+      (
+        within(dialog).getByRole('button', {
+          name: 'Voltar ao carrinho',
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false)
+    expect(
+      (
+        within(dialog).getByRole('button', {
+          name: 'Registrar pedido',
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false)
   })
 
   it('reads Sem canal and omits the Combo rows when none applies', () => {
@@ -124,15 +142,15 @@ describe('OrderRegistrationDialog', () => {
       'Itens',
       'Total',
     ])
-    expect(screen.getByText('Sem canal')).toBeTruthy()
-    expect(screen.getByText('Dinheiro')).toBeTruthy()
+    expect(screen.getByText('Sem canal').textContent).toBe('Sem canal')
+    expect(screen.getByText('Dinheiro').textContent).toBe('Dinheiro')
   })
 
   it('blocks confirmation with a reason when the selected channel cannot be resolved', () => {
     const props = renderDialog({ cart: comboCart, isChannelUnresolved: true })
 
     expect(screen.queryByText('Sem canal')).toBeNull()
-    expect(screen.getByText('Canal indisponível')).toBeTruthy()
+    expect(screen.getByText('Canal indisponível').textContent).toBe('Canal indisponível')
     const button = screen.getByRole('button', { name: 'Registrar pedido' })
     expect((button as HTMLButtonElement).disabled).toBe(true)
     const reason = screen.getByRole('alert')
@@ -183,7 +201,9 @@ describe('OrderRegistrationDialog', () => {
   it('keeps the loading text and a disabled confirmation while the cart updates', () => {
     renderDialog({ cart: undefined })
 
-    expect(screen.getByText('Atualizando os valores do pedido…')).toBeTruthy()
+    expect(screen.getByText('Atualizando os valores do pedido…').textContent).toBe(
+      'Atualizando os valores do pedido…',
+    )
     expect(screen.queryAllByRole('term')).toHaveLength(0)
     expect(
       (screen.getByRole('button', { name: 'Registrar pedido' }) as HTMLButtonElement)

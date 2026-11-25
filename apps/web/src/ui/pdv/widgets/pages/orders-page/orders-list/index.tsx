@@ -1,12 +1,12 @@
 import type { Order } from '@scoops/core/pdv/domain/entities'
 import { OrderStatus } from '@scoops/core/pdv/domain/structures'
 
-import { getPaymentMethodPresentation } from '@/ui/pdv/constants/payment-method-presentation'
 import { Badge } from '@/ui/shadcn/badge'
 import { Button } from '@/ui/shadcn/button'
 import { Icon } from '@/ui/shared/widgets/components/icon'
 import { Pagination } from '@/ui/shared/widgets/components/pagination'
 
+import { PaymentMethodCell } from './payment-method-cell'
 import { useOrdersList } from './use-orders-list'
 
 export type OrdersListProps = {
@@ -161,29 +161,5 @@ export const OrdersList = ({
         totalItems={ordersPage.total}
       />
     </section>
-  )
-}
-
-type PaymentMethodCellProps = { paymentMethod: Order['paymentMethod'] }
-
-const PaymentMethodCell = ({ paymentMethod }: PaymentMethodCellProps) => {
-  const { icon, label } = getPaymentMethodPresentation(paymentMethod)
-
-  return (
-    <span
-      className={
-        paymentMethod
-          ? 'flex items-center gap-2'
-          : 'flex items-center gap-2 text-text-tertiary'
-      }
-    >
-      <Icon
-        className={
-          paymentMethod ? 'size-[15px] shrink-0 text-primary' : 'size-[15px] shrink-0'
-        }
-        name={icon}
-      />
-      {label}
-    </span>
   )
 }

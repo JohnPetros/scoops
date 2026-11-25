@@ -580,6 +580,12 @@ async function buildSeedCombos(app: INestApplicationContext): Promise<ComboCreat
   )
 }
 
+const SEED_PAYMENT_METHODS = Object.values(OrderPaymentMethod)
+
+function seedPaymentMethod(index: number) {
+  return SEED_PAYMENT_METHODS[index % SEED_PAYMENT_METHODS.length]
+}
+
 async function buildSeedOrders(
   app: INestApplicationContext,
   salesChannels: Awaited<ReturnType<SalesChannelsRepository['findMany']>>,
@@ -739,8 +745,6 @@ async function buildSeedOrders(
     2, 4,
   ]
 
-  const paymentMethods = Object.values(OrderPaymentMethod)
-
   return Array.from({ length: currentDay }, (_, dayIndex) => {
     const day = dayIndex + 1
     const createdAt =
@@ -760,7 +764,7 @@ async function buildSeedOrders(
         createdBy: SEED_USERS.manager.id,
         createdByName: SEED_USERS.manager.name,
         channel: template.channel,
-        paymentMethod: paymentMethods[(dayIndex + orderIndex) % paymentMethods.length],
+        paymentMethod: seedPaymentMethod(dayIndex + orderIndex),
         lines: template.lines,
         discounts: [],
         subtotal,

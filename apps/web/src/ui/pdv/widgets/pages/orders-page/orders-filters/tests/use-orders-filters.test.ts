@@ -73,6 +73,32 @@ describe('useOrdersFilters', () => {
     })
   })
 
+  it('derives the payment method filter label and icon from the search', () => {
+    const derive = (paymentMethod: 'credit-card' | 'none' | undefined) =>
+      renderHook(() =>
+        useOrdersFilters({
+          channels: [],
+          isLoadingChannels: false,
+          onClear: vi.fn(),
+          onSearchChange: vi.fn(),
+          search: { ...search, paymentMethod },
+        }),
+      ).result.current
+
+    expect(derive(undefined)).toMatchObject({
+      paymentMethodFilterIcon: 'wallet',
+      paymentMethodFilterLabel: 'Todas as formas de pagamento',
+    })
+    expect(derive('credit-card')).toMatchObject({
+      paymentMethodFilterIcon: 'credit-card',
+      paymentMethodFilterLabel: 'Cartão de crédito',
+    })
+    expect(derive('none')).toMatchObject({
+      paymentMethodFilterIcon: 'circle-minus',
+      paymentMethodFilterLabel: 'Não informado',
+    })
+  })
+
   it('keeps the payment method when the period changes', () => {
     const onSearchChange = vi.fn()
     const { result } = renderHook(() =>

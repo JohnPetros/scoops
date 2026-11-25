@@ -21,6 +21,7 @@ import {
 } from '@/ui/shadcn/select'
 import { Icon } from '@/ui/shared/widgets/components/icon'
 import { useFormatCurrency } from '@/ui/shared/hooks/use-format-currency'
+import { useFormatPercentage } from '@/ui/shared/hooks/use-format-percentage'
 
 import { PaymentMethodSelector } from './payment-method-selector'
 import type { NewSaleCartProps } from './use-new-sale-cart'
@@ -28,11 +29,11 @@ import { useNewSaleCart } from './use-new-sale-cart'
 
 export type { NewSaleCartProps }
 
-const PERCENTAGE_FORMATTER = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 })
 const PAYMENT_METHOD_REASON_ID = 'new-sale-payment-method-reason'
 
 export const NewSaleCart = (props: NewSaleCartProps) => {
   const formatCurrency = useFormatCurrency()
+  const formatPercentage = useFormatPercentage()
   const {
     baseSubtotal,
     channelAdjustment,
@@ -101,7 +102,7 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
           >
             <SelectValue>
               {props.channels.find((channel) => channel.id === selectedChannelId)
-                ? `${props.channels.find((channel) => channel.id === selectedChannelId)?.name} · ${PERCENTAGE_FORMATTER.format(props.channels.find((channel) => channel.id === selectedChannelId)?.percentage ?? 0)}%`
+                ? `${props.channels.find((channel) => channel.id === selectedChannelId)?.name} · ${formatPercentage(props.channels.find((channel) => channel.id === selectedChannelId)?.percentage ?? 0)}%`
                 : 'Sem canal'}
             </SelectValue>
           </SelectTrigger>
@@ -110,7 +111,7 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
             {props.channels.map((channel) => (
               <SelectItem key={channel.id} value={channel.id}>
                 {channel.name} · {channel.percentage > 0 ? '+' : ''}
-                {PERCENTAGE_FORMATTER.format(channel.percentage)}%
+                {formatPercentage(channel.percentage)}%
               </SelectItem>
             ))}
           </SelectContent>
@@ -287,7 +288,7 @@ export const NewSaleCart = (props: NewSaleCartProps) => {
               <div className='flex justify-between gap-3 text-primary'>
                 <span>
                   {selectedChannel.name} · {selectedChannel.percentage > 0 ? '+' : ''}
-                  {PERCENTAGE_FORMATTER.format(selectedChannel.percentage)}%
+                  {formatPercentage(selectedChannel.percentage)}%
                 </span>
                 <strong>
                   {channelAdjustment > 0 ? '+ ' : channelAdjustment < 0 ? '− ' : ''}
