@@ -67,7 +67,7 @@ export default {
   boundaryTestPatterns: [
     'apps/web/tests/**/*.test.ts',
     'apps/web/tests/**/*.test.tsx',
-    'apps/web/tests/communication/notification-toast.test.tsx',
+    'apps/web/tests/communication/layouts/notification-toast.layout.test.ts',
     'apps/web/tests/health/*.test.ts',
     'apps/server/src/**/messaging/**/jobs/**/*.test.ts',
     'apps/server/src/**/templates/**/*.test.ts',

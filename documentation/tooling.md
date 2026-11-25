@@ -278,7 +278,7 @@ documented Server/PostgreSQL prerequisites. The committed route suite starts an 
 Vite server on `http://127.0.0.1:4001` with the SSR-auth fixture enabled; override the
 port with `PLAYWRIGHT_PORT` when needed. The current mocked notification SSE responses in
 `tests/fixtures/communication-module-fixture.ts` and
-`tests/communication/notification-toast.test.tsx` still set the allowed origin to
+`tests/communication/layouts/notification-toast.layout.test.ts` still set the allowed origin to
 `http://localhost:4001`; use the default port for suites exercising those fixtures. An alternate
 port can therefore pass the login health check while failing notification/CORS assertions.
 Do not treat those failures as production-server authorization evidence or weaken the
@@ -293,7 +293,7 @@ Run locally only the Playwright files that cover the changed code, by naming the
 run the complete Web browser suite locally; it is slow and CI owns it.
 
 ```bash
-pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
+pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 pnpm --filter web test:integration:ui
 ```
 
@@ -750,7 +750,7 @@ pnpm --filter @scoops/core exec vitest run src/pdv/use-cases/tests/register-orde
 pnpm --filter @scoops/core test:mutation --files src/pdv/use-cases/register-order-use-case.ts
 
 pnpm --filter web check:types
-pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
+pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 ```
 
 ### Local check scope

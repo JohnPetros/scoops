@@ -1,0 +1,565 @@
+import type { Page } from '@playwright/test'
+
+import { ProductFaker } from '@scoops/core/mrp/domain/entities/fakers'
+
+import { expect, test } from '../../playwright'
+
+const PRODUCT_ID = 'product-1'
+const PRIMARY_BRAND_ID = 'brand-primary'
+const SECONDARY_BRAND_ID = 'brand-secondary'
+
+const PRODUCT = ProductFaker.fake({
+  id: PRODUCT_ID,
+  establishmentId: 'establishment-1',
+  name: 'Polpa de morango',
+  unit: 'kg',
+  categories: ['ingredient'],
+  stockControl: 'by-brand',
+  status: 'active',
+  allowNegativeStock: false,
+  idealStock: 10,
+})
+
+const BRANDS = [
+  fakeBrand(PRIMARY_BRAND_ID, 'Frooty', true, 12),
+  fakeBrand(SECONDARY_BRAND_ID, 'Frutamil', false, 6),
+]
+
+const TRANSACTIONS = {
+  items: [
+    {
+      id: 'transaction-1',
+      establishmentId: 'establishment-1',
+      productId: PRODUCT_ID,
+      brandId: PRIMARY_BRAND_ID,
+      type: 'entry',
+      quantity: 4,
+      resultingBalance: 12,
+      productName: PRODUCT.name,
+      brandName: 'Frooty',
+      performedBy: 'manager-1',
+      performedByName: 'Maria Silva',
+      unit: 'kg',
+      occurredAt: '2026-08-18T12:30:00.000Z',
+    },
+  ],
+  page: 1,
+  limit: 5,
+  total: 1,
+}
+
+test.describe('ProductStockPage', () => {
+  test.describe.configure({ mode: 'serial' })
+
+  test('renders the stock tab at its nested URL', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: { items: [], page: 1, limit: 5, total: 0 } }
+          : { body: fakeStockResponse() },
+    })
+
+    await page.goto(`/products/${PRODUCT_ID}/stock`)
+
+    await expect(page).toHaveURL(new RegExp(`/products/${PRODUCT_ID}/stock$`))
+    await expect(page.getByRole('heading', { name: PRODUCT.name })).toBeVisible()
+    const categoryBadge = page.getByRole('button', { name: 'Ingrediente', exact: true })
+    await expect(categoryBadge).toBeVisible()
+    await expect(categoryBadge.locator('[data-slot="badge"] svg')).toBeVisible()
+    await categoryBadge.hover()
+    await expect(
+      page.getByRole('tooltip', { name: 'Ingrediente', exact: true }),
+    ).toBeVisible()
+    await expect(page.getByRole('tab', { name: /Estoque/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
+  })
+
+  test('redirects the Recipe URL for a non-manufacturable product to Stock', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await mrpFixture.mockProductStock({
+      respond: () => ({ body: fakeStockResponse() }),
+    })
+
+    await page.goto(`/products/${PRODUCT_ID}/recipe`)
+
+    await expect(page).toHaveURL(`/products/${PRODUCT_ID}/stock`)
+    await expect(page.getByRole('heading', { name: PRODUCT.name })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Receita' })).toHaveCount(0)
+  })
+
+  test('redirects anonymous access and preserves the semantic product path', async ({
+    page,
+  }) => {
+    await page.goto(`/products/${PRODUCT_ID}`)
+    await page.waitForURL(/\/login\?returnTo=/)
+    await expect(page).toHaveURL(/\/login\?returnTo=/)
+    expect(new URL(page.url()).searchParams.get('returnTo')).toContain(
+      `/products/${PRODUCT_ID}`,
+    )
+  })
+
+  test('lets Operators read stock and history without stock controls', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockOperatorSession()
+    await identityFixture.mockOperatorAccount()
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: TRANSACTIONS }
+          : { body: fakeStockResponse() },
+    })
+
+    await page.setViewportSize({ width: 1560, height: 1320 })
+    await page.goto(`/products/${PRODUCT_ID}/stock`)
+    await expect(page).toHaveURL(`/products/${PRODUCT_ID}/stock`)
+    await expect(page.getByRole('heading', { name: PRODUCT.name })).toBeVisible()
+    await expect(
+      page.getByRole('row', { name: /Frooty Principal/ }),
+    ).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'Maria Silva' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Entrada' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Baixa' })).toHaveCount(0)
+    await expect(
+      page.getByRole('button', { name: 'Abrir ações da marca Frooty' }),
+    ).toHaveCount(0)
+  })
+
+  test('loads the canonical populated route and covers exact detail and history requests', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    const consoleErrors: string[] = []
+    const failedRequests: string[] = []
+    page.on('console', (message) => {
+      if (message.type() === 'error') consoleErrors.push(message.text())
+    })
+    page.on('requestfailed', (request) => {
+      failedRequests.push(`${request.method()} ${request.url()}`)
+    })
+    const { requests } = await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: TRANSACTIONS }
+          : { body: fakeStockResponse() },
+    })
+
+    await page.setViewportSize({ width: 1560, height: 1320 })
+    await navigateToProductStock(page)
+    await expect(page).toHaveURL(new RegExp(`/products/${PRODUCT_ID}/stock$`))
+    await expect(page.getByRole('heading', { name: PRODUCT.name })).toBeVisible()
+    await expect(page.getByText('Normal', { exact: true })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'Frooty', exact: true })).toBeVisible()
+    await expect(page.getByRole('cell', { name: 'Maria Silva' })).toBeVisible()
+    await expect(page.getByRole('cell', { name: '+4 kg' })).toBeVisible()
+    await expect.poll(() => requests.length).toBe(2)
+    expect(requests.map(({ method, url }) => `${method} ${url.pathname}`)).toEqual([
+      `GET /products/${PRODUCT_ID}/stock`,
+      `GET /products/${PRODUCT_ID}/stock-transactions`,
+    ])
+    const historyRequest = requests[1]?.url
+    expect(historyRequest?.searchParams.get('page')).toBe('1')
+    expect(historyRequest?.searchParams.get('limit')).toBe('5')
+    expect(consoleErrors).toEqual([])
+    expect(failedRequests).toEqual([])
+  })
+
+  test('recovers detail and independent history request failures', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    let detailRequests = 0
+    let historyRequests = 0
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) => {
+        if (url.pathname.endsWith('/stock-transactions')) {
+          historyRequests += 1
+          return historyRequests === 1
+            ? { body: { message: 'history unavailable' }, status: 503 }
+            : { body: TRANSACTIONS }
+        }
+        detailRequests += 1
+        return detailRequests === 1
+          ? { body: { message: 'detail unavailable' }, status: 503 }
+          : { body: fakeStockResponse() }
+      },
+    })
+
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await navigateToProductStock(page)
+    await expect(page.getByText('Não foi possível carregar o estoque')).toBeVisible()
+    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await expect(page.getByRole('heading', { name: PRODUCT.name })).toBeVisible()
+    await expect(page.getByText('Não foi possível carregar o histórico.')).toBeVisible()
+    await page.getByRole('button', { name: 'Tentar novamente' }).click()
+    await expect(page.getByRole('cell', { name: 'Maria Silva' })).toBeVisible()
+    expect(detailRequests).toBe(2)
+    expect(historyRequests).toBe(2)
+  })
+
+  test('filters history with exact query values and distinguishes filtered empty', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    const { requests } = await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? {
+              body:
+                url.searchParams.get('type') === 'write-off'
+                  ? { ...TRANSACTIONS, items: [], total: 0 }
+                  : TRANSACTIONS,
+            }
+          : { body: fakeStockResponse() },
+    })
+
+    await navigateToProductStock(page)
+    await expect(page.getByRole('cell', { name: 'Maria Silva' })).toBeVisible()
+    await page.getByRole('combobox', { name: 'Tipo' }).click()
+    await page.getByRole('option', { name: 'Baixa Manual' }).click()
+    await expect(
+      page.getByText('Nenhuma movimentação corresponde aos filtros.'),
+    ).toBeVisible()
+    const request = requests.at(-1)
+    expect(request?.method).toBe('GET')
+    expect(request?.url.pathname).toBe(`/products/${PRODUCT_ID}/stock-transactions`)
+    expect(request?.url.searchParams.get('type')).toBe('write-off')
+    expect(request?.url.searchParams.get('page')).toBe('1')
+    expect(request?.url.searchParams.get('limit')).toBe('5')
+    const toDateInput = page.getByLabel('Até')
+    await toDateInput.focus()
+    await expect(toDateInput).toBeFocused()
+  })
+
+  test('adds a brand without client-owned primary state and refreshes the page', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    const { requests } = await mrpFixture.mockProductStock({
+      respond: ({ method, url }) => {
+        if (method === 'POST' && url.pathname.endsWith('/brands')) {
+          return { body: fakeBrand('brand-new', 'Nova marca', false, 3), status: 201 }
+        }
+        if (url.pathname.endsWith('/stock-transactions')) return { body: TRANSACTIONS }
+        return { body: fakeStockResponse() }
+      },
+    })
+
+    await page.setViewportSize({ width: 676, height: 771 })
+    await navigateToProductStock(page)
+    await page.getByRole('button', { name: 'Adicionar marca' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Adicionar marca' })
+    await expect(dialog.getByRole('textbox', { name: 'Nome da marca' })).toBeFocused()
+    await dialog.getByRole('textbox', { name: 'Nome da marca' }).fill('Nova marca')
+    await dialog.getByRole('textbox', { name: 'Qtd. por embalagem' }).fill('2')
+    await dialog.getByRole('textbox', { name: 'Valor por embalagem' }).fill('10')
+    await dialog.getByRole('textbox', { name: 'Estoque inicial (opcional)' }).fill('3')
+    await dialog.getByRole('textbox', { name: 'Nome da marca' }).focus()
+    await expect(dialog.getByRole('textbox', { name: 'Nome da marca' })).toBeFocused()
+    await dialog.getByRole('button', { name: 'Confirmar' }).click()
+    await expect(dialog).toBeHidden()
+    const request = requests.find(
+      ({ method, url }) => method === 'POST' && url.pathname.endsWith('/brands'),
+    )
+    expect(request?.url.pathname).toBe(`/products/${PRODUCT_ID}/brands`)
+    expect(request?.body).toEqual({
+      name: 'Nova marca',
+      unit: 'kg',
+      packageQuantity: 2,
+      packageValue: 10,
+      initialQuantity: 3,
+    })
+  })
+
+  test('submits package adjustment as an exact base-unit quantity', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    const { requests } = await mrpFixture.mockProductStock({
+      respond: ({ method, url }) => {
+        if (method === 'POST' && url.pathname.endsWith('/stock-adjustments')) {
+          return { body: { quantity: 16 } }
+        }
+        if (url.pathname.endsWith('/stock-transactions')) return { body: TRANSACTIONS }
+        return { body: fakeStockResponse() }
+      },
+    })
+
+    await navigateToProductStock(page)
+    await page.getByRole('button', { name: 'Entrada de estoque' }).first().click()
+    const dialog = page.getByRole('dialog', { name: 'Entrada de estoque' })
+    await dialog.getByRole('button', { name: 'Embalagens' }).click()
+    await dialog.getByLabel('Quantidade').fill('2')
+    await expect(dialog.getByText('2 × 2 kg = 4 kg')).toBeVisible()
+    await dialog.getByRole('button', { name: 'Confirmar entrada' }).click()
+    await expect(dialog).toBeHidden()
+    const request = requests.find(({ url }) =>
+      url.pathname.endsWith('/stock-adjustments'),
+    )
+    expect(request?.method).toBe('POST')
+    expect(request?.url.pathname).toBe(`/products/${PRODUCT_ID}/stock-adjustments`)
+    expect(request?.body).toEqual({
+      brandId: PRIMARY_BRAND_ID,
+      type: 'entry',
+      quantity: 4,
+    })
+  })
+
+  test('supports keyboard menu focus and has no page overflow at 320 pixels', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: TRANSACTIONS }
+          : { body: fakeStockResponse() },
+    })
+
+    await page.setViewportSize({ width: 320, height: 900 })
+    await navigateToProductStock(page)
+    const trigger = page.getByRole('button', {
+      name: 'Abrir ações da marca Frutamil',
+    })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menuitem', { name: 'Editar marca' })).toBeFocused()
+    await page.keyboard.press('ArrowDown')
+    await expect(
+      page.getByRole('menuitem', { name: 'Definir como principal' }),
+    ).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(trigger).toBeFocused()
+    expect(
+      await page.evaluate(
+        () =>
+          document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+    ).toBe(true)
+  })
+
+  test('covers the remaining brand dialog and menu reference states', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: TRANSACTIONS }
+          : { body: fakeStockResponse() },
+    })
+
+    await navigateToProductStock(page)
+    const secondaryActions = page.getByRole('button', {
+      name: 'Abrir ações da marca Frutamil',
+    })
+
+    await page.setViewportSize({ width: 293, height: 188 })
+    await secondaryActions.click()
+    await expect(page.getByRole('menuitem', { name: 'Editar marca' })).toBeVisible()
+    await page.keyboard.press('Escape')
+
+    await page.setViewportSize({ width: 676, height: 771 })
+    await secondaryActions.click()
+    await page.getByRole('menuitem', { name: 'Editar marca' }).click()
+    const editDialog = page.getByRole('dialog', { name: 'Editar marca' })
+    await expect(editDialog.getByText('Estoque inicial (opcional)')).toHaveCount(0)
+    const packageValueInput = editDialog.getByLabel('Valor por embalagem')
+    await packageValueInput.focus()
+    await expect(packageValueInput).toBeFocused()
+    await page.keyboard.press('Escape')
+
+    await page.setViewportSize({ width: 596, height: 353 })
+    await secondaryActions.click()
+    await page.getByRole('menuitem', { name: 'Excluir marca' }).click()
+    await expect(page.getByRole('alertdialog', { name: 'Excluir marca?' })).toBeVisible()
+
+    await page.setViewportSize({ width: 320, height: 900 })
+    await page.getByRole('button', { name: 'Cancelar' }).click()
+    await secondaryActions.click()
+    await page.getByRole('menuitem', { name: 'Editar marca' }).click()
+  })
+
+  test('covers single, package, insufficient, and empty states', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    let stockResponse = fakeStockResponse()
+    let historyResponse = TRANSACTIONS
+    await mrpFixture.mockProductStock({
+      respond: ({ url }) =>
+        url.pathname.endsWith('/stock-transactions')
+          ? { body: historyResponse }
+          : { body: stockResponse },
+    })
+
+    await page.setViewportSize({ width: 676, height: 771 })
+    await navigateToProductStock(page)
+    await page.getByRole('button', { name: 'Entrada de estoque' }).first().click()
+    const packageDialog = page.getByRole('dialog', { name: 'Entrada de estoque' })
+    await packageDialog.getByRole('button', { name: 'Embalagens' }).click()
+    await packageDialog.getByLabel('Quantidade').fill('2')
+    await page.keyboard.press('Escape')
+    await expect(packageDialog).toBeHidden()
+    await page.getByRole('button', { name: 'Baixa de estoque' }).first().click()
+    const writeOffDialog = page.getByRole('dialog', { name: 'Baixa de estoque' })
+    await writeOffDialog.getByRole('button', { name: 'Embalagens' }).click()
+    await writeOffDialog.getByLabel('Quantidade').fill('7')
+    await expect(writeOffDialog.getByText(/Estoque insuficiente/)).toBeVisible()
+    await page.keyboard.press('Escape')
+
+    stockResponse = {
+      ...fakeStockResponse(),
+      product: { ...PRODUCT, stockControl: 'single' },
+      stockQuantity: 3,
+      brands: [],
+    }
+    await page.reload()
+    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.getByRole('button', { name: 'Entrada' }).click()
+    await page
+      .getByRole('dialog', { name: 'Entrada de estoque' })
+      .getByLabel('Quantidade')
+      .fill('2')
+    await page.keyboard.press('Escape')
+
+    stockResponse = {
+      ...fakeStockResponse(),
+      stockQuantity: 0,
+      stockSituation: 'low',
+      brands: [],
+    }
+    historyResponse = { ...TRANSACTIONS, items: [], total: 0 }
+    await page.reload()
+    await expect(page.getByText('Nenhuma marca cadastrada')).toBeVisible()
+    await expect(page.getByText('Abaixo do ideal', { exact: true })).toBeVisible()
+    await expect(page.getByText('Nenhuma movimentação registrada.')).toBeVisible()
+
+    stockResponse = fakeStockResponse()
+    await page.reload()
+    await expect(page.getByText('Normal', { exact: true })).toBeVisible()
+    await expect(page.getByRole('cell', { name: /^Frooty/ })).toBeVisible()
+    await expect(page.getByText('Nenhuma movimentação registrada.')).toBeVisible()
+  })
+
+  test('covers independent detail and history loading states', async ({
+    page,
+    identityFixture,
+    mrpFixture,
+  }) => {
+    await identityFixture.mockManagerSession()
+    await identityFixture.mockManagerAccount()
+    let releaseDetail!: () => void
+    const detailGate = new Promise<void>((resolve) => {
+      releaseDetail = resolve
+    })
+    let historyDelayed = true
+    await mrpFixture.mockProductStock({
+      respond: async ({ url }) => {
+        if (url.pathname.endsWith('/stock-transactions')) {
+          if (historyDelayed) await new Promise((resolve) => setTimeout(resolve, 800))
+          return { body: TRANSACTIONS }
+        }
+        await detailGate
+        return { body: fakeStockResponse() }
+      },
+    })
+
+    await page.setViewportSize({ width: 1280, height: 900 })
+    const pendingDetailRequest = page.waitForRequest(
+      (request) =>
+        request.method() === 'GET' &&
+        new URL(request.url()).pathname === `/products/${PRODUCT_ID}/stock`,
+    )
+    const navigation = page.goto(`/products/${PRODUCT_ID}`)
+    await pendingDetailRequest
+    await expect(
+      page.getByRole('status', { name: 'Carregando estoque do produto' }),
+    ).toBeVisible()
+    releaseDetail()
+    await navigation
+    await expect(
+      page.getByRole('status', { name: 'Carregando histórico de movimentações' }),
+    ).toBeVisible()
+    historyDelayed = false
+    await expect(page.getByRole('cell', { name: 'Maria Silva' })).toBeVisible()
+  })
+})
+
+function fakeBrand(id: string, name: string, isPrimary: boolean, stockQuantity: number) {
+  return {
+    brand: {
+      id,
+      establishmentId: 'establishment-1',
+      productId: PRODUCT_ID,
+      name,
+      unit: 'kg',
+      packageQuantity: 2,
+      packagePrice: 10,
+      isPrimary,
+      createdAt: '2026-08-18T12:00:00.000Z',
+      updatedAt: '2026-08-18T12:00:00.000Z',
+    },
+    stockQuantity,
+    unitPrice: 5,
+  }
+}
+
+async function navigateToProductStock(page: Page) {
+  const stockResponse = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'GET' &&
+      new URL(response.url()).pathname === `/products/${PRODUCT_ID}/stock`,
+  )
+  await page.goto(`/products/${PRODUCT_ID}`)
+  await (await stockResponse).finished()
+}
+
+function fakeStockResponse() {
+  return {
+    product: PRODUCT,
+    stockQuantity: 18,
+    idealStock: 10,
+    stockSituation: 'normal',
+    brands: BRANDS,
+  }
+}

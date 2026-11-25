@@ -217,21 +217,35 @@ Route behavior is tested with Playwright under:
 apps/web/tests/
 ```
 
-Organize route suites by bounded module, then name the file after the feature or
-route behavior:
+Organize route suites by bounded module, then by kind. Name the file after the
+page, layout or endpoint it covers, followed by the suffix for its kind:
+
+| Kind | Folder | Suffix | Covers |
+| --- | --- | --- | --- |
+| Page | `<module>/pages/` | `.page.test.ts` | The page rendered by a route |
+| Layout | `<module>/layouts/` | `.layout.test.ts` | Behavior owned by a layout and shared across pages, such as the application shell, notification toasts, and route transition feedback |
+| Endpoint | `<module>/endpoints/` | `.endpoint.test.ts` | A Web server endpoint that answers a request without rendering a page |
 
 ```text
 apps/web/tests/
 ├── identity/
-│   ├── colaboradores.index.test.tsx
-│   └── colaboradores.$colaboradorId.test.tsx
-└── intake/
-    └── intake.novo.test.tsx
+│   └── pages/
+│       ├── users.page.test.ts
+│       └── user.page.test.ts
+└── shared/
+    └── layouts/
+        └── app.layout.test.ts
 ```
 
-When a feature exposes multiple route files, keep one test file per route file:
-`<route-file>.test.tsx`. This keeps list-route behavior separate from dynamic
-detail-route behavior and makes a failing route boundary immediately visible.
+Create a kind folder only when the module has a test of that kind.
+
+Do not repeat the kind in the name: use `users.page.test.ts`, not
+`users-page.page.test.ts`. The tooling smoke test under `tests/health/` is not a
+route suite and keeps the plain `.test.ts` suffix.
+
+When a feature exposes multiple route files, keep one page test file per route
+file. This keeps list-route behavior separate from dynamic detail-route behavior
+and makes a failing route boundary immediately visible.
 
 The first directory is the domain module that owns the route, not a translation
 of the URL segment. Collaborators belong to `identity` because identity owns
