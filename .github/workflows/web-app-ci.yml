@@ -119,8 +119,8 @@ jobs:
       - name: Check types
         run: pnpm --filter web check:types
 
-  web_coverage:
-    name: Web unit tests and coverage
+  web_widget_tests:
+    name: Web widget tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -146,7 +146,7 @@ jobs:
       - name: Generate routes
         run: pnpm --filter web generate-routes
 
-      - name: Run tests with coverage
+      - name: Run widget tests with coverage
         id: coverage
         run: pnpm --filter web test:coverage
 
@@ -195,8 +195,8 @@ jobs:
           path: apps/web/coverage/
           retention-days: 14
 
-  web_integration:
-    name: Web browser integration (${{ matrix.shard }}/4)
+  web_route_tests:
+    name: Web route tests (${{ matrix.shard }}/4)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -229,7 +229,7 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm --filter web exec playwright install --with-deps chromium
 
-      - name: Run browser integration tests
+      - name: Run route tests
         run: pnpm --filter web test:integration --shard=${{ matrix.shard }}/4 --workers=1
 
   web_build:
@@ -269,8 +269,8 @@ jobs:
       - web_code
       - web_architecture
       - web_types
-      - web_coverage
-      - web_integration
+      - web_widget_tests
+      - web_route_tests
       - web_build
     runs-on: ubuntu-latest
     steps:
@@ -279,16 +279,16 @@ jobs:
           WEB_CODE_RESULT: ${{ needs.web_code.result }}
           WEB_ARCHITECTURE_RESULT: ${{ needs.web_architecture.result }}
           WEB_TYPES_RESULT: ${{ needs.web_types.result }}
-          WEB_COVERAGE_RESULT: ${{ needs.web_coverage.result }}
-          WEB_INTEGRATION_RESULT: ${{ needs.web_integration.result }}
+          WEB_WIDGET_TESTS_RESULT: ${{ needs.web_widget_tests.result }}
+          WEB_ROUTE_TESTS_RESULT: ${{ needs.web_route_tests.result }}
           WEB_BUILD_RESULT: ${{ needs.web_build.result }}
         run: |
-          if [[ "$WEB_CODE_RESULT" != "success" || "$WEB_ARCHITECTURE_RESULT" != "success" || "$WEB_TYPES_RESULT" != "success" || "$WEB_COVERAGE_RESULT" != "success" || "$WEB_INTEGRATION_RESULT" != "success" || "$WEB_BUILD_RESULT" != "success" ]]; then
+          if [[ "$WEB_CODE_RESULT" != "success" || "$WEB_ARCHITECTURE_RESULT" != "success" || "$WEB_TYPES_RESULT" != "success" || "$WEB_WIDGET_TESTS_RESULT" != "success" || "$WEB_ROUTE_TESTS_RESULT" != "success" || "$WEB_BUILD_RESULT" != "success" ]]; then
             echo "Web code result: $WEB_CODE_RESULT"
             echo "Web architecture result: $WEB_ARCHITECTURE_RESULT"
             echo "Web types result: $WEB_TYPES_RESULT"
-            echo "Web coverage result: $WEB_COVERAGE_RESULT"
-            echo "Web integration result: $WEB_INTEGRATION_RESULT"
+            echo "Web widget tests result: $WEB_WIDGET_TESTS_RESULT"
+            echo "Web route tests result: $WEB_ROUTE_TESTS_RESULT"
             echo "Web build result: $WEB_BUILD_RESULT"
             exit 1
           fi
