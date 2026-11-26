@@ -10,7 +10,7 @@ const SOURCE_ROOTS = {
 }
 const DEFAULT_THRESHOLDS = { lines: 80, branches: 70 }
 const USAGE =
-  'Usage: node scripts/check-changed-coverage.mjs <core|server|web> <lcov-path> --base <git-ref> [--head <git-ref>] [--lines 80] [--branches 70] [--output <path>]'
+  'Usage: node scripts/check-changed-coverage.mjs <core|server|web> <lcov-path> --base <git-ref> [--head <git-ref> | --working-tree] [--lines 80] [--branches 70] [--output <path>]'
 
 export function parseLcov(content, root = process.cwd()) {
   const files = new Map()
@@ -103,6 +103,15 @@ export function measureChangedCoverage(coverage, changed, sourceRoot) {
   return { totals, gaps }
 }
 
+// Untracked files have no diff, so every line in them is new.
+export function addUntrackedLines(changed, paths, read) {
+  for (const path of paths) {
+    const count = read(path).split('\n').length
+    changed.set(path, new Set(Array.from({ length: count }, (_, index) => index + 1)))
+  }
+  return changed
+}
+
 // Compares exact ratios; a metric with nothing to measure passes.
 function passes({ covered, total }, threshold) {
   return total === 0 || covered * 100 >= threshold * total
@@ -152,8 +161,13 @@ function parseThreshold(value) {
 }
 
 export function parseArguments(argumentsList) {
-  const [workspace, lcovPath, ...rest] = argumentsList
+  const [workspace, lcovPath, ...flags] = argumentsList
+  const rest = flags.filter((flag) => flag !== '--working-tree')
   const options = { workspace, lcovPath, head: 'HEAD', ...DEFAULT_THRESHOLDS }
+  if (rest.length !== flags.length) {
+    if (rest.includes('--head')) throw new Error(USAGE)
+    options.workingTree = true
+  }
   for (let index = 0; index < rest.length; index += 2) {
     const [flag, value] = [rest[index], rest[index + 1]]
     if (value === undefined) throw new Error(USAGE)
@@ -168,30 +182,47 @@ export function parseArguments(argumentsList) {
   return options
 }
 
+function git(argumentsList) {
+  return execFileSync('git', ['-c', 'core.quotePath=false', ...argumentsList], {
+    encoding: 'utf8',
+    maxBuffer: 256 * 1024 * 1024,
+  })
+}
+
+function readChangedLines({ base, head, workingTree }, sourceRoot) {
+  const diff = git([
+    'diff',
+    '--no-renames',
+    '--no-ext-diff',
+    '--src-prefix=a/',
+    '--dst-prefix=b/',
+    '--unified=0',
+    base,
+    ...(workingTree ? [] : [head]),
+    '--',
+    sourceRoot,
+  ])
+  const changed = parseChangedLines(diff)
+  if (!workingTree) return changed
+  const untracked = git([
+    'ls-files',
+    '--others',
+    '--exclude-standard',
+    '-z',
+    '--',
+    sourceRoot,
+  ])
+  return addUntrackedLines(changed, untracked.split('\0').filter(Boolean), (path) =>
+    readFileSync(path, 'utf8'),
+  )
+}
+
 function main() {
   const options = parseArguments(process.argv.slice(2))
   const sourceRoot = SOURCE_ROOTS[options.workspace]
-  const diff = execFileSync(
-    'git',
-    [
-      '-c',
-      'core.quotePath=false',
-      'diff',
-      '--no-renames',
-      '--no-ext-diff',
-      '--src-prefix=a/',
-      '--dst-prefix=b/',
-      '--unified=0',
-      options.base,
-      options.head,
-      '--',
-      sourceRoot,
-    ],
-    { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 },
-  )
   const result = measureChangedCoverage(
     parseLcov(readFileSync(options.lcovPath, 'utf8')),
-    parseChangedLines(diff),
+    readChangedLines(options, sourceRoot),
     sourceRoot,
   )
   const markdown = renderChangedCoverage(options.workspace, result, options)

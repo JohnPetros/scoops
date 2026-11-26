@@ -1,0 +1,76 @@
+name: Email CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/email-package-ci.yml"
+      - ".code-multivitals.json"
+      - "package.json"
+      - "packages/email/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "scripts/check-complexity.mjs"
+      - "scripts/comment-complexity-report.mjs"
+      - "scripts/tests/check-complexity.test.mjs"
+      - "scripts/tests/comment-complexity-report.test.mjs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: email-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  complexity:
+    name: Complexity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.0.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check complexity
+        id: complexity
+        run: |
+          node --test scripts/tests/check-complexity.test.mjs scripts/tests/comment-complexity-report.test.mjs
+          pnpm --filter @scoops/email check:complexity --base HEAD^1 --output "$GITHUB_WORKSPACE/complexity-report.md"
+
+      - name: Publish Email complexity on pull request
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.complexity.outputs.findings != '' }}
+        uses: actions/github-script@v9
+        env:
+          HAS_FINDINGS: ${{ steps.complexity.outputs.findings }}
+        with:
+          script: |
+            const { commentComplexityReport } = await import(
+              `${process.env.GITHUB_WORKSPACE}/scripts/comment-complexity-report.mjs`
+            )
+            const outcome = await commentComplexityReport({
+              github,
+              context,
+              workspace: 'email',
+              reportPath: `${process.env.GITHUB_WORKSPACE}/complexity-report.md`,
+              hasFindings: process.env.HAS_FINDINGS === 'true',
+            })
+            core.info(`Complexity comment: ${outcome}`)

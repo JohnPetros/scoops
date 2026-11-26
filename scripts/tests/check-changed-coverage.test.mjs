@@ -139,4 +139,36 @@ test('CLI fails on uncovered changed lines and appends its report', (t) => {
     `Totals\n\n${failing.stdout}`,
   )
   assert.equal(run('--lines', '60', '--branches', '50').status, 0)
+  assert.equal(run('--working-tree', '--head', 'HEAD').status, 1)
+})
+
+test('CLI measures uncommitted and untracked lines of the working tree', (t) => {
+  const root = mkdtempSync(join(tmpdir(), 'changed-coverage-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  const git = (...args) =>
+    execFileSync(
+      'git',
+      ['-c', 'user.name=test', '-c', 'user.email=test@example.com', ...args],
+      { cwd: root },
+    )
+  mkdirSync(join(root, 'apps/web/src'), { recursive: true })
+  writeFileSync(join(root, SOURCE), 'one\n')
+  git('init', '-q')
+  git('add', '.')
+  git('commit', '-q', '-m', 'base')
+  writeFileSync(join(root, SOURCE), 'one\ntwo\nthree\n')
+  writeFileSync(join(root, 'apps/web/src/new.ts'), 'one\n')
+  const report = [LCOV, 'SF:apps/web/src/new.ts', 'DA:1,0', 'end_of_record']
+  writeFileSync(join(root, 'lcov.info'), report.join('\n'))
+  const run = (...extra) =>
+    spawnSync(
+      process.execPath,
+      [SCRIPT, 'web', 'lcov.info', '--base', 'HEAD', ...extra],
+      { cwd: root, encoding: 'utf8', env: { ...process.env, GITHUB_STEP_SUMMARY: '' } },
+    )
+
+  assert.match(run().stdout, /\| Lines \| N\/A \|/)
+  const result = run('--working-tree')
+  assert.equal(result.status, 1, result.stderr)
+  assert.match(result.stdout, /\| Lines \| 33\.33% \| 80% \| 1 \/ 3 \| FAIL \|/)
 })

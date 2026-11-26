@@ -173,13 +173,35 @@ pnpm --filter @scoops/validation check:lint
 ## Complexity analysis with CodeMultiVitals
 
 CodeMultiVitals is pinned in the root `package.json` and lockfile. The
-repository configuration in `.code-multivitals.json` sets the thresholds for
-cyclomatic complexity, cognitive complexity, function length, nesting depth,
-and Halstead volume. `scripts/check-complexity.mjs` invokes the CodeMultiVitals
-CLI over production source files while excluding tests and generated route
-metadata.
+repository configuration in `.code-multivitals.json` sets the warning and error
+limits for cyclomatic complexity, cognitive complexity, function length, nesting
+depth and Halstead volume. A value above a limit reaches that level.
+`scripts/check-complexity.mjs` measures production source with the CodeMultiVitals
+analyser, excluding tests and generated route metadata.
 
-Run the local quality gate:
+The gate judges a change, not the whole codebase. It measures each changed source
+file on the target branch and in the change, in the same run, so no baseline file
+is committed. Functions are matched by file and name, never by line number, and
+git rename detection follows moved files. Each function is then compared metric by
+metric:
+
+| Function and metric on the target branch | Blocking result |
+| --- | --- |
+| New function | Any metric over its error limit |
+| Metric at or below its error limit | It goes over the error limit |
+| Cyclomatic complexity, cognitive complexity or nesting depth over the error limit | Any increase |
+| Function length or Halstead volume over the error limit | An increase of more than 10% |
+
+Warnings do not block. The output lists the metrics that are newly at warning
+level. The maintainability index is not part of the gate.
+
+Cyclomatic complexity and function length include nested functions, while the
+other three metrics cover only the function's own code. Adding a branching handler
+inside a React hook or component therefore raises the outer function's cyclomatic
+complexity too.
+
+Run the gate on every workspace, comparing the working tree, including untracked
+files, with the point where the branch left `origin/main`:
 
 ```bash
 pnpm check:complexity
@@ -195,25 +217,32 @@ pnpm --filter web check:complexity
 pnpm --filter @scoops/email check:complexity
 ```
 
-The committed `.code-multivitals-baseline.json` records existing violations so
-legacy complexity does not block unrelated work. New violations and worsened
-existing violation severities fail the check. The baseline stores
-repository-relative paths and is materialized into a temporary runner-specific
-file because the CodeMultiVitals CLI reports absolute paths.
+Fetch `origin` first so the comparison is current. Use `--base <git-ref>` to
+compare with another branch and `--head <git-ref>` to measure a commit instead of
+the working tree.
 
-When an intentional refactor changes the accepted baseline, regenerate it and
-review the resulting diff before committing:
+Keep these limits of the comparison in mind:
 
-```bash
-pnpm update:complexity-baseline
-pnpm check:complexity
-```
+- A renamed function, or a function moved to another file, counts as new.
+- A file counts as new when git does not recognize its rename. Rename tracked
+  files with `git mv`, so a local run can follow them.
+- Size can still grow by up to 10% in each pull request.
+- The analyser reads every file as TSX. The gate fails on a changed file it cannot
+  parse, such as a `.ts` generic arrow written `<T>() => {}`; write `<T,>() => {}`.
 
-Each app/package CI workflow has a separate `Complexity` job. It runs this gate
-against only that workflow's production source (`packages/core`,
-`packages/validation`, `apps/server`, or `apps/web`) while using the shared
-baseline. Changes to the CodeMultiVitals configuration, baseline, dependency
-lockfile, or checker also trigger the relevant jobs.
+Core, Validation, Server, Web and Email CI each have a separate `Complexity` job.
+It runs the checker tests, then the gate for that workflow's production source
+against the pull request's target branch (`--base HEAD^1`), and writes the result
+to the job summary. Changes to the CodeMultiVitals configuration, dependency
+lockfile, complexity scripts or their tests also trigger the relevant jobs.
+
+When there are blocking results or new warnings, or the gate cannot measure the
+change, the job also comments on the pull request through
+`scripts/comment-complexity-report.mjs`. Each workspace keeps one comment and
+updates it on later runs, including to `PASS`. A pull request with nothing to
+report gets no comment, pull requests from forks are not commented, and a failure
+before the gate runs, such as in the checker tests, posts nothing.
+`--output <path>` writes the report that the comment publishes.
 
 ## Architecture boundaries
 
@@ -554,8 +583,10 @@ unit and widget tests only, so Playwright route tests do not count toward this g
 appended to the workspace coverage comment. To reproduce it after a workspace coverage run:
 
 ```bash
-node scripts/check-changed-coverage.mjs web apps/web/coverage/lcov.info --base origin/main
+node scripts/check-changed-coverage.mjs web apps/web/coverage/lcov.info --base "$(git merge-base origin/main HEAD)" --working-tree
 ```
+
+`--working-tree` also measures uncommitted and untracked lines.
 
 The project target is at least 85% lines, statements and functions and 80% branches in every
 workspace. New and materially changed behavior must add scenario-complete tests and improve or
@@ -734,7 +765,7 @@ automatically enforced by local Git hooks.
 
 ## GitHub Actions CI status
 
-The repository contains four path-filtered GitHub Actions validation workflows. The workflow
+The repository contains five path-filtered GitHub Actions validation workflows. The workflow
 files are authoritative for their exact triggers, path filters and commands; this section provides
 the maintained summary:
 
@@ -743,6 +774,8 @@ the maintained summary:
   Core and shared tooling inputs;
 - `.github/workflows/validation-package-ci.yml` (`Validation CI`) runs Validation code,
   architecture and type checks as parallel jobs for Validation or Core inputs;
+- `.github/workflows/email-package-ci.yml` (`Email CI`) runs only the complexity gate
+  for Email template inputs;
 - `.github/workflows/server-app-ci.yml` (`Server CI`) runs Server code, architecture,
   type, controller test, job test and build checks as parallel jobs for Server,
   Validation or Core inputs. A coverage job then merges both test reports, failing if
@@ -753,15 +786,14 @@ the maintained summary:
   Real-service browser scenarios are validated separately with their required
   Server/PostgreSQL environment.
 
-Each app and package workflow finishes its primary checks with an aggregate `Web`,
+Each Core, Validation, Server and Web workflow finishes its primary checks with an aggregate `Web`,
 `Server`, `Core` or `Validation` job that requires all split validation jobs to pass.
 These aggregate check names remain stable for branch protection; the individual jobs
 expose the failing validation directly. Core mutation shards and their score gate remain
 separate checks.
 
-Each workflow also has a separate `Complexity` job that runs the scoped
-CodeMultiVitals baseline quality gate alongside the app/package-specific
-validation job.
+Each of the five workflows also has a separate `Complexity` job that runs the
+[complexity gate](#complexity-analysis-with-codemultivitals) for its workspace.
 
 Core, Server and Web validation run on matching pull requests. Validation also runs on
 matching pushes to `main`. Separate
@@ -790,6 +822,41 @@ pnpm --filter @scoops/core test:mutation --files src/pdv/use-cases/register-orde
 pnpm --filter web check:types
 pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 ```
+
+### Check changed code
+
+`pnpm check:changed` runs the local checks for everything changed since the branch left
+`origin/main`, including uncommitted and untracked files. Fetch `origin` first.
+
+```bash
+pnpm check:changed
+pnpm check:changed --dry-run
+pnpm check:changed --tests apps/server/src/pdv/rest/controllers/tests/<name>.controller.test.ts
+```
+
+| Check | What it covers |
+| --- | --- |
+| Lint | Changed files |
+| Complexity | Functions in changed source files |
+| Types | Changed workspaces, and the workspaces that depend on changed source |
+| Architecture | Changed workspaces |
+| Script tests | Tests named after changed scripts |
+| Test integrity | Runs when a test file changed |
+| Core and Web tests | Tests that import a changed file (`vitest related`) |
+| Server tests | Changed tests, and tests named after changed files |
+| Changed-lines coverage | Changed lines, measured from the tests above |
+| Playwright | Changed spec files only |
+| Mutation | Changed eligible use cases, and those whose tests changed |
+
+It runs no coverage floor, build or whole suite, although a widely imported Core or Web
+file selects many tests. A Server controller test boots the whole application, so Server
+tests are matched by name: `tests/<name>.test.ts` beside `<name>.ts`. Add other tests that cover a change with `--tests`. Notes at the end list
+changes to shared code that may need a broader check, and changed UI whose Playwright files
+you should run.
+
+The command exits with 0 when every check passed, 1 when a check failed and 2 when a check
+was skipped, such as Server tests without Docker. `REVIEW` marks a finished mutation run:
+compare each file's score with 70%.
 
 ### Local check scope
 

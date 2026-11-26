@@ -5,7 +5,6 @@ on:
     paths:
       - ".github/workflows/validation-package-ci.yml"
       - "biome.json"
-      - ".code-multivitals-baseline.json"
       - ".code-multivitals.json"
       - "package.json"
       - "packages/core/**"
@@ -13,6 +12,9 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "scripts/check-complexity.mjs"
+      - "scripts/comment-complexity-report.mjs"
+      - "scripts/tests/check-complexity.test.mjs"
+      - "scripts/tests/comment-complexity-report.test.mjs"
       - ".dependency-cruiser.mjs"
 
 permissions:
@@ -127,10 +129,15 @@ jobs:
     name: Complexity
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -147,4 +154,26 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check complexity
-        run: pnpm --filter @scoops/validation check:complexity
+        id: complexity
+        run: |
+          node --test scripts/tests/check-complexity.test.mjs scripts/tests/comment-complexity-report.test.mjs
+          pnpm --filter @scoops/validation check:complexity --base HEAD^1 --output "$GITHUB_WORKSPACE/complexity-report.md"
+
+      - name: Publish Validation complexity on pull request
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.complexity.outputs.findings != '' }}
+        uses: actions/github-script@v9
+        env:
+          HAS_FINDINGS: ${{ steps.complexity.outputs.findings }}
+        with:
+          script: |
+            const { commentComplexityReport } = await import(
+              `${process.env.GITHUB_WORKSPACE}/scripts/comment-complexity-report.mjs`
+            )
+            const outcome = await commentComplexityReport({
+              github,
+              context,
+              workspace: 'validation',
+              reportPath: `${process.env.GITHUB_WORKSPACE}/complexity-report.md`,
+              hasFindings: process.env.HAS_FINDINGS === 'true',
+            })
+            core.info(`Complexity comment: ${outcome}`)
