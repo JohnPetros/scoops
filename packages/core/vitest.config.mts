@@ -14,13 +14,13 @@ export default defineConfig({
       ],
       reportOnFailure: true,
       reportsDirectory: './coverage',
-      // Baseline floor measured on 2026-08-27. Raise only; project target is 85/80.
+      // Baseline floor measured on 2026-11-26. Raise only; project target is 85/80.
       thresholds: {
         autoUpdate: false,
-        branches: 57.7,
-        functions: 68.6,
-        lines: 64.5,
-        statements: 62.4,
+        branches: 79.8,
+        functions: 86.8,
+        lines: 83.9,
+        statements: 82.8,
       },
     },
     globals: true,

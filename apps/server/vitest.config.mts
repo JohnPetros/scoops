@@ -17,6 +17,8 @@ export default defineConfig({
         'src/**/fixtures/**',
         'src/**/index.ts',
         'src/**/*.d.ts',
+        // Development script run by hand; no test boundary owns it.
+        'src/shared/database/seed.ts',
       ],
       include: ['src/**/*.ts'],
       provider: 'v8',
@@ -28,13 +30,13 @@ export default defineConfig({
       ],
       reportOnFailure: true,
       reportsDirectory: './coverage',
-      // Baseline floor measured on 2026-08-27. Raise only; project target is 85/80.
+      // Baseline floor measured on 2026-11-26. Raise only; project target is 85/80.
       thresholds: {
         autoUpdate: false,
-        branches: 52.7,
-        functions: 71.6,
-        lines: 75.2,
-        statements: 71.6,
+        branches: 61.4,
+        functions: 79.6,
+        lines: 80.0,
+        statements: 77.2,
       },
     },
     environment: 'node',
