@@ -18,6 +18,8 @@ on:
       - "scripts/check-complexity.mjs"
       - "scripts/sync-heroku-env.mjs"
       - "scripts/write-coverage-report.mjs"
+      - "scripts/check-changed-coverage.mjs"
+      - "scripts/tests/check-changed-coverage.test.mjs"
       - ".dependency-cruiser.mjs"
 
 permissions:
@@ -207,6 +209,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          # The changed-lines coverage gate diffs against the first parent.
+          fetch-depth: 2
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -249,6 +254,12 @@ jobs:
         run: node scripts/write-coverage-report.mjs server apps/server/coverage/coverage-summary.json apps/server/coverage/coverage-comment.md
         env:
           COVERAGE_OUTCOME: ${{ steps.coverage.outcome }}
+
+      - name: Check Server coverage of changed lines
+        if: always() && github.event_name == 'pull_request' && hashFiles('apps/server/coverage/lcov.info') != ''
+        run: |
+          node --test scripts/tests/check-changed-coverage.test.mjs
+          node scripts/check-changed-coverage.mjs server apps/server/coverage/lcov.info --base HEAD^1 --output apps/server/coverage/coverage-comment.md
 
       - name: Publish Server coverage on pull request
         if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && hashFiles('apps/server/coverage/coverage-comment.md') != ''

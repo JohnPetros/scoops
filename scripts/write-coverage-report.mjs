@@ -34,22 +34,22 @@ if (!thresholdsBlock) {
 const rows = metrics.map((metric) => {
   const result = summary.total?.[metric]
   if (!result) throw new Error(`Coverage summary is missing the ${metric} metric.`)
-  const baseline = thresholdsBlock.match(new RegExp(`\\b${metric}:\\s*([\\d.]+)`))?.[1]
-  if (!baseline) throw new Error(`Coverage config is missing the ${metric} threshold.`)
+  const floor = thresholdsBlock.match(new RegExp(`\\b${metric}:\\s*([\\d.]+)`))?.[1]
+  if (!floor) throw new Error(`Coverage config is missing the ${metric} threshold.`)
   const label = metric[0].toUpperCase() + metric.slice(1)
-  return `| ${label} | ${result.pct}% | ${baseline}% | ${result.covered} / ${result.total} |`
+  return `| ${label} | ${result.pct}% | ${floor}% | ${result.covered} / ${result.total} |`
 })
 const report = [
   `<!-- coverage-report:${workspace} -->`,
   `## ${workspaceName} test coverage`,
   '',
-  '| Metric | Coverage | Current Baseline | Covered / Total |',
+  '| Metric | Coverage | Floor | Covered / Total |',
   '| --- | ---: | ---: | ---: |',
   ...rows,
   '',
   coveragePassed
-    ? '✅ All configured Vitest coverage baselines passed.'
-    : '❌ Tests or configured Vitest coverage baselines failed. This is a blocking CI result.',
+    ? '✅ All configured Vitest coverage floors passed.'
+    : '❌ Tests or configured Vitest coverage floors failed. This is a blocking CI result.',
   ...(runUrl ? ['', `[Open workflow run](${runUrl})`] : []),
   '',
 ].join('\n')

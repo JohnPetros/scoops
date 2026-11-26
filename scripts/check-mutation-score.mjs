@@ -18,6 +18,34 @@ const MODULE_LABELS = {
   pdv: 'PDV',
 }
 const MODULES = Object.values(MODULE_LABELS)
+// Same classification as Stryker's mutation score: timeouts are detected, uncovered
+// mutants are undetected, and ignored or invalid mutants are not scored.
+const STATUS_COUNTERS = {
+  Killed: 'killed',
+  Timeout: 'timeout',
+  Survived: 'survived',
+  NoCoverage: 'noCoverage',
+  Ignored: 'ignored',
+  RuntimeError: 'errors',
+  CompileError: 'errors',
+}
+const UNSCORED_COUNTERS = new Set(['ignored', 'errors'])
+const DETECTED_COUNTERS = new Set(['killed', 'timeout'])
+
+function createModuleResult() {
+  return {
+    denominator: 0,
+    detected: 0,
+    errors: 0,
+    files: 0,
+    ignored: 0,
+    killed: 0,
+    noCoverage: 0,
+    survived: 0,
+    timeout: 0,
+    totalMutants: 0,
+  }
+}
 export function parseThreshold(value = '70') {
   if (!/^\d+(?:\.\d+)?$/.test(value)) {
     throw new Error('Threshold must be a number from 0 to 100.')
@@ -46,12 +74,7 @@ export function collectMutationReports(rootPath) {
 }
 
 export function aggregateMutationReports(reportPaths) {
-  const moduleResults = new Map(
-    MODULES.map((label) => [
-      label,
-      { denominator: 0, files: 0, ignored: 0, killed: 0, noCoverage: 0, totalMutants: 0 },
-    ]),
-  )
+  const moduleResults = new Map(MODULES.map((label) => [label, createModuleResult()]))
   const seenFiles = new Set()
   const files = new Map()
 
@@ -90,7 +113,7 @@ export function aggregateMutationReports(reportPaths) {
       if (!file || !Array.isArray(file.mutants)) {
         throw new Error(`Mutation file ${sourcePath} must contain a mutants array.`)
       }
-      const fileResult = { denominator: 0, killed: 0, module: moduleLabel }
+      const fileResult = { denominator: 0, detected: 0, module: moduleLabel }
       const result = moduleResults.get(moduleLabel)
       if (file.mutants.length > 0) result.files += 1
       for (const mutant of file.mutants) {
@@ -99,21 +122,7 @@ export function aggregateMutationReports(reportPaths) {
             `Mutation file ${sourcePath} has a mutant with an invalid status.`,
           )
         }
-        result.totalMutants += 1
-        if (mutant.status === 'NoCoverage') {
-          result.noCoverage += 1
-          continue
-        }
-        if (mutant.status === 'Ignored') {
-          result.ignored += 1
-          continue
-        }
-        result.denominator += 1
-        fileResult.denominator += 1
-        if (mutant.status === 'Killed') {
-          result.killed += 1
-          fileResult.killed += 1
-        }
+        scoreMutant(mutant.status, result, fileResult)
       }
       files.set(normalizedPath.replace(/^packages\/core\//, ''), fileResult)
     }
@@ -123,8 +132,58 @@ export function aggregateMutationReports(reportPaths) {
   return { files, missingModules, modules: moduleResults }
 }
 
-function fileScore(result) {
-  return result.denominator === 0 ? null : result.killed / result.denominator
+function scoreMutant(status, moduleResult, fileResult) {
+  // An unknown or unfinished status counts as an undetected survivor.
+  const counter = STATUS_COUNTERS[status] ?? 'survived'
+  moduleResult.totalMutants += 1
+  moduleResult[counter] += 1
+  if (UNSCORED_COUNTERS.has(counter)) return
+  moduleResult.denominator += 1
+  fileResult.denominator += 1
+  if (!DETECTED_COUNTERS.has(counter)) return
+  moduleResult.detected += 1
+  fileResult.detected += 1
+}
+
+function ratioScore(result) {
+  return !result || result.denominator === 0 ? null : result.detected / result.denominator
+}
+
+function meetsThreshold(result, threshold) {
+  const score = ratioScore(result)
+  return score !== null && score * 100 >= threshold
+}
+
+// Compares exact ratios, so rounding never hides a drop.
+function holdsScore(current, previous) {
+  return (
+    ratioScore(current) !== null &&
+    current.detected * previous.denominator >= previous.detected * current.denominator
+  )
+}
+
+function formatScore(result) {
+  const score = ratioScore(result)
+  return score === null ? 'N/A' : `${(score * 100).toFixed(2)}%`
+}
+
+function evaluateChangedFile(current, previous, status, threshold) {
+  const isBelowFloor =
+    status !== 'A' &&
+    ratioScore(previous) !== null &&
+    !meetsThreshold(previous, threshold)
+  if (!isBelowFloor) {
+    return {
+      passed: meetsThreshold(current, threshold),
+      policy: 'changed/new ≥ threshold',
+      failure: `changed/new file is ${formatScore(current)}, below ${threshold}%`,
+    }
+  }
+  return {
+    passed: meetsThreshold(current, threshold) || holdsScore(current, previous),
+    policy: 'changed below threshold: no drop',
+    failure: `changed file below ${threshold}% dropped from ${formatScore(previous)} to ${formatScore(current)}`,
+  }
 }
 
 export function parseChangedUseCaseFiles(output) {
@@ -202,13 +261,14 @@ export function compareFileScores(
         rows.push({ path, current, previous, passed: true, policy: 'deleted' })
         continue
       }
-      const score = fileScore(current)
-      const passed = score !== null && score * 100 >= threshold
-      rows.push({ path, current, previous, passed, policy: 'changed/new ≥ threshold' })
-      if (!passed)
-        failures.push(
-          `${path}: changed/new file is ${score === null ? 'N/A' : `${(score * 100).toFixed(2)}%`}, below ${threshold}%`,
-        )
+      const { passed, policy, failure } = evaluateChangedFile(
+        current,
+        previous,
+        status,
+        threshold,
+      )
+      rows.push({ path, current, previous, passed, policy })
+      if (!passed) failures.push(`${path}: ${failure}`)
       continue
     }
     if (!current || !previous) {
@@ -223,19 +283,14 @@ export function compareFileScores(
       failures.push(`${path}: missing ${missingSide} mutation data for unchanged file`)
       continue
     }
-    const currentScore = fileScore(current)
-    const previousScore = fileScore(previous)
-    let passed
-    if (previousScore === null)
-      passed = currentScore === null || currentScore * 100 >= threshold
-    else
-      passed =
-        currentScore !== null &&
-        current.killed * previous.denominator >= previous.killed * current.denominator
+    const passed =
+      ratioScore(previous) === null
+        ? ratioScore(current) === null || meetsThreshold(current, threshold)
+        : holdsScore(current, previous)
     rows.push({ path, current, previous, passed, policy: 'unchanged: no drop' })
     if (!passed) {
       failures.push(
-        `${path}: unchanged file dropped from ${previousScore === null ? 'N/A' : `${(previousScore * 100).toFixed(2)}%`} to ${currentScore === null ? 'N/A' : `${(currentScore * 100).toFixed(2)}%`}`,
+        `${path}: unchanged file dropped from ${formatScore(previous)} to ${formatScore(current)}`,
       )
     }
   }
@@ -243,19 +298,14 @@ export function compareFileScores(
 }
 
 export function renderFileScoreTable(comparison, threshold) {
-  const rows = comparison.rows.map(({ current, path, passed, policy, previous }) => {
-    const format = (result) => {
-      const score = result && fileScore(result)
-      return score === null || score === undefined
-        ? 'N/A'
-        : `${(score * 100).toFixed(2)}%`
-    }
-    return `| ${path} | ${policy} | ${format(previous)} | ${format(current)} | ${passed ? 'PASS' : 'FAIL'} |`
-  })
+  const rows = comparison.rows.map(
+    ({ current, path, passed, policy, previous }) =>
+      `| ${path} | ${policy} | ${formatScore(previous)} | ${formatScore(current)} | ${passed ? 'PASS' : 'FAIL'} |`,
+  )
   return [
     '## Core mutation score by use-case file',
     '',
-    `Changed/new eligible files must score at least ${threshold}%; unchanged eligible files must not drop from their target-branch score. Scores are compared without rounding.`,
+    `New eligible files, and changed files that were at or above ${threshold}%, must score at least ${threshold}%. Changed files already below it, and unchanged files, must not drop from their target-branch score. Scores are compared without rounding.`,
     '',
     '| File | Policy | Target branch | Candidate | Result |',
     '| --- | --- | ---: | ---: | --- |',
@@ -264,20 +314,28 @@ export function renderFileScoreTable(comparison, threshold) {
   ].join('\n')
 }
 
-export function renderMutationScoreTable(aggregate, threshold, excludedModules = []) {
+function evaluateModule(current, previous, threshold) {
+  if (meetsThreshold(current, threshold)) return 'PASS'
+  const isBelowFloor =
+    ratioScore(previous) !== null && !meetsThreshold(previous, threshold)
+  return isBelowFloor && holdsScore(current, previous) ? 'PASS (no drop)' : 'FAIL'
+}
+
+export function renderMutationScoreTable(
+  aggregate,
+  baseline,
+  threshold,
+  excludedModules = [],
+) {
   const rows = MODULES.map((module) => {
-    const { ignored, killed, noCoverage, denominator, totalMutants } =
-      aggregate.modules.get(module)
-    const survived = denominator - killed
-    const score = denominator === 0 ? null : (killed / denominator) * 100
-    const scoreText = score === null ? 'N/A' : `${score.toFixed(2)}%`
-    const isExcluded = excludedModules.includes(module.toLowerCase())
-    const result = isExcluded
+    const current = aggregate.modules.get(module)
+    const previous = baseline.modules.get(module)
+    const { killed, timeout, survived, noCoverage, ignored, errors, totalMutants } =
+      current
+    const result = excludedModules.includes(module.toLowerCase())
       ? 'TEMPORARILY EXCLUDED'
-      : score !== null && score >= threshold
-        ? 'PASS'
-        : 'FAIL'
-    return `| ${module} | ${killed} | ${survived} | ${noCoverage} | ${ignored} | ${totalMutants} | ${scoreText} | ${result} |`
+      : evaluateModule(current, previous, threshold)
+    return `| ${module} | ${killed} | ${timeout} | ${survived} | ${noCoverage} | ${ignored} | ${errors} | ${totalMutants} | ${formatScore(previous)} | ${formatScore(current)} | ${result} |`
   })
   const exclusionNote = excludedModules.length
     ? `Temporarily excluded from module and per-file thresholds: ${excludedModules.map((module) => MODULE_LABELS[module]).join(', ')}. Mutation results remain visible; remove the exclusion when module coverage is ready.`
@@ -285,22 +343,26 @@ export function renderMutationScoreTable(aggregate, threshold, excludedModules =
   return [
     '## Core mutation score by module',
     '',
-    `Required score: ${threshold}% per module. Score = killed / (all mutants except NoCoverage and Ignored).`,
+    `A module must score at least ${threshold}%; a module already below it on the target branch must not drop. Score = (killed + timeout) / (all mutants except Ignored, RuntimeError and CompileError). Uncovered mutants count against the score.`,
     exclusionNote,
     '',
-    '| Module | Killed | Survived | NoCoverage | Ignored | Total mutants | Mutation score | Result |',
-    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
+    '| Module | Killed | Timeout | Survived | NoCoverage | Ignored | Errors | Total mutants | Target branch | Candidate | Result |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |',
     ...rows,
     '',
   ].join('\n')
 }
 
-function isPassing(aggregate, threshold, excludedModules = []) {
-  return MODULES.every((module) => {
-    if (excludedModules.includes(module.toLowerCase())) return true
-    const { killed, denominator } = aggregate.modules.get(module)
-    return denominator > 0 && (killed / denominator) * 100 >= threshold
-  })
+function isPassing(aggregate, baseline, threshold, excludedModules = []) {
+  return MODULES.every(
+    (module) =>
+      excludedModules.includes(module.toLowerCase()) ||
+      evaluateModule(
+        aggregate.modules.get(module),
+        baseline.modules.get(module),
+        threshold,
+      ) !== 'FAIL',
+  )
 }
 
 function parseArguments(argumentsList) {
@@ -398,7 +460,7 @@ function main() {
     threshold,
     excludedModules,
   )
-  const markdown = `${renderMutationScoreTable(aggregate, threshold, excludedModules)}\n${renderFileScoreTable(comparison, threshold)}`
+  const markdown = `${renderMutationScoreTable(aggregate, baseline, threshold, excludedModules)}\n${renderFileScoreTable(comparison, threshold)}`
   if (outputPath) {
     mkdirSync(dirname(outputPath), { recursive: true })
     writeFileSync(outputPath, markdown)
@@ -412,7 +474,7 @@ function main() {
       `Missing mutation data for modules: ${aggregate.missingModules.join(', ')}.`,
     )
   }
-  if (!isPassing(aggregate, threshold, excludedModules)) process.exitCode = 1
+  if (!isPassing(aggregate, baseline, threshold, excludedModules)) process.exitCode = 1
   if (comparison.failures.length) {
     console.error(
       `Per-file mutation gate failed:\n${comparison.failures.map((failure) => `- ${failure}`).join('\n')}`,

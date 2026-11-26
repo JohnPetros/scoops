@@ -132,15 +132,19 @@ For applicable Core CI, include its separate `Mutation` job, which runs the full
 Core use-case scope with `--all` across all four CI shards and uploads HTML/JSON
 reports even on failure. Verify
 execution success and the hybrid score gate separately from the Spec's semantic
-mutation acceptance. Require same-run target-branch and candidate reports: each
-included module (Analytics, Communication, Identity, MRP and PDV) and each changed
-or new eligible use-case source file in those modules must score at least 70%; every
+mutation acceptance. Require same-run target-branch and candidate reports. Timeouts
+count as detected and uncovered mutants as undetected. Each included module
+(Analytics, Communication, Identity, MRP and PDV), each new eligible use-case source
+file in those modules and each changed file that was at or above 70% must score at
+least 70%. A module or changed file already below 70% must not drop, and every
 unchanged eligible use-case file in those modules must preserve or improve its exact
 target-branch score, without rounding or an allowed decrease. Billing's module and
 per-file thresholds are temporarily suspended pending related test coverage. Missing,
 invalid or incomplete reports, missing unchanged-file baselines and unscoreable
 included modules fail closed. A file that is N/A on both revisions remains N/A; when
-only one revision has a score, the candidate must meet 70%. Inspect relevant
+only one revision has a score, the candidate must meet 70%. The Core, Server and Web
+coverage jobs also require 80% of changed lines and 70% of changed-line branches.
+Inspect relevant
 CI report discrepancies and reconcile them with current local mutation evidence.
 
 Pending, missing expected, cancelled or earlier-SHA checks are not passing evidence. A local

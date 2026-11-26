@@ -46,11 +46,11 @@ test('writes a coverage report and appends it to the GitHub step summary', async
     const stepSummary = await readFile(stepSummaryPath, 'utf8')
     assert.match(report, /<!-- coverage-report:web -->/)
     assert.match(report, /## Web test coverage/)
-    assert.match(report, /\| Statements \| 91% \| 52\.2% \| 91 \/ 100 \|/)
-    assert.match(report, /\| Branches \| 82% \| 49\.2% \| 82 \/ 100 \|/)
-    assert.match(report, /\| Functions \| 88% \| 49% \| 88 \/ 100 \|/)
-    assert.match(report, /\| Lines \| 90% \| 54\.1% \| 90 \/ 100 \|/)
-    assert.match(report, /✅ All configured Vitest coverage baselines passed\./)
+    assert.match(report, /\| Statements \| 91% \| 56\.6% \| 91 \/ 100 \|/)
+    assert.match(report, /\| Branches \| 82% \| 54\.3% \| 82 \/ 100 \|/)
+    assert.match(report, /\| Functions \| 88% \| 57\.5% \| 88 \/ 100 \|/)
+    assert.match(report, /\| Lines \| 90% \| 58\.3% \| 90 \/ 100 \|/)
+    assert.match(report, /✅ All configured Vitest coverage floors passed\./)
     assert.match(
       report,
       /\[Open workflow run\]\(https:\/\/github\.com\/scoops\/example\/actions\/runs\/123\)/,

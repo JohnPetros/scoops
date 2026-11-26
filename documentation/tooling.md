@@ -441,24 +441,30 @@ the comparison, but it must not inherit candidate dependencies, regular test
 configuration or `node_modules`. After the shards finish, a separate `Mutation score` job
 combines each revision's JSON reports and applies a hybrid gate:
 
-- each included candidate module must score at least 70%;
-- each changed or new eligible use-case source file in an included module must score at least 70%;
-- every unchanged eligible use-case file in an included module must preserve or improve its target-branch
-  score, comparing exact scores without rounding or any allowed decrease.
+- an included module must score at least 70%; a module already below 70% on the target branch
+  must not drop;
+- a new eligible use-case source file, and a changed one that was at or above 70% on the target
+  branch, must score at least 70%;
+- a changed file already below 70% on the target branch must not drop, unless it reaches 70%;
+- every unchanged eligible use-case file in an included module must preserve or improve its
+  target-branch score.
+
+Scores are compared exactly, without rounding or any allowed decrease.
 
 The included modules are Analytics, Communication, Identity, MRP and PDV. The job
 uploads its complete score/comparison report even when a gate fails. Billing
 is temporarily excluded from module and per-file thresholds because its current use-case mutants have no related tests
 and cannot produce a meaningful score. Remove this exclusion once Billing tests
-cover its use cases, and then require its score to meet the same threshold. For every
+cover its use cases, and then require its score to meet the same rules. For every
 included module, no scoreable mutants fails closed. A file that had no scoreable
 mutants on both revisions remains N/A; if only one revision is scoreable, the
 candidate must meet the 70% floor. Missing,
 incomplete or invalid base/candidate reports and a missing comparable baseline for
 an unchanged file also fail closed. A stale report from an earlier run cannot
 substitute for the same-run target-branch measurement.
-Scores use killed divided by all mutants except NoCoverage and Ignored; survivors,
-timeouts, runtime errors and other unresolved statuses count against the threshold.
+Scores use killed plus timed-out mutants divided by all mutants except Ignored, RuntimeError
+and CompileError, as Stryker classifies them. Uncovered mutants, survivors and any unfinished
+or unknown status count against the score.
 
 Each shard labels mutation results by module (Analytics, Billing, Communication,
 Identity, MRP and PDV) in the GitHub Actions summary and the artifact's
@@ -494,7 +500,9 @@ not acceptance; applicable mutation pass conditions must also be satisfied.
 
 Core, Server and Web use Vitest's V8 coverage provider. Coverage includes unimported production
 source files so an untested file remains visible at `0%`; tests, fixtures, generated route
-metadata and pure export barrels are excluded where applicable.
+metadata and pure export barrels are excluded where applicable. Server coverage also excludes
+the development seed script, `apps/server/src/shared/database/seed.ts`, which no test boundary
+owns.
 
 Run all coverage suites from the repository root:
 
@@ -529,10 +537,25 @@ service or upload token is required.
 
 | Workspace | Statements | Branches | Functions | Lines |
 | --- | ---: | ---: | ---: | ---: |
-| Core baseline floor | 62.4% | 57.7% | 68.6% | 64.5% |
-| Server baseline floor | 71.6% | 52.7% | 71.6% | 75.2% |
-| Web baseline floor | 52.2% | 49.2% | 49.0% | 54.1% |
+| Core floor | 82.8% | 79.8% | 86.8% | 83.9% |
+| Server floor | 77.2% | 61.4% | 79.6% | 80.0% |
+| Web floor | 56.6% | 54.3% | 57.5% | 58.3% |
 | Project target | 85.0% | 80.0% | 85.0% | 85.0% |
+
+Floors sit about one point below the results measured on 2026-11-26. Raise them when the measured
+results rise.
+
+Pull requests also gate the coverage of changed lines. In the same CI job,
+`scripts/check-changed-coverage.mjs` compares the workspace LCOV report with the lines the pull
+request adds or modifies under that workspace's `src/`, and requires at least 80% of the changed
+executable lines and 70% of the branches on changed lines. Files that the coverage configuration
+excludes are not measured, and a change with no executable lines passes. Web coverage comes from
+unit and widget tests only, so Playwright route tests do not count toward this gate. The result is
+appended to the workspace coverage comment. To reproduce it after a workspace coverage run:
+
+```bash
+node scripts/check-changed-coverage.mjs web apps/web/coverage/lcov.info --base origin/main
+```
 
 The project target is at least 85% lines, statements and functions and 80% branches in every
 workspace. New and materially changed behavior must add scenario-complete tests and improve or

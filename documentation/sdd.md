@@ -193,15 +193,17 @@ Follow Tooling for local changed-file selection or explicit use-case scope. Core
 always executes every eligible Core use case with `--all` across all four CI
 shards and publishes HTML/JSON reports, including on failure.
 The integrated CI suite measures the PR candidate and target branch in the same
-run and compares their merged reports. Each included Core module and each changed
-or new eligible use-case source file in an included module must score at least 70%.
-Each unchanged eligible use-case file in an included module must preserve or improve its exact target-branch score;
-rounding and score decreases are not allowed. Billing is temporarily excluded until
-related tests make its mutants scoreable; its module and per-file thresholds are
-temporarily suspended. Missing, invalid or incomplete reports, missing unchanged-file
-baselines and unscoreable included modules fail closed. A file that is N/A on both
-revisions remains N/A; when only one revision has a score, the candidate must meet
-70%. Passing that gate does not
+run and compares their merged reports, counting timeouts as detected and uncovered
+mutants as undetected. Each included Core module, each new eligible use-case source
+file and each changed file that was at or above 70% must score at least 70%. A module
+or changed file already below 70% must not drop, and each unchanged eligible
+use-case file must preserve or improve its exact target-branch score; rounding and
+score decreases are not allowed. Billing is temporarily excluded until related tests
+make its mutants scoreable; its module and per-file thresholds are temporarily
+suspended. Missing, invalid or incomplete reports, missing unchanged-file baselines
+and unscoreable included modules fail closed. A file that is N/A on both revisions
+remains N/A; when only one revision has a score, the candidate must meet 70%. Passing
+that gate does not
 replace a Spec’s semantic pass conditions or evidence-based dispositions of
 surviving, uncovered and equivalent mutants.
 Execution errors and actionable assertion gaps require correction, not a blanket

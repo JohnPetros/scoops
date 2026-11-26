@@ -83,7 +83,7 @@ export function renderMutationReport(report, shard) {
     'Partial shard results only. Files count includes only files with reported mutants.',
     'Absent modules have no reported mutants in this shard; this does not establish their test coverage or a zero mutation count across all shards.',
     'Statuses are reported separately; execution errors are not killed mutants. These counts do not establish acceptance.',
-    'Partial shard score = Killed / (total mutants − NoCoverage − Ignored). Errors, timeouts and other statuses remain in the denominator. A zero denominator is N/A. These are partial shard scores, not final module CI scores.',
+    'Partial shard score = (Killed + Timeout) / (total mutants − Ignored − RuntimeError − CompileError). Uncovered and other statuses count against it. A zero denominator is N/A. These are partial shard scores, not final module CI scores.',
     '',
     `| Module | Files | Total mutants | ${columns.map(escapeCell).join(' | ')} | Partial shard score |`,
     `| --- | ---: | ---: | ${columns.map(() => '---:').join(' | ')} | ---: |`,
@@ -94,14 +94,12 @@ export function renderMutationReport(report, shard) {
 }
 
 function renderRow(label, result, columns) {
+  const count = (status) => result.statuses.get(status) ?? 0
   const denominator =
-    result.total -
-    (result.statuses.get('NoCoverage') ?? 0) -
-    (result.statuses.get('Ignored') ?? 0)
+    result.total - count('Ignored') - count('RuntimeError') - count('CompileError')
+  const detected = count('Killed') + count('Timeout')
   const score =
-    denominator === 0
-      ? 'N/A'
-      : `${(((result.statuses.get('Killed') ?? 0) / denominator) * 100).toFixed(2)}%`
+    denominator === 0 ? 'N/A' : `${((detected / denominator) * 100).toFixed(2)}%`
   return `| ${escapeCell(label)} | ${result.files} | ${result.total} | ${columns.map((status) => result.statuses.get(status) ?? 0).join(' | ')} | ${score} |`
 }
 
