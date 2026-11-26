@@ -19,7 +19,7 @@
     "check:architecture": "pnpm --filter @scoops/core check:architecture && pnpm --filter @scoops/validation check:architecture && pnpm --filter server check:architecture && pnpm --filter web check:architecture",
     "check:spec-implementation": "node scripts/check-spec-implementation.mjs",
     "check-types": "turbo run check-types",
-    "check:code": "pnpm --filter @scoops/core check:code && pnpm --filter @scoops/validation check:code && pnpm --filter server check:code && pnpm --filter web check:code",
+    "check:lint": "pnpm --filter @scoops/core check:lint && pnpm --filter @scoops/validation check:lint && pnpm --filter server check:lint && pnpm --filter web check:lint",
     "check:types": "pnpm --filter @scoops/core check:types && pnpm --filter @scoops/validation check:types && pnpm --filter server check:types && pnpm --filter web check:types"
   },
   "devDependencies": {

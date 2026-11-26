@@ -111,7 +111,7 @@ commands are:
 | `pnpm dev` | Runs persistent development tasks without caching. |
 | `pnpm format` | Formats the complete repository with Biome. |
 
-The repository currently names workspace validation scripts `check:code` and
+The repository currently names workspace validation scripts `check:lint` and
 `check:types`, while the root Turbo tasks are named `lint` and `check-types`.
 Until those names are aligned, run validation through the workspace commands
 documented below instead of assuming `pnpm lint` or `pnpm check-types` validates
@@ -164,10 +164,10 @@ pnpm format
 Check each workspace's source:
 
 ```bash
-pnpm --filter web check:code
-pnpm --filter server check:code
-pnpm --filter @scoops/core check:code
-pnpm --filter @scoops/validation check:code
+pnpm --filter web check:lint
+pnpm --filter server check:lint
+pnpm --filter @scoops/core check:lint
+pnpm --filter @scoops/validation check:lint
 ```
 
 ## Complexity analysis with CodeMultiVitals

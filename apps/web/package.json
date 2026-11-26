@@ -16,7 +16,7 @@
     "check:complexity": "node ../../scripts/check-complexity.mjs --scope apps/web",
     "check:architecture": "dependency-cruise --config ../../.dependency-cruiser.mjs -- src",
     "format": "biome format --write .",
-    "check:code": "biome check src",
+    "check:lint": "biome check src",
     "check:types": "tsc --noEmit"
   },
   "dependencies": {

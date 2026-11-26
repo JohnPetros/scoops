@@ -47,7 +47,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check code
-        run: pnpm --filter @scoops/validation check:code
+        run: pnpm --filter @scoops/validation check:lint
 
   validation_architecture:
     name: Validation architecture

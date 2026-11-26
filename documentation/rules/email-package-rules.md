@@ -82,7 +82,7 @@ packages/email/
 Before handing off changes to this package, run:
 
 ```bash
-pnpm --filter @scoops/email check:code
+pnpm --filter @scoops/email check:lint
 pnpm --filter @scoops/email check:types
 ```
 

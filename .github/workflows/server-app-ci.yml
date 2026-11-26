@@ -52,7 +52,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check code
-        run: pnpm --filter server check:code
+        run: pnpm --filter server check:lint
 
   server_architecture:
     name: Server architecture

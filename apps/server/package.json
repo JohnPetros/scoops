@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "biome format --write .",
-    "check:code": "biome check src",
+    "check:lint": "biome check src",
     "check:architecture": "dependency-cruise --config ../../.dependency-cruiser.mjs -- src",
     "check:types": "tsc --noEmit -p tsconfig.build.json",
     "check:complexity": "node ../../scripts/check-complexity.mjs --scope apps/server",
