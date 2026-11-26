@@ -13,6 +13,7 @@
     "doop": "node ./scripts/open-doop.mjs",
     "test:scripts": "node --test scripts/tests/*.test.mjs",
     "check:test-integrity": "node scripts/check-test-integrity.mjs",
+    "check:changed": "node scripts/check-changed.mjs",
     "check:complexity": "node scripts/check-complexity.mjs",
     "test:coverage": "pnpm --filter @scoops/core test:coverage && pnpm --filter server test:coverage && pnpm --filter web test:coverage",
     "check:architecture": "pnpm --filter @scoops/core check:architecture && pnpm --filter @scoops/validation check:architecture && pnpm --filter server check:architecture && pnpm --filter web check:architecture",

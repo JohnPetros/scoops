@@ -823,6 +823,41 @@ pnpm --filter web check:types
 pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 ```
 
+### Check changed code
+
+`pnpm check:changed` runs the local checks for everything changed since the branch left
+`origin/main`, including uncommitted and untracked files. Fetch `origin` first.
+
+```bash
+pnpm check:changed
+pnpm check:changed --dry-run
+pnpm check:changed --tests apps/server/src/pdv/rest/controllers/tests/<name>.controller.test.ts
+```
+
+| Check | What it covers |
+| --- | --- |
+| Lint | Changed files |
+| Complexity | Functions in changed source files |
+| Types | Changed workspaces, and the workspaces that depend on changed source |
+| Architecture | Changed workspaces |
+| Script tests | Tests named after changed scripts |
+| Test integrity | Runs when a test file changed |
+| Core and Web tests | Tests that import a changed file (`vitest related`) |
+| Server tests | Changed tests, and tests named after changed files |
+| Changed-lines coverage | Changed lines, measured from the tests above |
+| Playwright | Changed spec files only |
+| Mutation | Changed eligible use cases, and those whose tests changed |
+
+It runs no coverage floor, build or whole suite, although a widely imported Core or Web
+file selects many tests. A Server controller test boots the whole application, so Server
+tests are matched by name: `tests/<name>.test.ts` beside `<name>.ts`. Add other tests that cover a change with `--tests`. Notes at the end list
+changes to shared code that may need a broader check, and changed UI whose Playwright files
+you should run.
+
+The command exits with 0 when every check passed, 1 when a check failed and 2 when a check
+was skipped, such as Server tests without Docker. `REVIEW` marks a finished mutation run:
+compare each file's score with 70%.
+
 ### Local check scope
 
 - **Scope to changed files.** Lint with `biome check <changed files>`, test with
