@@ -78,7 +78,7 @@ report alone does not establish acceptance.
 
 Run focused checks during development. Use the repository's commands and test-ownership
 policy; do not add direct tests to indirect boundaries or weaken tests, coverage thresholds,
-complexity baselines or checkers to pass. Run applicable complexity checks at a coherent
+complexity limits or checkers to pass. Run applicable complexity checks at a coherent
 composition boundary before expensive checks that a structural correction would invalidate.
 Run only the checks for the changed code, following the Local check scope in
 [`tooling.md`](../tooling.md): that covers linting, types, architecture, complexity, coverage,
