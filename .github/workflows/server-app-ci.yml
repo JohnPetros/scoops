@@ -229,6 +229,17 @@ jobs:
           pattern: server-blob-report-*
           merge-multiple: true
 
+      - name: Require both suite reports
+        run: |
+          missing=0
+          for suite in controllers jobs; do
+            if [[ ! -f "apps/server/.vitest-reports/$suite.json" ]]; then
+              echo "::error::Missing $suite suite report. Re-run its test job."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
       - name: Merge coverage and enforce thresholds
         id: coverage
         run: pnpm --filter server test:coverage:merge
