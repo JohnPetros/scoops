@@ -32,7 +32,7 @@ const METRICS = {
   halsteadVolume: { label: 'Halstead volume', growth: 0.1 },
 }
 const USAGE =
-  'Usage: node scripts/check-complexity.mjs [--scope <app-or-package-path>] [--base <git-ref>] [--head <git-ref>]'
+  'Usage: node scripts/check-complexity.mjs [--scope <app-or-package-path>] [--base <git-ref>] [--head <git-ref>] [--output <path>]'
 
 export function isProductionSource(path, scope) {
   const scopes = scope ? [SOURCE_SCOPES[scope]] : Object.values(SOURCE_SCOPES)
@@ -248,6 +248,23 @@ function renderLocation({ path, line, name }) {
   return `| ${path}:${line} | \`${name}\` |`
 }
 
+function renderTitle(scope) {
+  return `## Complexity: ${scope ?? 'all workspaces'}`
+}
+
+export function renderFailure(scope, message) {
+  return [
+    renderTitle(scope),
+    '',
+    '**FAIL**: the gate could not measure the change.',
+    '',
+    '```text',
+    message,
+    '```',
+    '',
+  ].join('\n')
+}
+
 export function renderComplexity(scope, result) {
   const { mergeBase, files, violations, warnings } = result
   const summary = violations.length
@@ -262,7 +279,7 @@ export function renderComplexity(scope, result) {
       `${renderLocation(item)} ${METRICS[item.metric].label} | ${formatValue(item.before)} | ${formatValue(item.after)} |`,
   )
   return [
-    `## Complexity: ${scope ?? 'all workspaces'}`,
+    renderTitle(scope),
     '',
     `Compared ${files} changed source file(s) with ${mergeBase.slice(0, 8)}.`,
     '',
@@ -300,6 +317,7 @@ export function parseArguments(argumentsList) {
     if (flag === '--scope') options.scope = value
     else if (flag === '--base') options.base = value
     else if (flag === '--head') options.head = value
+    else if (flag === '--output') options.output = value
     else throw new Error(`Unknown option: ${flag}\n${USAGE}`)
   }
   if (options.scope && !SOURCE_SCOPES[options.scope]) {
@@ -310,15 +328,31 @@ export function parseArguments(argumentsList) {
   return options
 }
 
+// The output file and the `findings` step output drive the pull-request comment.
+function publishReport({ output }, markdown, hasFindings) {
+  process.stdout.write(markdown)
+  if (output) {
+    mkdirSync(dirname(resolve(output)), { recursive: true })
+    writeFileSync(output, markdown)
+  }
+  const { GITHUB_OUTPUT, GITHUB_STEP_SUMMARY } = process.env
+  if (GITHUB_STEP_SUMMARY) appendFileSync(GITHUB_STEP_SUMMARY, `\n${markdown}`)
+  if (GITHUB_OUTPUT) appendFileSync(GITHUB_OUTPUT, `findings=${hasFindings}\n`)
+}
+
 function main() {
   const options = parseArguments(process.argv.slice(2))
-  const result = checkComplexity(options)
-  const markdown = renderComplexity(options.scope, result)
-  process.stdout.write(markdown)
-  if (process.env.GITHUB_STEP_SUMMARY) {
-    appendFileSync(process.env.GITHUB_STEP_SUMMARY, `\n${markdown}`)
+  let result
+  try {
+    result = checkComplexity(options)
+  } catch (error) {
+    publishReport(options, renderFailure(options.scope, error.message), true)
+    throw error
   }
-  if (result.violations.length) process.exitCode = 1
+  const { violations, warnings } = result
+  const hasFindings = violations.length + warnings.length > 0
+  publishReport(options, renderComplexity(options.scope, result), hasFindings)
+  if (violations.length) process.exitCode = 1
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

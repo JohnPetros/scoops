@@ -234,7 +234,14 @@ Core, Validation, Server, Web and Email CI each have a separate `Complexity` job
 It runs the checker tests, then the gate for that workflow's production source
 against the pull request's target branch (`--base HEAD^1`), and writes the result
 to the job summary. Changes to the CodeMultiVitals configuration, dependency
-lockfile, checker or checker tests also trigger the relevant jobs.
+lockfile, complexity scripts or their tests also trigger the relevant jobs.
+
+When there are blocking results or new warnings, or the gate cannot run, the job
+also comments on the pull request through
+`scripts/comment-complexity-report.mjs`. Each workspace keeps one comment and
+updates it on later runs, including to `PASS`. A pull request with nothing to
+report gets no comment, and pull requests from forks are not commented.
+`--output <path>` writes the report that the comment publishes.
 
 ## Architecture boundaries
 

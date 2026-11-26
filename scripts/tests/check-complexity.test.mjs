@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
@@ -232,4 +239,45 @@ test('exits with a usage error for an unknown option', () => {
 
   assert.equal(run.status, 1)
   assert.match(run.stderr, /Unknown option/)
+})
+
+// Runs the command with its own step files, so a CI run of this test leaves the real
+// job summary and step outputs alone.
+function runScript(context, argumentsList) {
+  const directory = mkdtempSync(join(tmpdir(), 'scoops-complexity-run-'))
+  context.after(() => rmSync(directory, { recursive: true, force: true }))
+  const paths = Object.fromEntries(
+    ['report', 'summary', 'output'].map((name) => [name, join(directory, name)]),
+  )
+  const run = spawnSync(
+    process.execPath,
+    [SCRIPT, ...argumentsList, '--output', paths.report],
+    {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        GITHUB_OUTPUT: paths.output,
+        GITHUB_STEP_SUMMARY: paths.summary,
+      },
+    },
+  )
+  const read = (name) => readFileSync(paths[name], 'utf8')
+  return { status: run.status, read }
+}
+
+test('writes the report and says there is nothing to comment on', (context) => {
+  const run = runScript(context, ['--base', 'HEAD', '--head', 'HEAD'])
+
+  assert.equal(run.status, 0)
+  assert.match(run.read('report'), /Compared 0 changed source file\(s\)/)
+  assert.match(run.read('summary'), /\*\*PASS\*\*/)
+  assert.equal(run.read('output'), 'findings=false\n')
+})
+
+test('reports a gate that could not run as a finding', (context) => {
+  const run = runScript(context, ['--base', 'missing-ref'])
+
+  assert.equal(run.status, 1)
+  assert.match(run.read('report'), /could not measure the change[\s\S]*merge base/)
+  assert.equal(run.read('output'), 'findings=true\n')
 })
