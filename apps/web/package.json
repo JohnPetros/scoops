@@ -12,7 +12,6 @@
     "test:coverage": "vitest run --coverage --passWithNoTests --testTimeout=15000",
     "test:integration": "playwright test",
     "test:integration:ui": "playwright test --ui",
-    "test:auth:setup": "playwright test --config=playwright.auth.config.ts --workers=1",
     "check:playwright": "node scripts/check-playwright-cli.mjs",
     "check:complexity": "node ../../scripts/check-complexity.mjs --scope apps/web",
     "check:architecture": "dependency-cruise --config ../../.dependency-cruiser.mjs -- src",

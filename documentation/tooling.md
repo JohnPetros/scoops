@@ -278,12 +278,11 @@ documented Server/PostgreSQL prerequisites. The committed route suite starts an 
 Vite server on `http://127.0.0.1:4001` with the SSR-auth fixture enabled; override the
 port with `PLAYWRIGHT_PORT` when needed. The current mocked notification SSE responses in
 `tests/fixtures/communication-module-fixture.ts` and
-`tests/communication/notification-toast.test.tsx` still set the allowed origin to
+`tests/communication/layouts/notification-toast.layout.test.ts` still set the allowed origin to
 `http://localhost:4001`; use the default port for suites exercising those fixtures. An alternate
 port can therefore pass the login health check while failing notification/CORS assertions.
 Do not treat those failures as production-server authorization evidence or weaken the
-assertions to accommodate them. The real-service auth setup continues to use the
-developer server on port `4000`.
+assertions to accommodate them.
 
 Use the Playwright CLI for all repository browser interaction, inspection and
 validation, including manual or exploratory flows. Do not use `browser-use`, CDP
@@ -293,7 +292,7 @@ Run locally only the Playwright files that cover the changed code, by naming the
 run the complete Web browser suite locally; it is slow and CI owns it.
 
 ```bash
-pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
+pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 pnpm --filter web test:integration:ui
 ```
 
@@ -308,23 +307,9 @@ Run a real-service scenario explicitly only after starting the required Server,
 database, and Mailpit services; mocked route coverage is not persistence,
 authorization, or external-email evidence.
 
-To create reusable authenticated browser sessions for real-service scenarios,
-run the opt-in setup command after seeding the local development accounts:
-
-```bash
-pnpm --filter web test:auth:setup
-```
-
-The command logs in the local Manager and Operator seed accounts and writes
-generated Playwright storage states to `apps/web/playwright/.auth/`. Check their Git
-tracking status before setup; the current Manager and Operator state files are tracked.
-Never publish refreshed session credentials. Preserve existing tracked state files before
-validation and restore task-generated changes afterward; do not untrack files or alter ignore
-configuration as an incidental validation step. Override the
-credentials with `PLAYWRIGHT_MANAGER_EMAIL`, `PLAYWRIGHT_MANAGER_PASSWORD`,
-`PLAYWRIGHT_OPERATOR_EMAIL`, and `PLAYWRIGHT_OPERATOR_PASSWORD` when needed.
-Use a generated state in a test with `test.use({ storageState: ... })`; do not
-commit the generated files.
+For authenticated real-service scenarios, sign in through the Playwright CLI with
+the local Manager and Operator seed accounts. Do not commit saved browser session
+state or publish session credentials.
 
 Browser screenshots used for validation are ephemeral. Write them to Playwright's
 `test-results/` output or retain them as CI artifacts; do not write implementation
@@ -339,12 +324,9 @@ pnpm --filter web exec playwright install chromium
 
 ### Server tests
 
-The server uses Vitest with a Node environment. Tests are discovered from
-`apps/server/src/**/*.test.ts`; Testcontainers PostgreSQL is available for
-database-backed fixtures, and `shared/messaging/inngest/inngest-fixture.ts`
-provides a Docker-backed Inngest development server for job integration tests.
-Better Auth controller fixtures use the same standard PostgreSQL contract and do
-not require an external authentication gateway.
+The server uses Vitest with a Node environment and requires Docker. Its tests are
+split into two suites, declared as Vitest projects in
+`apps/server/vitest.config.mts`. Test files run one at a time.
 
 ```bash
 pnpm --filter server test
@@ -352,9 +334,36 @@ pnpm --filter server test:watch
 pnpm --filter server test:coverage
 ```
 
-The server configuration gives tests and lifecycle hooks a 60-second timeout to
-allow container startup. The test command currently passes when no test files are
-present.
+These commands run both suites. The `test` command currently passes when no test
+files are present.
+
+#### Controller tests
+
+HTTP integration tests under `src/<module>/rest/controllers/tests/`, backed by
+Testcontainers PostgreSQL. Better Auth controller fixtures use the same standard
+PostgreSQL contract and do not require an external authentication gateway. Tests
+and lifecycle hooks have a 60-second timeout to allow container startup. See the
+[controller testing rules](./rules/controllers-testing-rules.md).
+
+```bash
+pnpm --filter server test:controllers
+```
+
+The `controllers` project selects every server test outside the job suite, so a
+test file in another location still runs.
+
+#### Job tests
+
+Inngest and Nest scheduled-job tests under
+`src/<module>/messaging/**/jobs/tests/`.
+`shared/messaging/inngest/inngest-fixture.ts` provides a Docker-backed Inngest
+development server, and email jobs require the Mailpit service. Tests and
+lifecycle hooks have a 120-second timeout. See the
+[job testing rules](./rules/jobs-testing-rules.md).
+
+```bash
+pnpm --filter server test:jobs
+```
 
 The Core package uses Vitest for use-case unit tests:
 
@@ -506,6 +515,10 @@ prints a text summary. CI runs these commands and enforces the measured no-regre
 configured in each Vitest file. Falling below any statements, branches, functions or lines floor
 makes Vitest exit non-zero and fails the CI job. Automatic threshold updates are disabled. These
 floors are not the quality target and must never be lowered to make a change pass.
+
+Server CI runs the controller and job suites as separate jobs through `test:blob`, which records
+coverage without enforcing floors on a partial run. The `Server coverage` job then runs
+`test:coverage:merge` to combine both reports and enforce the Server floors.
 
 After a workspace coverage gate passes, its CI workflow writes the metrics to the GitHub Actions
 job summary and creates or updates that workspace's coverage comment on internal pull requests.
@@ -708,12 +721,14 @@ the maintained summary:
 - `.github/workflows/validation-package-ci.yml` (`Validation CI`) runs Validation code,
   architecture and type checks as parallel jobs for Validation or Core inputs;
 - `.github/workflows/server-app-ci.yml` (`Server CI`) runs Server code, architecture,
-  type, Inngest integration, coverage and build checks as parallel jobs for Server,
-  Validation or Core inputs;
+  type, controller test, job test and build checks as parallel jobs for Server,
+  Validation or Core inputs. A coverage job then merges both test reports, failing if
+  either is missing, and enforces the Server floors;
 - `.github/workflows/web-app-ci.yml` (`Web CI`) runs route generation with Web code,
-  architecture, type, coverage, mocked Playwright route and build checks in parallel
-  jobs for Web, Validation or Core inputs. Real-service browser scenarios are validated
-  separately with their required Server/PostgreSQL environment.
+  architecture, type, widget test with coverage, route test (mocked Playwright, in four
+  shards) and build checks in parallel jobs for Web, Validation or Core inputs.
+  Real-service browser scenarios are validated separately with their required
+  Server/PostgreSQL environment.
 
 Each app and package workflow finishes its primary checks with an aggregate `Web`,
 `Server`, `Core` or `Validation` job that requires all split validation jobs to pass.
@@ -750,7 +765,7 @@ pnpm --filter @scoops/core exec vitest run src/pdv/use-cases/tests/register-orde
 pnpm --filter @scoops/core test:mutation --files src/pdv/use-cases/register-order-use-case.ts
 
 pnpm --filter web check:types
-pnpm --filter web exec playwright test tests/pdv/orders-page.test.tsx
+pnpm --filter web exec playwright test tests/pdv/pages/orders.page.test.ts
 ```
 
 ### Local check scope

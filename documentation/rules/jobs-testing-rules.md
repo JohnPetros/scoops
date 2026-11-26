@@ -217,29 +217,29 @@ seeders, or real repositories rather than arbitrary SQL.
 Do not reset the Inngest Dev Server between cases in the same file. A completed
 run is the synchronization boundary before database reset.
 
-## Keep the Dockerized suite separate and CI-enforced
+## Keep the job suite separate and CI-enforced
 
-Job integration tests run through:
+Inngest and Nest scheduled-job tests form the `jobs` suite:
 
 ```bash
-pnpm --filter server test:inngest
+pnpm --filter server test:jobs
 ```
 
-`apps/server/vitest.inngest.config.mts` includes only tests under
-`src/**/messaging/inngest/jobs/tests/**/*.test.ts`, disables file parallelism,
-and provides sufficient hook and test timeouts for cold container startup. The
-default server Vitest configuration excludes the same directory.
+The `jobs` project in `apps/server/vitest.config.mts` includes only tests under
+`src/**/messaging/**/jobs/tests/**/*.test.ts`, disables file parallelism, and
+provides sufficient hook and test timeouts for cold container startup. The
+`controllers` project excludes the same pattern, so each test runs once.
 
-Server CI must run `test:inngest` on a Docker-capable runner. Local absence of
-Docker may prevent execution, but it must not turn the CI job into an optional or
-silently skipped check.
+Server CI must run the `Server job tests` check on a Docker-capable runner. Local
+absence of Docker may prevent execution, but it must not turn the CI job into an
+optional or silently skipped check. Email job tests also require Mailpit.
 
 Static validation remains required:
 
 ```bash
 pnpm --filter server check:types
 pnpm --filter server check:architecture
-pnpm --filter server exec vitest list --config vitest.inngest.config.mts
+pnpm --filter server exec vitest list --project jobs
 ```
 
 Test discovery proves only that files load and are selected. It does not replace
@@ -256,10 +256,10 @@ Assert that the named cron is registered through `SchedulerRegistry` using the
 job's static `ID`. Invoke the public scheduled method through the Nest container
 to verify its behavior deterministically; do not wait for wall-clock cron ticks.
 Assert resulting state and safe `TelemetryProvider` outcomes. These tests run in
-the regular Server Vitest suite:
+the Server job suite:
 
 ```bash
-pnpm --filter server test
+pnpm --filter server test:jobs
 ```
 
 ## Antipatterns to avoid

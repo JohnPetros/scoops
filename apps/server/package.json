@@ -21,10 +21,13 @@
     "db:schema:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run --passWithNoTests",
-    "test:inngest": "vitest run --config vitest.inngest.config.mts",
+    "test:controllers": "vitest run --project controllers",
+    "test:jobs": "vitest run --project jobs",
     "test:watch": "vitest",
     "test:cov": "pnpm test:coverage",
     "test:coverage": "vitest run --coverage",
+    "test:blob": "vitest run --coverage --coverage.thresholds.branches=0 --coverage.thresholds.functions=0 --coverage.thresholds.lines=0 --coverage.thresholds.statements=0 --reporter=default --reporter=github-actions --reporter=blob",
+    "test:coverage:merge": "vitest --merge-reports --coverage",
     "db:seed": "tsx src/shared/database/seed.ts"
   },
   "dependencies": {
