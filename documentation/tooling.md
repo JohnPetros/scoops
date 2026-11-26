@@ -236,11 +236,12 @@ against the pull request's target branch (`--base HEAD^1`), and writes the resul
 to the job summary. Changes to the CodeMultiVitals configuration, dependency
 lockfile, complexity scripts or their tests also trigger the relevant jobs.
 
-When there are blocking results or new warnings, or the gate cannot run, the job
-also comments on the pull request through
+When there are blocking results or new warnings, or the gate cannot measure the
+change, the job also comments on the pull request through
 `scripts/comment-complexity-report.mjs`. Each workspace keeps one comment and
 updates it on later runs, including to `PASS`. A pull request with nothing to
-report gets no comment, and pull requests from forks are not commented.
+report gets no comment, pull requests from forks are not commented, and a failure
+before the gate runs, such as in the checker tests, posts nothing.
 `--output <path>` writes the report that the comment publishes.
 
 ## Architecture boundaries
