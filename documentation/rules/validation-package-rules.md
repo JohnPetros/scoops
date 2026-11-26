@@ -95,7 +95,7 @@ When adding or changing a reusable schema:
 4. Update every affected web and server consumer together; add
    `@scoops/validation` as a workspace dependency only in packages that import
    it.
-5. Run `pnpm --filter @scoops/validation check:code` and
+5. Run `pnpm --filter @scoops/validation check:lint` and
    `pnpm --filter @scoops/validation check:types`, followed by the relevant
    consumer checks and tests.
 

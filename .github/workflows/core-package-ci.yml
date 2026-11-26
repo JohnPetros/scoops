@@ -54,7 +54,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check code
-        run: pnpm --filter @scoops/core check:code
+        run: pnpm --filter @scoops/core check:lint
 
   core_architecture:
     name: Core architecture

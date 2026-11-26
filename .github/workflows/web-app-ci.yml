@@ -57,7 +57,7 @@ jobs:
         run: pnpm --filter web generate-routes
 
       - name: Check code
-        run: pnpm --filter web check:code
+        run: pnpm --filter web check:lint
 
   web_architecture:
     name: Web architecture
