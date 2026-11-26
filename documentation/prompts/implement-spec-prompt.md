@@ -105,10 +105,12 @@ execution alone does not satisfy the Spec's semantic pass conditions. No global 
 threshold or Web/Server mutation obligation is implied by the Spec's semantic acceptance.
 Core CI separately runs the full eligible Core use-case scope with `--all` across four
 balanced shards for both the PR target branch and candidate in the same workflow run. Its
-gate requires at least 70% per included module (Analytics, Communication, Identity, MRP
-and PDV), at least 70% for each changed/new eligible file in those modules, and no exact
-score drop for unchanged eligible files. Billing's module and per-file thresholds are
-temporarily suspended. It does not replace local assessment of the contracted scope.
+gate counts timeouts as detected and uncovered mutants as undetected. It requires at least
+70% per included module (Analytics, Communication, Identity, MRP and PDV), per new eligible
+file in those modules and per changed file that was at or above 70%; a module or changed
+file already below 70% must not drop, and unchanged eligible files must not drop at all.
+Billing's module and per-file thresholds are temporarily suspended. It does not replace
+local assessment of the contracted scope.
 After corrections, rerun only invalidated mutation checks and preserve unaffected evidence.
 
 Evaluation `ready` authorizes conclusion, not delivery closure; `conclude-spec` owns closure.
@@ -145,7 +147,8 @@ Once all source and shared/generated artifacts form one coherent candidate:
 2. run the checks for the changed code on the integrated candidate (tests, code, architecture,
    type, complexity, coverage and build, scoped per the Local check scope in `tooling.md`, and
    never the complete Web Playwright suite, which PR CI runs). Affected Core, Server and Web
-   workspaces must meet their configured coverage floors in CI;
+   workspaces must meet their configured coverage floors in CI, with at least 80% of changed
+   lines and 70% of changed-line branches covered;
 3. execute required `MV-*` scenarios with their actual environment and fixtures. Record
    expected and observed results; inspect console, network and persisted state where relevant;
 4. record current evidence and criterion coverage in Evaluation;

@@ -547,10 +547,12 @@ entities, structures, events, errors, interfaces and shared code are consumed by
 not mutation targets. Do not add Web or Server mutation obligations. Core CI separately runs
 `--all` across four shards covering every eligible Core use case and publishes reports.
 Core CI measures the PR candidate and target branch in the same run and compares
-their merged reports. It enforces at least 70% for Analytics, Communication,
-Identity, MRP and PDV and for each changed or new eligible use-case source file in
-those modules. Every unchanged eligible use-case file in those modules must preserve
-or improve its exact target-branch score, without rounding or an allowed decrease.
+their merged reports, counting timeouts as detected and uncovered mutants as
+undetected. It requires at least 70% for Analytics, Communication, Identity, MRP and
+PDV, for each new eligible use-case source file in those modules and for each changed
+file that was at or above 70%. A module or changed file already below 70% must not
+drop, and every unchanged eligible use-case file in those modules must preserve or
+improve its exact target-branch score, without rounding or an allowed decrease.
 Billing's module and per-file thresholds are temporarily suspended until related
 tests make its mutants scoreable. Missing, invalid or incomplete reports, missing
 unchanged-file baselines and unscoreable included modules fail closed. A file that is
