@@ -9,6 +9,7 @@ export type IdentityModuleFixture = {
   mockManagerSession: () => Promise<void>
   mockManagerAccount: () => Promise<void>
   mockSessionUnavailable: () => Promise<void>
+  mockSessionWithoutAccount: () => Promise<void>
   mockOperatorSession: () => Promise<void>
   mockOperatorAccount: () => Promise<void>
 }
@@ -117,6 +118,13 @@ export const IdentityModuleFixture = (page: Page): IdentityModuleFixture => {
 
     async mockSessionUnavailable() {
       await setSsrAuth(503, { message: 'Identity service unavailable' })
+    },
+
+    // The browser keeps a healthy account, so only the route middleware can reject.
+    async mockSessionWithoutAccount() {
+      sessionMode = 'manager'
+      await mockBrowserAuthRoutes()
+      await setSsrAuth(200, { session: sessionResponse().session })
     },
 
     async mockOperatorSession() {

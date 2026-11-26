@@ -12,6 +12,18 @@ test.describe('AppLayout', () => {
     expect(await page.content()).not.toContain('Bem-vindo,')
   })
 
+  test('redirects a session without an account to login', async ({
+    page,
+    identityFixture,
+  }) => {
+    await identityFixture.mockSessionWithoutAccount()
+
+    await page.goto(ROUTES.account)
+
+    await expect(page).toHaveURL(/\/login\?returnTo=%2Faccount$/)
+    await expect(page.getByRole('heading', { name: 'Entre no Scoops' })).toBeVisible()
+  })
+
   test('keeps authenticated users in the application shell', async ({
     page,
     identityFixture,

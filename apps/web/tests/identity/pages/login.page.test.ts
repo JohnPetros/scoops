@@ -11,11 +11,21 @@ const AUTH_SESSION = {
   session: { id: 'better-auth-session-id' },
 }
 
+const UNSAFE_RETURN_DESTINATIONS = [
+  { label: 'a list of paths', returnTo: JSON.stringify([ROUTES.app, ROUTES.account]) },
+  { label: 'an external URL', returnTo: 'https://example.com/account' },
+  { label: 'a protocol-relative URL', returnTo: '//example.com/account' },
+  { label: 'a backslash host', returnTo: '/\\example.com' },
+  { label: 'the login page', returnTo: ROUTES.login },
+  { label: 'a login loop', returnTo: `${ROUTES.login}?returnTo=%2Fdashboard` },
+  { label: 'a token in the query', returnTo: `${ROUTES.app}?access_token=secret` },
+  { label: 'a session in the query', returnTo: `${ROUTES.app}?session=private` },
+  { label: 'a control character', returnTo: `${ROUTES.account}\u0000` },
+]
+
 test.describe('LoginPage', () => {
-  test('renders accessible credentials and rejects an external return destination', async ({
-    page,
-  }) => {
-    await page.goto('/login?returnTo=https%3A%2F%2Fevil.example')
+  test('renders accessible credentials', async ({ page }) => {
+    await page.goto(ROUTES.login)
 
     await expect(page).toHaveURL(/\/login(?:\/?)?(?:\?.*)?$/)
     await expect(page.getByRole('heading', { name: 'Entre no Scoops' })).toBeVisible()
@@ -122,6 +132,37 @@ test.describe('LoginPage', () => {
       page.getByRole('heading', { name: 'Dashboard', exact: true }),
     ).toBeVisible()
   })
+
+  for (const { label, returnTo } of UNSAFE_RETURN_DESTINATIONS) {
+    test(`opens the dashboard instead of ${label} after login`, async ({
+      page,
+      identityFixture,
+    }) => {
+      await identityFixture.mockManagerAccount()
+      await page.route('**/api/auth/sign-in/email*', async (route) => {
+        await route.fulfill({
+          contentType: 'application/json',
+          status: 200,
+          headers: {
+            'set-cookie':
+              'scoops.session_token=browser-manager-session; Path=/; HttpOnly; SameSite=Lax',
+          },
+          body: JSON.stringify(AUTH_SESSION),
+        })
+      })
+
+      await page.goto(`${ROUTES.login}?returnTo=${encodeURIComponent(returnTo)}`)
+      await page.waitForLoadState('networkidle')
+      await page.getByRole('textbox', { name: 'E-mail' }).fill(LOGIN_CREDENTIALS.email)
+      await page.getByRole('textbox', { name: 'Senha' }).fill(LOGIN_CREDENTIALS.password)
+      await page.getByRole('button', { name: 'Entrar no Scoops' }).click()
+
+      await expect(page).toHaveURL(ROUTES.app)
+      await expect(
+        page.getByRole('heading', { name: 'Dashboard', exact: true }),
+      ).toBeVisible()
+    })
+  }
 
   test('shows a neutral error when the provider rejects credentials', async ({
     page,
