@@ -6,7 +6,6 @@ on:
       - ".dockerignore"
       - ".github/workflows/server-app-staging-cd.yml"
       - ".github/workflows/server-app-ci.yml"
-      - ".code-multivitals-baseline.json"
       - ".code-multivitals.json"
       - "apps/server/**"
       - "biome.json"
@@ -16,6 +15,7 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "scripts/check-complexity.mjs"
+      - "scripts/tests/check-complexity.test.mjs"
       - "scripts/sync-heroku-env.mjs"
       - "scripts/write-coverage-report.mjs"
       - "scripts/check-changed-coverage.mjs"
@@ -367,6 +367,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -383,4 +385,6 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Check complexity
-        run: pnpm --filter server check:complexity
+        run: |
+          node --test scripts/tests/check-complexity.test.mjs
+          pnpm --filter server check:complexity --base HEAD^1
