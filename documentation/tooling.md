@@ -721,12 +721,14 @@ the maintained summary:
 - `.github/workflows/validation-package-ci.yml` (`Validation CI`) runs Validation code,
   architecture and type checks as parallel jobs for Validation or Core inputs;
 - `.github/workflows/server-app-ci.yml` (`Server CI`) runs Server code, architecture,
-  type, Inngest integration, coverage and build checks as parallel jobs for Server,
-  Validation or Core inputs;
+  type, controller test, job test and build checks as parallel jobs for Server,
+  Validation or Core inputs. A coverage job then merges both test reports, failing if
+  either is missing, and enforces the Server floors;
 - `.github/workflows/web-app-ci.yml` (`Web CI`) runs route generation with Web code,
-  architecture, type, coverage, mocked Playwright route and build checks in parallel
-  jobs for Web, Validation or Core inputs. Real-service browser scenarios are validated
-  separately with their required Server/PostgreSQL environment.
+  architecture, type, widget test with coverage, route test (mocked Playwright, in four
+  shards) and build checks in parallel jobs for Web, Validation or Core inputs.
+  Real-service browser scenarios are validated separately with their required
+  Server/PostgreSQL environment.
 
 Each app and package workflow finishes its primary checks with an aggregate `Web`,
 `Server`, `Core` or `Validation` job that requires all split validation jobs to pass.

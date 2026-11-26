@@ -426,7 +426,7 @@ For route, authentication, form, search, or REST changes, also run the focused
 browser integration suite:
 
 ```bash
-pnpm --filter web test:integration tests/<module>/<feature>.test.tsx
+pnpm --filter web test:integration tests/<module>/<pages|layouts|endpoints>/<name>.<page|layout|endpoint>.test.ts
 ```
 
 Do not skip the focused browser suite merely because unit tests pass. Record
