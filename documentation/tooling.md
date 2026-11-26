@@ -583,8 +583,10 @@ unit and widget tests only, so Playwright route tests do not count toward this g
 appended to the workspace coverage comment. To reproduce it after a workspace coverage run:
 
 ```bash
-node scripts/check-changed-coverage.mjs web apps/web/coverage/lcov.info --base origin/main
+node scripts/check-changed-coverage.mjs web apps/web/coverage/lcov.info --base "$(git merge-base origin/main HEAD)" --working-tree
 ```
+
+`--working-tree` also measures uncommitted and untracked lines.
 
 The project target is at least 85% lines, statements and functions and 80% branches in every
 workspace. New and materially changed behavior must add scenario-complete tests and improve or
