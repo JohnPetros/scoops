@@ -316,7 +316,7 @@ jobs:
           retention-days: 14
 
   mutation-score:
-    name: Mutation score (70% per module, Billing temporarily excluded)
+    name: Mutation score
     needs: mutation
     if: always()
     runs-on: ubuntu-latest
@@ -348,7 +348,7 @@ jobs:
           path: mutation-reports/baseline
           merge-multiple: false
 
-      - name: Enforce minimum mutation score per module
+      - name: Enforce the mutation score gate
         run: node scripts/check-mutation-score.mjs mutation-reports/candidate --baseline-root mutation-reports/baseline --base-ref "${{ github.event.pull_request.base.sha }}" --head-ref "${{ github.event.pull_request.head.sha }}" --threshold 70 --exclude-modules billing --output mutation-score-summary.md
 
       - name: Publish Core mutation report on pull request

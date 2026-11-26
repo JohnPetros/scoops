@@ -133,7 +133,7 @@ test('CLI writes an artifact and appends to the existing GitHub summary; rejects
   }
 })
 
-test('scores partial shard results with errors in the denominator and excludes uncovered and ignored mutants', () => {
+test('scores partial shard results counting timeouts as detected and uncovered mutants as undetected', () => {
   const markdown = renderMutationReport(
     {
       files: {
@@ -149,18 +149,18 @@ test('scores partial shard results with errors in the denominator and excludes u
           'Pending',
           'FutureStatus',
         ),
-        'src/pdv/use-cases/b.ts': createFile('NoCoverage', 'Ignored'),
+        'src/pdv/use-cases/b.ts': createFile('CompileError', 'Ignored'),
         'src/identity/use-cases/c.ts': createFile('Killed'),
       },
     },
     '1/4',
   )
   const rows = markdown.split('\n')
-  assert.ok(rows.find((row) => row.startsWith('| MRP |')).endsWith('| 25.00% |'))
+  assert.ok(rows.find((row) => row.startsWith('| MRP |')).endsWith('| 42.86% |'))
   assert.ok(rows.find((row) => row.startsWith('| PDV |')).endsWith('| N/A |'))
   assert.ok(rows.find((row) => row.startsWith('| Identity |')).endsWith('| 100.00% |'))
   assert.ok(
-    rows.find((row) => row.startsWith('| Total (this shard) |')).endsWith('| 33.33% |'),
+    rows.find((row) => row.startsWith('| Total (this shard) |')).endsWith('| 50.00% |'),
   )
   assert.match(markdown, /Partial shard score/)
   assert.match(markdown, /not final module CI scores/)

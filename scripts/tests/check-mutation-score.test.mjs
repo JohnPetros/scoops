@@ -142,7 +142,7 @@ test('aggregates files spread over four reports and passes the exact 70 percent 
   assert.equal(collectMutationReports(root).length, 4)
   const aggregate = aggregateMutationReports(reports)
   assert.deepEqual(aggregate.missingModules, [])
-  const markdown = renderMutationScoreTable(aggregate, 70)
+  const markdown = renderMutationScoreTable(aggregate, aggregate, 70)
   for (const module of [
     'Analytics',
     'Billing',
@@ -154,13 +154,13 @@ test('aggregates files spread over four reports and passes the exact 70 percent 
     assert.match(
       markdown,
       new RegExp(
-        `\\| ${module} \\| 7 \\| 3 \\| 0 \\| 0 \\| 10 \\| 70\\.00% \\| PASS \\|`,
+        `\\| ${module} \\| 7 \\| 0 \\| 3 \\| 0 \\| 0 \\| 0 \\| 10 \\| 70\\.00% \\| 70\\.00% \\| PASS \\|`,
       ),
     )
   }
 })
 
-test('counts timeouts, errors, pending and unknown statuses while excluding uncovered and ignored mutants', (t) => {
+test('counts timeouts as detected, uncovered and unknown statuses as undetected, and leaves errors and ignored unscored', (t) => {
   const root = createRoot(t)
   const reports = passingReports(root)
   const path = join(root, 'shard-1', 'mutation.json')
@@ -191,38 +191,46 @@ test('counts timeouts, errors, pending and unknown statuses while excluding unco
 
   const aggregate = aggregateMutationReports(reports)
   const analytics = aggregate.modules.get('Analytics')
-  assert.equal(analytics.killed, 7)
-  assert.equal(analytics.denominator, 13)
+  assert.equal(analytics.detected, 8)
+  assert.equal(analytics.denominator, 12)
   assert.match(
-    renderMutationScoreTable(aggregate, 70),
-    /\| Analytics \| 7 \| 6 \| 1 \| 1 \| 15 \| 53\.85% \| FAIL \|/,
+    renderMutationScoreTable(aggregate, aggregate, 70),
+    /\| Analytics \| 7 \| 1 \| 3 \| 1 \| 1 \| 2 \| 15 \| 66\.67% \| 66\.67% \| PASS \(no drop\) \|/,
   )
 })
 
 test('fails scores below threshold and marks zero-scored modules N/A', (t) => {
   const root = createRoot(t)
   const reports = passingReports(root)
+  const passingBaseline = aggregateMutationReports(reports)
   const analyticsPath = join(root, 'shard-2', 'mutation.json')
   const report = JSON.parse(readFileSync(analyticsPath, 'utf8'))
   report.files['src/analytics/use-cases/c-use-case.ts'] = mutants(
     'Survived',
     'Survived',
-    'Timeout',
+    'Survived',
+    'Survived',
     'RuntimeError',
   )
   writeFileSync(analyticsPath, JSON.stringify(report))
   const noCoveragePath = join(root, 'shard-4', 'mutation.json')
   const noCoverageReport = JSON.parse(readFileSync(noCoveragePath, 'utf8'))
   noCoverageReport.files['src/pdv/use-cases/i-use-case.ts'] = mutants(
-    'NoCoverage',
+    'CompileError',
     'Ignored',
   )
   writeFileSync(noCoveragePath, JSON.stringify(noCoverageReport))
 
   const aggregate = aggregateMutationReports(reports)
-  const markdown = renderMutationScoreTable(aggregate, 70)
-  assert.match(markdown, /\| Analytics \| 7 \| 4 \| 0 \| 0 \| 11 \| 63\.64% \| FAIL \|/)
-  assert.match(markdown, /\| PDV \| 0 \| 0 \| 1 \| 1 \| 2 \| N\/A \| FAIL \|/)
+  const markdown = renderMutationScoreTable(aggregate, passingBaseline, 70)
+  assert.match(
+    markdown,
+    /\| Analytics \| 7 \| 0 \| 4 \| 0 \| 0 \| 1 \| 12 \| 70\.00% \| 63\.64% \| FAIL \|/,
+  )
+  assert.match(
+    markdown,
+    /\| PDV \| 0 \| 0 \| 0 \| 0 \| 1 \| 1 \| 2 \| 70\.00% \| N\/A \| FAIL \|/,
+  )
   assert.equal(aggregate.modules.get('PDV').denominator, 0)
 })
 
@@ -265,8 +273,8 @@ test('fails closed for absent module mutant data and malformed reports or status
   const aggregate = aggregateMutationReports(reports)
   assert.deepEqual(aggregate.missingModules, ['PDV'])
   assert.match(
-    renderMutationScoreTable(aggregate, 70),
-    /\| PDV \| 0 \| 0 \| 0 \| 0 \| 0 \| N\/A \| FAIL \|/,
+    renderMutationScoreTable(aggregate, aggregate, 70),
+    /\| PDV \| 0 \| 0 \| 0 \| 0 \| 0 \| 0 \| 0 \| N\/A \| N\/A \| FAIL \|/,
   )
 
   writeFileSync(pdvPath, '{invalid')
@@ -283,22 +291,25 @@ test('fails closed for absent module mutant data and malformed reports or status
 test('requires exact no-drop for unchanged files and a 70 percent floor for changed or newly scoreable files', () => {
   const baseline = {
     files: new Map([
-      ['src/analytics/use-cases/existing-use-case.ts', { denominator: 10, killed: 7 }],
+      ['src/analytics/use-cases/existing-use-case.ts', { denominator: 10, detected: 7 }],
       [
         'src/analytics/use-cases/newly-scoreable-use-case.ts',
-        { denominator: 0, killed: 0 },
+        { denominator: 0, detected: 0 },
       ],
-      ['src/analytics/use-cases/deleted-use-case.ts', { denominator: 10, killed: 8 }],
+      ['src/analytics/use-cases/deleted-use-case.ts', { denominator: 10, detected: 8 }],
     ]),
   }
   const candidate = {
     files: new Map([
-      ['src/analytics/use-cases/existing-use-case.ts', { denominator: 100, killed: 69 }],
+      [
+        'src/analytics/use-cases/existing-use-case.ts',
+        { denominator: 100, detected: 69 },
+      ],
       [
         'src/analytics/use-cases/newly-scoreable-use-case.ts',
-        { denominator: 10, killed: 7 },
+        { denominator: 10, detected: 7 },
       ],
-      ['src/analytics/use-cases/added-use-case.ts', { denominator: 10, killed: 7 }],
+      ['src/analytics/use-cases/added-use-case.ts', { denominator: 10, detected: 7 }],
     ]),
   }
   const comparison = compareFileScores(
@@ -353,7 +364,7 @@ test('fails closed when unchanged file data is missing on either side', () => {
     { files: new Map() },
     {
       files: new Map([
-        ['src/analytics/use-cases/a-use-case.ts', { denominator: 1, killed: 1 }],
+        ['src/analytics/use-cases/a-use-case.ts', { denominator: 1, detected: 1 }],
       ]),
     },
     new Map(),
@@ -394,7 +405,7 @@ test('exempts an actually deleted use-case file without candidate mutation data'
   const path = 'src/analytics/use-cases/deleted-use-case.ts'
   const comparison = compareFileScores(
     { files: new Map() },
-    { files: new Map([[path, { denominator: 10, killed: 8 }]]) },
+    { files: new Map([[path, { denominator: 10, detected: 8 }]]) },
     new Map([[path, 'D']]),
     70,
   )
@@ -404,7 +415,7 @@ test('exempts an actually deleted use-case file without candidate mutation data'
     {
       path,
       current: undefined,
-      previous: { denominator: 10, killed: 8 },
+      previous: { denominator: 10, detected: 8 },
       passed: true,
       policy: 'deleted',
     },
@@ -416,7 +427,7 @@ test('requires candidate data for changed Billing files while excluding its scor
   const lowScorePath = 'src/billing/use-cases/low-score-use-case.ts'
   const comparison = compareFileScores(
     {
-      files: new Map([[lowScorePath, { denominator: 10, killed: 1 }]]),
+      files: new Map([[lowScorePath, { denominator: 10, detected: 1 }]]),
     },
     { files: new Map() },
     new Map([
@@ -467,7 +478,7 @@ test('CLI prints and appends the score table and exits nonzero when a module mis
   assert.equal(passing.status, 0, passing.stderr)
   assert.match(
     passing.stdout,
-    /\| Analytics \| 7 \| 3 \| 0 \| 0 \| 10 \| 70\.00% \| PASS \|/,
+    /\| Analytics \| 7 \| 0 \| 3 \| 0 \| 0 \| 0 \| 10 \| 70\.00% \| 70\.00% \| PASS \|/,
   )
   assert.match(readFileSync(summaryPath, 'utf8'), /Core mutation score by module/)
 
@@ -476,7 +487,8 @@ test('CLI prints and appends the score table and exits nonzero when a module mis
   analyticsReport.files['src/analytics/use-cases/c-use-case.ts'] = mutants(
     'Survived',
     'Survived',
-    'Timeout',
+    'Survived',
+    'Survived',
     'RuntimeError',
   )
   writeFileSync(analyticsReportPath, JSON.stringify(analyticsReport))
@@ -491,10 +503,10 @@ test('CLI prints and appends the score table and exits nonzero when a module mis
   assert.equal(failing.status, 1)
   assert.match(
     failing.stdout,
-    /\| Analytics \| 7 \| 4 \| 0 \| 0 \| 11 \| 63\.64% \| FAIL \|/,
+    /\| Analytics \| 7 \| 0 \| 4 \| 0 \| 0 \| 1 \| 12 \| 70\.00% \| 63\.64% \| FAIL \|/,
   )
   assert.equal(readFileSync(outputPath, 'utf8'), failing.stdout)
-  assert.match(readFileSync(outputPath, 'utf8'), /\| Analytics \| 7 \| 4 \|/)
+  assert.match(readFileSync(outputPath, 'utf8'), /\| Analytics \| 7 \| 0 \| 4 \|/)
   const malformed = spawnSync(process.execPath, [...hybridArgs, '--threshold', '101'], {
     encoding: 'utf8',
   })
@@ -544,7 +556,7 @@ test('CLI can temporarily exclude Billing while keeping its result visible and v
   assert.equal(result.status, 0, result.stderr)
   assert.match(
     result.stdout,
-    /\| Billing \| 0 \| 0 \| 276 \| 0 \| 276 \| N\/A \| TEMPORARILY EXCLUDED \|/,
+    /\| Billing \| 0 \| 0 \| 0 \| 276 \| 0 \| 0 \| 276 \| 0\.00% \| 0\.00% \| TEMPORARILY EXCLUDED \|/,
   )
   assert.match(
     result.stdout,
@@ -576,4 +588,72 @@ test('CLI can temporarily exclude Billing while keeping its result visible and v
   )
   assert.equal(invalid.status, 1)
   assert.match(invalid.stderr, /Unknown excluded module/)
+})
+
+test('lets a module and a changed file below the threshold pass only without a drop', () => {
+  const path = 'src/pdv/use-cases/legacy-use-case.ts'
+  const addedPath = 'src/pdv/use-cases/added-use-case.ts'
+  const baseline = { files: new Map([[path, { denominator: 10, detected: 4 }]]) }
+  const changed = new Map([
+    [path, 'M'],
+    [addedPath, 'A'],
+  ])
+  const compare = (detected) =>
+    compareFileScores(
+      {
+        files: new Map([
+          [path, { denominator: 20, detected }],
+          [addedPath, { denominator: 10, detected: 6 }],
+        ]),
+      },
+      baseline,
+      changed,
+      70,
+    ).failures
+
+  assert.equal(compare(8).length, 1)
+  assert.match(compare(8)[0], /added-use-case.*60\.00%, below 70%/)
+  assert.equal(compare(7).length, 2)
+  assert.match(compare(7)[1], /legacy-use-case.*dropped from 40\.00% to 35\.00%/)
+})
+
+test('requires a changed file that met the threshold to stay at or above it', () => {
+  const path = 'src/pdv/use-cases/healthy-use-case.ts'
+  const compare = (detected) =>
+    compareFileScores(
+      { files: new Map([[path, { denominator: 10, detected }]]) },
+      { files: new Map([[path, { denominator: 10, detected: 9 }]]) },
+      new Map([[path, 'M']]),
+      70,
+    ).failures
+
+  assert.deepEqual(compare(7), [])
+  assert.equal(compare(6).length, 1)
+})
+
+test('passes modules below the threshold that hold their target-branch score and fails drops', (t) => {
+  const root = createRoot(t)
+  const candidateRoot = join(root, 'candidate')
+  const baselineRoot = join(root, 'baseline')
+  const lower = (reportsRoot, survivors) => {
+    passingReports(reportsRoot)
+    const reportPath = join(reportsRoot, 'shard-2', 'mutation.json')
+    const report = JSON.parse(readFileSync(reportPath, 'utf8'))
+    report.files['src/analytics/use-cases/c-use-case.ts'] = mutants(
+      ...Array.from({ length: survivors }, () => 'NoCoverage'),
+    )
+    writeFileSync(reportPath, JSON.stringify(report))
+    return aggregateMutationReports(collectMutationReports(reportsRoot))
+  }
+  const baseline = lower(baselineRoot, 5)
+  const held = lower(candidateRoot, 5)
+  assert.match(
+    renderMutationScoreTable(held, baseline, 70),
+    /\| Analytics .*\| 58\.33% \| 58\.33% \| PASS \(no drop\) \|/,
+  )
+  const dropped = lower(candidateRoot, 6)
+  assert.match(
+    renderMutationScoreTable(dropped, baseline, 70),
+    /\| Analytics .*\| 58\.33% \| 53\.85% \| FAIL \|/,
+  )
 })
