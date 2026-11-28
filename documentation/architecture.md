@@ -498,14 +498,14 @@ health check; Swagger exposes the application REST surface.
 
 Structured logs, correlation IDs, metrics, tracing, alerting, and dashboards are
 required at their applicable boundaries. The Web and Server applications export
-environment-specific signals to Sentry in staging and production. Browser,
+signals to Sentry in production only; staging does not initialize Sentry. Browser,
 server-rendering, HTTP and job signals use bounded safe fields; browser replay
 masks text and inputs and blocks media. Web trace propagation is limited to the
-configured API origin. Local and test modes do not export telemetry. Credentials,
+configured API origin. Staging, local and test modes do not export telemetry. Credentials,
 tokens, full financial identifiers, and unnecessary PII are excluded. Private
-source maps are uploaded during configured builds under the deployed Git SHA and
-removed from runtime images. Sentry account setup, alert delivery, and a
-production deployment workflow remain operator/deployment responsibilities.
+source maps are uploaded during production builds under the deployed Git SHA and
+removed from runtime images. Sentry account setup and alert delivery remain
+operator responsibilities.
 
 Product-usage telemetry uses a separate browser-only PostHog adapter behind the
 shared provision boundary. Owning UI consumers observe workflow and navigation

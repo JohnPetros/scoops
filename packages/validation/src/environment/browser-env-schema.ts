@@ -35,11 +35,11 @@ function validateBrowserSentryConfiguration(
 ) {
   if (!['stg', 'prod'].includes(environment.scoopsWebAppMode)) return
 
-  if (!environment.sentryDsn) {
+  if (environment.scoopsWebAppMode === 'prod' && !environment.sentryDsn) {
     context.addIssue({
       code: 'custom',
       path: ['sentryDsn'],
-      message: 'Sentry DSN is required in deployed modes',
+      message: 'Sentry DSN is required in production',
     })
   }
 

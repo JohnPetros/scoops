@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - ".dockerignore"
-      - ".github/workflows/server-app-staging-cd.yml"
       - ".github/workflows/server-app-ci.yml"
       - ".code-multivitals.json"
       - "apps/server/**"
@@ -18,7 +17,9 @@ on:
       - "scripts/comment-complexity-report.mjs"
       - "scripts/tests/check-complexity.test.mjs"
       - "scripts/tests/comment-complexity-report.test.mjs"
-      - "scripts/sync-heroku-env.mjs"
+      - "scripts/coolify-deploy.mjs"
+      - "scripts/tests/coolify-deploy.test.mjs"
+      - ".github/workflows/server-app-cd.yml"
       - "scripts/write-coverage-report.mjs"
       - "scripts/check-changed-coverage.mjs"
       - "scripts/tests/check-changed-coverage.test.mjs"
@@ -57,6 +58,9 @@ jobs:
 
       - name: Check code
         run: pnpm --filter server check:lint
+
+      - name: Test Coolify deploy script
+        run: node --test scripts/tests/coolify-deploy.test.mjs
 
   server_architecture:
     name: Server architecture

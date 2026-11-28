@@ -12,10 +12,11 @@ const bundledWorkspacePackages = [
 module.exports = (options) => {
   const [nodeExternals] = options.externals
   const sentryAppMode = process.env.SCOOPS_SERVER_APP_MODE
-  const isDeployedBuild = sentryAppMode === 'stg' || sentryAppMode === 'prod'
+  // Only production reports to Sentry; staging builds skip the source-map upload.
+  const isSentryBuild = sentryAppMode === 'prod'
   const plugins = [...(options.plugins ?? [])]
 
-  if (isDeployedBuild) {
+  if (isSentryBuild) {
     const missingSettings = [
       ['SENTRY_ORG', process.env.SENTRY_ORG],
       ['SENTRY_PROJECT', process.env.SENTRY_PROJECT],
@@ -25,13 +26,13 @@ module.exports = (options) => {
 
     if (missingSettings.length > 0) {
       throw new Error(
-        `Deployed server builds require ${missingSettings.map(([name]) => name).join(', ')}.`,
+        `Production server builds require ${missingSettings.map(([name]) => name).join(', ')}.`,
       )
     }
 
     if (!/^[a-f0-9]{40}$/i.test(process.env.SCOOPS_RELEASE_SHA ?? '')) {
       throw new Error(
-        'SCOOPS_RELEASE_SHA must be a full Git commit SHA in deployed builds.',
+        'SCOOPS_RELEASE_SHA must be a full Git commit SHA in production builds.',
       )
     }
 
@@ -52,7 +53,7 @@ module.exports = (options) => {
 
   return {
     ...options,
-    ...(isDeployedBuild ? { devtool: 'hidden-source-map' } : {}),
+    ...(isSentryBuild ? { devtool: 'hidden-source-map' } : {}),
     plugins,
     output: {
       ...options.output,

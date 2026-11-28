@@ -19,6 +19,8 @@ export default defineConfig({
         'src/**/*.d.ts',
         // Development script run by hand; no test boundary owns it.
         'src/shared/database/seed.ts',
+        // Side-effect bootstrap imported only by main.ts; no test boundary owns it.
+        'src/shared/provision/telemetry/sentry-init.ts',
       ],
       include: ['src/**/*.ts'],
       provider: 'v8',

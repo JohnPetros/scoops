@@ -797,10 +797,11 @@ Each of the five workflows also has a separate `Complexity` job that runs the
 
 Core, Server and Web validation run on matching pull requests. Validation also runs on
 matching pushes to `main`. Separate
-[`server-app-staging-cd.yml`](../.github/workflows/server-app-staging-cd.yml) and
-[`web-app-staging-cd.yml`](../.github/workflows/web-app-staging-cd.yml) workflows
-deploy matching pushes to `main` to Heroku staging. The repository does not
-currently define a production deployment workflow. See
+[`server-app-cd.yml`](../.github/workflows/server-app-cd.yml) and
+[`web-app-cd.yml`](../.github/workflows/web-app-cd.yml) workflows
+deploy matching pushes to `main` to Coolify staging. Merging a release PR into
+`production` runs [`create-release.yml`](../.github/workflows/create-release.yml),
+which tags the version, publishes the GitHub Release and deploys production. See
 [`infrastructure.md`](./infrastructure.md) for environment topology. New GitHub
 automation must use Scoops-specific workflow names, secrets and environment
 variables.
