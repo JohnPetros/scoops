@@ -1,0 +1,163 @@
+name: Web Coolify CD
+
+# Pushes to main deploy staging. Production is deployed by the create-release
+# workflow, which calls this one after a release PR merges into production.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".dockerignore"
+      - ".github/workflows/web-app-cd.yml"
+      - "apps/web/**"
+      - "package.json"
+      - "packages/core/**"
+      - "packages/validation/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "scripts/coolify-deploy.mjs"
+  workflow_call:
+    inputs:
+      environment:
+        description: Deployment environment (staging or production)
+        required: true
+        type: string
+      ref:
+        description: Git ref to build and deploy
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Deployment environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      ref:
+        description: Git ref to build and deploy, such as a release tag (defaults to the selected branch)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    name: Deploy Web (${{ inputs.environment || 'staging' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ inputs.environment || 'staging' }}
+    concurrency:
+      group: web-coolify-${{ inputs.environment || 'staging' }}
+      cancel-in-progress: ${{ (inputs.environment || 'staging') == 'staging' }}
+    env:
+      TARGET_ENVIRONMENT: ${{ inputs.environment || 'staging' }}
+      TARGET_MODE: ${{ inputs.environment == 'production' && 'prod' || 'stg' }}
+      COOLIFY_URL: ${{ vars.COOLIFY_URL }}
+      COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
+      COOLIFY_APP_UUID: ${{ vars.COOLIFY_WEB_APP_UUID }}
+
+    steps:
+      - name: Checkout revision
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Validate deployment configuration
+        env:
+          SENTRY_ORG: ${{ inputs.environment == 'production' && secrets.SENTRY_ORG || '' }}
+          SENTRY_PROJECT: ${{ inputs.environment == 'production' && secrets.SENTRY_WEB_PRODUCTION_PROJECT || '' }}
+          SENTRY_AUTH_TOKEN: ${{ inputs.environment == 'production' && secrets.SENTRY_AUTH_TOKEN || '' }}
+          SENTRY_WEB_DSN: ${{ inputs.environment == 'production' && secrets.SENTRY_WEB_PRODUCTION_DSN || '' }}
+        run: |
+          case "$TARGET_ENVIRONMENT" in
+            staging|production) ;;
+            *) echo "Unknown deployment environment: $TARGET_ENVIRONMENT" >&2; exit 1 ;;
+          esac
+          release_sha="$(git rev-parse HEAD)"
+          [[ "$release_sha" =~ ^[a-f0-9]{40}$ ]]
+          {
+            echo "RELEASE_SHA=$release_sha"
+            echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/scoops-web"
+            echo "IMAGE_TAG=$TARGET_MODE-$release_sha"
+          } >> "$GITHUB_ENV"
+          test -n "$COOLIFY_URL"
+          test -n "$COOLIFY_API_TOKEN"
+          test -n "$COOLIFY_APP_UUID"
+          # Only production reports to Sentry.
+          if [ "$TARGET_ENVIRONMENT" = production ]; then
+            test -n "$SENTRY_ORG"
+            test -n "$SENTRY_PROJECT"
+            test -n "$SENTRY_AUTH_TOKEN"
+            test -n "$SENTRY_WEB_DSN"
+          fi
+
+      - name: Load and sync web environment
+        env:
+          WEB_ENV_FILE: ${{ secrets[inputs.environment == 'production' && 'SCOOPS_WEB_APP_PRODUCTION_ENV' || 'SCOOPS_WEB_APP_STAGING_ENV'] }}
+          SENTRY_WEB_DSN: ${{ inputs.environment == 'production' && secrets.SENTRY_WEB_PRODUCTION_DSN || '' }}
+        run: |
+          test -n "$WEB_ENV_FILE"
+          env_file="$RUNNER_TEMP/web.env"
+          printf '%s' "$WEB_ENV_FILE" > "$env_file"
+          printf '\nSCOOPS_RELEASE_SHA=%s\nVITE_SCOOPS_RELEASE_SHA=%s\nPORT=8080\n' \
+            "$RELEASE_SHA" "$RELEASE_SHA" >> "$env_file"
+          # Staging gets empty DSNs so it never reports to Sentry, even if its env file sets one.
+          printf 'SENTRY_DSN=%s\nVITE_SENTRY_DSN=%s\n' "$SENTRY_WEB_DSN" "$SENTRY_WEB_DSN" >> "$env_file"
+          chmod 600 "$env_file"
+          node scripts/coolify-deploy.mjs sync-env "$env_file" "$COOLIFY_APP_UUID" "$GITHUB_ENV"
+
+      - name: Validate web build environment
+        run: |
+          test -n "$VITE_SCOOPS_SERVER_APP_URL"
+          test -n "$VITE_SCOOPS_SERVER_API_PREFIX"
+          test -n "$SCOOPS_SERVER_PROXY_URL"
+          test "$SCOOPS_WEB_APP_MODE" = "$TARGET_MODE"
+          test "$VITE_SCOOPS_WEB_APP_MODE" = "$TARGET_MODE"
+          test "$VITE_SENTRY_DSN" = "$SENTRY_DSN"
+          if [ "$TARGET_ENVIRONMENT" = production ]; then test -n "$SENTRY_DSN"; fi
+          test "$SCOOPS_RELEASE_SHA" = "$RELEASE_SHA"
+          test "$VITE_SCOOPS_RELEASE_SHA" = "$RELEASE_SHA"
+
+      - name: Authenticate with GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push web image
+        env:
+          SENTRY_ORG: ${{ inputs.environment == 'production' && secrets.SENTRY_ORG || '' }}
+          SENTRY_PROJECT: ${{ inputs.environment == 'production' && secrets.SENTRY_WEB_PRODUCTION_PROJECT || '' }}
+          SENTRY_AUTH_TOKEN: ${{ inputs.environment == 'production' && secrets.SENTRY_AUTH_TOKEN || '' }}
+        run: |
+          sentry_args=()
+          if [ "$TARGET_ENVIRONMENT" = production ]; then
+            sentry_args=(
+              --secret "id=sentry_auth_token,env=SENTRY_AUTH_TOKEN"
+              --build-arg "SENTRY_ORG=$SENTRY_ORG"
+              --build-arg "SENTRY_PROJECT=$SENTRY_PROJECT"
+            )
+          fi
+          DOCKER_BUILDKIT=1 docker build \
+            --provenance=false \
+            --sbom=false \
+            --platform linux/amd64 \
+            --target runtime \
+            "${sentry_args[@]}" \
+            --build-arg "VITE_SCOOPS_SERVER_APP_URL=$VITE_SCOOPS_SERVER_APP_URL" \
+            --build-arg "VITE_SCOOPS_SERVER_API_PREFIX=$VITE_SCOOPS_SERVER_API_PREFIX" \
+            --build-arg "VITE_SCOOPS_WEB_APP_MODE=$VITE_SCOOPS_WEB_APP_MODE" \
+            --build-arg "VITE_SENTRY_DSN=$VITE_SENTRY_DSN" \
+            --build-arg "VITE_SCOOPS_RELEASE_SHA=$VITE_SCOOPS_RELEASE_SHA" \
+            --build-arg "VITE_POSTHOG_ENABLED=${VITE_POSTHOG_ENABLED:-false}" \
+            --build-arg "VITE_POSTHOG_PROJECT_TOKEN=${VITE_POSTHOG_PROJECT_TOKEN:-}" \
+            --build-arg "VITE_POSTHOG_API_HOST=${VITE_POSTHOG_API_HOST:-}" \
+            --build-arg "SCOOPS_SERVER_PROXY_URL=$SCOOPS_SERVER_PROXY_URL" \
+            --tag "$IMAGE_NAME:$IMAGE_TAG" \
+            --file apps/web/Dockerfile \
+            .
+          docker push "$IMAGE_NAME:$IMAGE_TAG"
+
+      - name: Release web
+        run: node scripts/coolify-deploy.mjs deploy "$COOLIFY_APP_UUID" "$IMAGE_TAG"

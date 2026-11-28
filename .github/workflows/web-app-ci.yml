@@ -4,7 +4,6 @@ on:
   pull_request:
     paths:
       - ".dockerignore"
-      - ".github/workflows/web-app-staging-cd.yml"
       - ".github/workflows/web-app-ci.yml"
       - ".code-multivitals.json"
       - "apps/web/**"
@@ -18,7 +17,9 @@ on:
       - "scripts/comment-complexity-report.mjs"
       - "scripts/tests/check-complexity.test.mjs"
       - "scripts/tests/comment-complexity-report.test.mjs"
-      - "scripts/sync-heroku-env.mjs"
+      - "scripts/coolify-deploy.mjs"
+      - "scripts/tests/coolify-deploy.test.mjs"
+      - ".github/workflows/web-app-cd.yml"
       - "scripts/write-coverage-report.mjs"
       - "scripts/check-changed-coverage.mjs"
       - "scripts/tests/check-changed-coverage.test.mjs"
