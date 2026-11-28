@@ -11,7 +11,7 @@ import { browserEnvSchema } from '../../packages/validation/src/environment/brow
 
 const config = defineConfig(({ command, mode }) => {
   const environment = { ...loadEnv(mode, process.cwd(), ''), ...process.env }
-  const serverProxyUrl = environment.SCOOPS_SERVER_PROXY_URL?.replace(/\/$/, '')
+  const serverAppUrl = environment.SCOOPS_SERVER_APP_URL?.replace(/\/$/, '')
   const webAppMode =
     environment.VITE_SCOOPS_WEB_APP_MODE ?? (mode === 'test' ? 'test' : 'dev')
   // Only production reports to Sentry; staging builds skip the source-map upload.
@@ -107,11 +107,11 @@ const config = defineConfig(({ command, mode }) => {
             nitro({
               sourcemap: isSentryBuild,
               rollupConfig: { external: [/^@sentry\//] },
-              ...(serverProxyUrl
+              ...(serverAppUrl
                 ? {
                     routeRules: {
-                      '/api/auth/**': { proxy: `${serverProxyUrl}/api/auth/**` },
-                      '/api/server/**': { proxy: `${serverProxyUrl}/**` },
+                      '/api/auth/**': { proxy: `${serverAppUrl}/api/auth/**` },
+                      '/api/server/**': { proxy: `${serverAppUrl}/**` },
                     },
                   }
                 : {}),

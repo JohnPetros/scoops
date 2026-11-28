@@ -114,7 +114,7 @@ jobs:
         run: |
           test -n "$VITE_SCOOPS_SERVER_APP_URL"
           test -n "$VITE_SCOOPS_SERVER_API_PREFIX"
-          test -n "$SCOOPS_SERVER_PROXY_URL"
+          test -n "$SCOOPS_SERVER_APP_URL"
           test "$SCOOPS_WEB_APP_MODE" = "$TARGET_MODE"
           test "$VITE_SCOOPS_WEB_APP_MODE" = "$TARGET_MODE"
           test "$VITE_SENTRY_DSN" = "$SENTRY_DSN"
@@ -153,7 +153,7 @@ jobs:
             --build-arg "VITE_POSTHOG_ENABLED=${VITE_POSTHOG_ENABLED:-false}" \
             --build-arg "VITE_POSTHOG_PROJECT_TOKEN=${VITE_POSTHOG_PROJECT_TOKEN:-}" \
             --build-arg "VITE_POSTHOG_API_HOST=${VITE_POSTHOG_API_HOST:-}" \
-            --build-arg "SCOOPS_SERVER_PROXY_URL=$SCOOPS_SERVER_PROXY_URL" \
+            --build-arg "SCOOPS_SERVER_APP_URL=$SCOOPS_SERVER_APP_URL" \
             --tag "$IMAGE_NAME:$IMAGE_TAG" \
             --file apps/web/Dockerfile \
             .
