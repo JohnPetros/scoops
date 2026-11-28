@@ -20,10 +20,10 @@ export type WebErrorClass =
 
 interface WebTelemetryConfiguration {
   dsn: string
-  environment: 'staging' | 'production'
+  environment: 'production'
   release: string
-  tracesSampleRate: 1 | 0.1
-  replaysSessionSampleRate: 0.1 | 0.01
+  tracesSampleRate: 0.1
+  replaysSessionSampleRate: 0.01
   replaysOnErrorSampleRate: 1
 }
 
@@ -107,20 +107,15 @@ function createWebTelemetryConfiguration(
   browserEnv: typeof BROWSER_ENV,
 ): WebTelemetryConfiguration | null {
   const { scoopsWebAppMode, sentryDsn, scoopsReleaseSha } = browserEnv
-  if (
-    (scoopsWebAppMode !== 'stg' && scoopsWebAppMode !== 'prod') ||
-    !sentryDsn ||
-    !scoopsReleaseSha
-  ) {
-    return null
-  }
+  // Only production reports to Sentry; staging and local modes stay silent.
+  if (scoopsWebAppMode !== 'prod' || !sentryDsn || !scoopsReleaseSha) return null
 
   return {
     dsn: sentryDsn,
-    environment: scoopsWebAppMode === 'stg' ? 'staging' : 'production',
+    environment: 'production',
     release: scoopsReleaseSha,
-    tracesSampleRate: scoopsWebAppMode === 'stg' ? 1 : 0.1,
-    replaysSessionSampleRate: scoopsWebAppMode === 'stg' ? 0.1 : 0.01,
+    tracesSampleRate: 0.1,
+    replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1,
   }
 }

@@ -30,28 +30,24 @@ export function initializeServerSentry(): void {
   const environment = serverEnvSchema.parse(process.env)
   const mode = environment.SCOOPS_SERVER_APP_MODE
 
-  if (mode === 'dev' || mode === 'test' || isInitialized) return
+  // Only production reports to Sentry; staging and local modes stay silent.
+  if (mode !== 'prod' || isInitialized) return
 
   Sentry.init(
-    createServerSentryOptions(
-      mode,
-      environment.SENTRY_DSN,
-      environment.SCOOPS_RELEASE_SHA,
-    ),
+    createServerSentryOptions(environment.SENTRY_DSN, environment.SCOOPS_RELEASE_SHA),
   )
   isInitialized = true
 }
 
 function createServerSentryOptions(
-  mode: 'stg' | 'prod',
   dsn: string | undefined,
   release: string | undefined,
 ): SentryInitOptions {
   return {
     dsn,
-    environment: mode === 'stg' ? 'staging' : 'production',
+    environment: 'production',
     release,
-    tracesSampleRate: mode === 'stg' ? 1 : 0.1,
+    tracesSampleRate: 0.1,
     sendDefaultPii: false,
     dataCollection: {
       userInfo: false,

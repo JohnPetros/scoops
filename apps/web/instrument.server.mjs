@@ -29,24 +29,25 @@ if (!WEB_MODES.includes(MODE)) {
   throw new Error('SCOOPS_WEB_APP_MODE must be set to dev, test, stg, or prod.')
 }
 
-const IS_DEPLOYED = MODE === 'stg' || MODE === 'prod'
+// Only production reports to Sentry; staging and local modes stay silent.
+const IS_PRODUCTION = MODE === 'prod'
 if (
-  IS_DEPLOYED &&
+  IS_PRODUCTION &&
   (!isValidSentryDsn(SENTRY_DSN) ||
     !/^[a-f0-9]{40}$/i.test(RELEASE_SHA ?? '') ||
     !isValidApiOrigin(SCOOPS_SERVER_APP_URL))
 ) {
   throw new Error(
-    'SENTRY_DSN, SCOOPS_RELEASE_SHA, and VITE_SCOOPS_SERVER_APP_URL are required in deployed modes.',
+    'SENTRY_DSN, SCOOPS_RELEASE_SHA, and VITE_SCOOPS_SERVER_APP_URL are required in production.',
   )
 }
 
-if (IS_DEPLOYED) {
+if (IS_PRODUCTION) {
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: MODE === 'stg' ? 'staging' : 'production',
+    environment: 'production',
     release: RELEASE_SHA,
-    tracesSampleRate: MODE === 'stg' ? 1 : 0.1,
+    tracesSampleRate: 0.1,
     tracePropagationTargets: [getApiOriginPattern(new URL(SCOOPS_SERVER_APP_URL).origin)],
     sendDefaultPii: false,
     beforeSend: scrubServerEvent,

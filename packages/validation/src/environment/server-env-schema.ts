@@ -108,12 +108,8 @@ function validateSentryConfiguration(
 ) {
   if (!['stg', 'prod'].includes(environment.SCOOPS_SERVER_APP_MODE)) return
 
-  if (!environment.SENTRY_DSN) {
-    addValidationIssue(
-      context,
-      ['SENTRY_DSN'],
-      'Sentry DSN is required in deployed modes',
-    )
+  if (environment.SCOOPS_SERVER_APP_MODE === 'prod' && !environment.SENTRY_DSN) {
+    addValidationIssue(context, ['SENTRY_DSN'], 'Sentry DSN is required in production')
   }
 
   if (!environment.SCOOPS_RELEASE_SHA) {

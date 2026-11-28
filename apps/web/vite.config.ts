@@ -14,7 +14,8 @@ const config = defineConfig(({ command, mode }) => {
   const serverProxyUrl = environment.SCOOPS_SERVER_PROXY_URL?.replace(/\/$/, '')
   const webAppMode =
     environment.VITE_SCOOPS_WEB_APP_MODE ?? (mode === 'test' ? 'test' : 'dev')
-  const isDeployedMode = webAppMode === 'stg' || webAppMode === 'prod'
+  // Only production reports to Sentry; staging builds skip the source-map upload.
+  const isSentryBuild = webAppMode === 'prod'
   const releaseSha = environment.VITE_SCOOPS_RELEASE_SHA
 
   const browserEnvironment = browserEnvSchema.safeParse({
@@ -42,7 +43,7 @@ const config = defineConfig(({ command, mode }) => {
     }
   }
 
-  if (isDeployedMode) {
+  if (isSentryBuild) {
     const missingSettings = [
       ['VITE_SENTRY_DSN', environment.VITE_SENTRY_DSN],
       ['VITE_SCOOPS_RELEASE_SHA', releaseSha],
@@ -53,19 +54,19 @@ const config = defineConfig(({ command, mode }) => {
 
     if (missingSettings.length > 0) {
       throw new Error(
-        `Deployed Sentry builds require ${missingSettings.map(([name]) => name).join(', ')}.`,
+        `Production Sentry builds require ${missingSettings.map(([name]) => name).join(', ')}.`,
       )
     }
 
     if (!isValidSentryDsn(environment.VITE_SENTRY_DSN)) {
       throw new Error(
-        'VITE_SENTRY_DSN must be a valid HTTPS Sentry DSN in deployed builds.',
+        'VITE_SENTRY_DSN must be a valid HTTPS Sentry DSN in production builds.',
       )
     }
 
     if (!/^[a-f0-9]{40}$/i.test(releaseSha ?? '')) {
       throw new Error(
-        'VITE_SCOOPS_RELEASE_SHA must be a full Git commit SHA in deployed builds.',
+        'VITE_SCOOPS_RELEASE_SHA must be a full Git commit SHA in production builds.',
       )
     }
   }
@@ -86,7 +87,7 @@ const config = defineConfig(({ command, mode }) => {
       }),
       tailwindcss(),
       tanstackStart(),
-      ...(command === 'build' && isDeployedMode
+      ...(command === 'build' && isSentryBuild
         ? [
             sentryTanstackStart({
               org: environment.SENTRY_ORG,
@@ -104,7 +105,7 @@ const config = defineConfig(({ command, mode }) => {
       ...(command === 'build' && mode !== 'test'
         ? [
             nitro({
-              sourcemap: isDeployedMode,
+              sourcemap: isSentryBuild,
               rollupConfig: { external: [/^@sentry\//] },
               ...(serverProxyUrl
                 ? {
